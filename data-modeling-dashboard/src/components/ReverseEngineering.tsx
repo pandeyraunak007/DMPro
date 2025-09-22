@@ -289,6 +289,14 @@ const ReverseEngineering: React.FC = () => {
     }));
   };
 
+  const goToNextStep = (currentSection: keyof typeof expandedSections, nextSection: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [currentSection]: false,
+      [nextSection]: true
+    }));
+  };
+
   const testConnection = async () => {
     setConnectionTested(true);
   };
@@ -579,6 +587,19 @@ const ReverseEngineering: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {/* Next Button */}
+              {((sourceType === 'database' && selectedSource && connectionTested) || (sourceType === 'script' && scriptFile)) && (
+                <div className="flex justify-end pt-4 border-t border-zinc-700">
+                  <button
+                    onClick={() => goToNextStep('source', 'objects')}
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                  >
+                    Next: Select Objects
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           </AccordionSection>
 
@@ -732,6 +753,24 @@ const ReverseEngineering: React.FC = () => {
                 </div>
                 <button className="text-xs text-blue-400 hover:text-blue-300 px-3 py-1 border border-blue-600 rounded">
                   Preview Selection
+                </button>
+              </div>
+
+              {/* Next Button */}
+              <div className="flex justify-between pt-4 border-t border-zinc-700">
+                <button
+                  onClick={() => goToNextStep('objects', 'source')}
+                  className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                  Back: Source Selection
+                </button>
+                <button
+                  onClick={() => goToNextStep('objects', 'entities')}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Next: Configure Options
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -932,6 +971,24 @@ const ReverseEngineering: React.FC = () => {
                   Estimated processing time: <strong>2-3 minutes</strong>
                 </div>
               </div>
+
+              {/* Next Button */}
+              <div className="flex justify-between pt-4 border-t border-zinc-700">
+                <button
+                  onClick={() => goToNextStep('entities', 'objects')}
+                  className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                  Back: Object Selection
+                </button>
+                <button
+                  onClick={() => goToNextStep('entities', 'relationships')}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Next: Relationships
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </AccordionSection>
 
@@ -984,6 +1041,24 @@ const ReverseEngineering: React.FC = () => {
                     <span className="text-xs text-zinc-400">{rel.column}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Next Button */}
+              <div className="flex justify-between pt-4 border-t border-zinc-700">
+                <button
+                  onClick={() => goToNextStep('relationships', 'entities')}
+                  className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                  Back: Configure Options
+                </button>
+                <button
+                  onClick={() => goToNextStep('relationships', 'rules')}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Next: Import Rules
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </AccordionSection>
@@ -1234,6 +1309,24 @@ const ReverseEngineering: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Next Button */}
+              <div className="flex justify-between pt-4 border-t border-zinc-700">
+                <button
+                  onClick={() => goToNextStep('rules', 'relationships')}
+                  className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                  Back: Relationships
+                </button>
+                <button
+                  onClick={() => goToNextStep('rules', 'summary')}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Next: Review Summary
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </AccordionSection>
 
@@ -1286,6 +1379,24 @@ const ReverseEngineering: React.FC = () => {
                   <li>• View 'v_complex_report' contains computed columns</li>
                 </ul>
               </div>
+
+              {/* Next Button */}
+              <div className="flex justify-between pt-4 border-t border-zinc-700">
+                <button
+                  onClick={() => goToNextStep('summary', 'rules')}
+                  className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                  Back: Import Rules
+                </button>
+                <button
+                  onClick={() => goToNextStep('summary', 'actions')}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Proceed to Actions
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </AccordionSection>
 
@@ -1321,6 +1432,17 @@ const ReverseEngineering: React.FC = () => {
                   placeholder="Enter model name..."
                   defaultValue={`MS Fabric Import - ${new Date().toLocaleDateString()}`}
                 />
+              </div>
+
+              {/* Back Button */}
+              <div className="flex justify-start pt-4 border-t border-zinc-700">
+                <button
+                  onClick={() => goToNextStep('actions', 'summary')}
+                  className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                  Back: Review Summary
+                </button>
               </div>
             </div>
           </AccordionSection>

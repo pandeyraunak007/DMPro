@@ -16,7 +16,6 @@ import {
   HelpCircle,
   ChevronLeft,
   ChevronRight,
-  Settings2,
   Plus,
   Users,
   Activity,
@@ -34,11 +33,10 @@ import {
   ArrowRight,
   Folder,
   Calendar,
-  Bell,
-  Bot,
   Lock,
   CheckCircle,
   AlertCircle,
+  Bot,
   Zap,
   Target,
   PieChart,
@@ -296,63 +294,6 @@ const SystemInsightsPanel = () => {
   );
 };
 
-// Real-time Notifications (PRD Requirement)
-const NotificationCenter = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const notifications = [
-    { id: 1, type: 'info', message: 'AI suggested new relationship for Customer-Order model', time: '2m ago' },
-    { id: 2, type: 'success', message: 'Model "E-Commerce Platform" exported successfully', time: '5m ago' },
-    { id: 3, type: 'warning', message: 'Model "Inventory DB" locked by John Smith', time: '12m ago' }
-  ];
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'info':
-        return <Bot className="w-3 h-3 text-blue-500" />;
-      case 'success':
-        return <CheckCircle className="w-3 h-3 text-emerald-500" />;
-      case 'warning':
-        return <AlertCircle className="w-3 h-3 text-amber-500" />;
-      default:
-        return <Bell className="w-3 h-3" />;
-    }
-  };
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="toolbar-btn secondary relative"
-      >
-        <Bell className="w-4 h-4" />
-        {notifications.length > 0 && (
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-violet-500 rounded-full"></span>
-        )}
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-50">
-          <div className="p-3 border-b border-zinc-800">
-            <h3 className="text-sm font-semibold text-zinc-100">Notifications</h3>
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {notifications.map((notification) => (
-              <div key={notification.id} className="p-3 hover:bg-zinc-800 transition-colors">
-                <div className="flex items-start gap-3">
-                  {getNotificationIcon(notification.type)}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-zinc-100">{notification.message}</p>
-                    <p className="text-xs text-zinc-500 mt-1">{notification.time}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 // AI Assistant Preview (PRD Requirement)
 const AIAssistantPreview = () => {
@@ -697,18 +638,6 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top Navigation */}
-        <div className="border-b border-zinc-800 bg-zinc-900">
-          <div className="flex items-center justify-end px-6 py-3">
-            <div className="flex items-center gap-3">
-              <NotificationCenter />
-              <button className="toolbar-btn secondary">
-                <Settings2 className="w-4 h-4" />
-                Display
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Linear Toolbar - only show on dashboard */}
         {currentPage === 'dashboard' && <LinearToolbar />}
@@ -799,6 +728,8 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+
+          {currentPage === 'model-explorer' && <ModelExplorer />}
 
           {currentPage === 'reverse-engineering' && <ReverseEngineering />}
 

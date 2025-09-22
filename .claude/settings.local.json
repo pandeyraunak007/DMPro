@@ -28,7 +28,10 @@
       "Bash(git branch:*)",
       "WebFetch(domain:bookshelf.erwin.com)",
       "Bash(\"C:\\Program Files\\nodejs\\node.exe\" --version)",
-      "Bash(del \"C:\\Users\\pande\\OneDrive\\Documents\\Raunak\\forGit\\DMPro\\data-modeling-dashboard\\src\\components\\ModelExplorer.tsx\")"
+      "Bash(del \"C:\\Users\\pande\\OneDrive\\Documents\\Raunak\\forGit\\DMPro\\data-modeling-dashboard\\src\\components\\ModelExplorer.tsx\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\.bin\\next\" dev)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\.bin\\next.cmd\" dev)",
+      "Bash(powershell -Command \"$env:PATH = ''C:\\Program Files\\nodejs;'' + $env:PATH; & npm run dev\")"
     ],
     "deny": [],
     "ask": []

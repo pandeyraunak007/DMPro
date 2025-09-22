@@ -3,11 +3,6 @@
 import React, { useState } from 'react';
 import {
   Search,
-  Bell,
-  Settings2,
-  User,
-  Moon,
-  Sun,
   ChevronDown,
   ChevronRight,
   Plus,
@@ -15,10 +10,9 @@ import {
   Table,
   Key,
   Link,
-  FileText,
   Layers3,
   Box,
-  Grid3X3,
+  Grid,
   Maximize2,
   ZoomIn,
   ZoomOut,
@@ -58,14 +52,27 @@ import {
   AlignLeft,
   AlignCenter,
   Type,
-  Palette,
   Layers,
   BookOpen,
   HelpCircle,
-  Info
+  Info,
+  ClipboardList,
+  Palette,
+  BarChart3,
+  Link2,
+  FileText,
+  Settings,
+  ChevronUp,
+  UserCheck,
+  Mail,
+  Phone,
+  Calendar,
+  CheckSquare,
+  Radio,
+  Hash
 } from 'lucide-react';
 
-// Color theme based on Premium UI Design Document
+// Linear.app-inspired Premium UI Color Theme
 const theme = {
   light: {
     pageBackground: '#F9FAFB',
@@ -75,7 +82,9 @@ const theme = {
     primaryText: '#111827',
     secondaryText: '#6B7280',
     borders: '#E5E7EB',
-    floatingToolbar: '#FFFFFF'
+    floatingToolbar: '#FFFFFF',
+    hoverBackground: '#F3F4F6',
+    activeBackground: '#EEF2FF'
   },
   dark: {
     pageBackground: '#181818',
@@ -85,7 +94,9 @@ const theme = {
     primaryText: '#E4E4E4',
     secondaryText: '#A1A1AA',
     borders: '#3A3A3A',
-    floatingToolbar: '#2C2C2C'
+    floatingToolbar: '#2C2C2C',
+    hoverBackground: '#2F2F2F',
+    activeBackground: '#374151'
   }
 };
 
@@ -130,18 +141,17 @@ interface Model {
 // Header Bar Component
 const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => void }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showNotifications, setShowNotifications] = useState(false);
 
   return (
-    <div className={`h-14 px-6 flex items-center justify-between border-b ${
+    <div className={`h-16 px-6 flex items-center justify-between border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
-    } shadow-sm`}>
+    } shadow-sm transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Left: Logo */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
           <Database className="w-5 h-5 text-white" />
         </div>
-        <span className={`font-semibold text-lg ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+        <span className={`font-semibold text-lg tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
           DMPro
         </span>
       </div>
@@ -154,8 +164,8 @@ const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () =
         </span>
       </div>
 
-      {/* Right: Search, Notifications, Theme, Profile */}
-      <div className="flex items-center gap-3">
+      {/* Right: Search */}
+      <div className="flex items-center">
         {/* Global Search */}
         <div className="relative">
           <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
@@ -173,37 +183,6 @@ const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () =
             } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
           />
         </div>
-
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-800' : 'bg-gray-100'} transition-colors`}
-          >
-            <Bell className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-          </button>
-        </div>
-
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-800' : 'bg-gray-100'} transition-colors`}
-        >
-          {isDark ? (
-            <Sun className="w-5 h-5 text-gray-400" />
-          ) : (
-            <Moon className="w-5 h-5 text-gray-600" />
-          )}
-        </button>
-
-        {/* Profile */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-indigo-600" />
-          </div>
-          <ChevronDown className={`w-4 h-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
-        </div>
       </div>
     </div>
   );
@@ -218,25 +197,26 @@ const MainTabs = ({ isDark }: { isDark: boolean }) => {
     { id: 'file', label: 'File', icon: <FileText className="w-4 h-4" /> },
     { id: 'home', label: 'Home', icon: <Folder className="w-4 h-4" /> },
     { id: 'view', label: 'View', icon: <Eye className="w-4 h-4" /> },
-    { id: 'diagram', label: 'Diagram', icon: <Grid3X3 className="w-4 h-4" /> },
+    { id: 'diagram', label: 'Diagram', icon: <Grid className="w-4 h-4" /> },
     { id: 'actions', label: 'Actions', icon: <Zap className="w-4 h-4" /> },
     { id: 'help', label: 'Help', icon: <HelpCircle className="w-4 h-4" /> }
   ];
 
   return (
-    <div className={`h-12 px-6 flex items-center border-b ${
+    <div className={`h-14 px-6 flex items-center border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
-    }`}>
+    } transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div className="flex items-center gap-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+            className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
               activeTab === tab.id
-                ? `${isDark ? 'bg-zinc-800 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`
-                : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`
+                ? `${isDark ? 'bg-zinc-800 text-indigo-400 shadow-sm' : 'bg-indigo-50 text-indigo-600 shadow-sm'}`
+                : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/70'}`
             }`}
+            style={{ fontWeight: activeTab === tab.id ? 600 : 500 }}
           >
             {tab.icon}
             {tab.label}
@@ -289,17 +269,18 @@ const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: 
   const toolbarItems = getToolbarContent();
 
   return (
-    <div className={`h-14 px-6 flex items-center gap-4 border-b ${
+    <div className={`h-16 px-6 flex items-center gap-3 border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'
-    }`}>
+    } transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {toolbarItems.map((item, index) => (
         <button
           key={index}
-          className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+          className={`flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-xl transition-all duration-200 shadow-sm ${
             isDark
-              ? 'text-gray-300 hover:text-gray-100 hover:bg-zinc-800'
-              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
+              ? 'text-gray-300 hover:text-gray-100 hover:bg-zinc-800 hover:shadow-md border border-zinc-800 bg-zinc-900'
+              : 'text-gray-700 hover:text-gray-900 hover:bg-white hover:shadow-md border border-gray-200 bg-gray-50'
           }`}
+          style={{ fontWeight: 500 }}
         >
           {item.icon}
           {item.label}
@@ -342,12 +323,12 @@ const ModelTree = ({ isDark }: { isDark: boolean }) => {
     return (
       <div>
         <div
-          className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg cursor-pointer transition-colors ${
+          className={`flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-xl cursor-pointer transition-all duration-200 ${
             isDark
-              ? 'text-gray-300 hover:text-gray-100 hover:bg-zinc-800'
-              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+              ? 'text-gray-300 hover:text-gray-100 hover:bg-zinc-800/70'
+              : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/70'
           }`}
-          style={{ paddingLeft: `${12 + level * 16}px` }}
+          style={{ paddingLeft: `${12 + level * 20}px`, fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 500 }}
           onClick={() => hasChildren && toggleExpanded(id)}
         >
           {hasChildren ? (
@@ -392,12 +373,12 @@ const ModelTree = ({ isDark }: { isDark: boolean }) => {
                 {
                   id: 'diagram-1',
                   label: 'Logical Model',
-                  icon: <Grid3X3 className="w-4 h-4 text-green-500" />
+                  icon: <Grid className="w-4 h-4 text-green-500" />
                 },
                 {
                   id: 'diagram-2',
                   label: 'Physical Model',
-                  icon: <Grid3X3 className="w-4 h-4 text-orange-500" />
+                  icon: <Grid className="w-4 h-4 text-orange-500" />
                 }
               ]
             },
@@ -430,11 +411,11 @@ const ModelTree = ({ isDark }: { isDark: boolean }) => {
   ];
 
   return (
-    <div className={`w-80 h-full border-r overflow-y-auto ${
+    <div className={`w-80 h-full border-r overflow-y-auto transition-colors ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
-    }`}>
+    }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div className="p-4">
-        <h3 className={`text-sm font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+        <h3 className={`text-sm font-semibold mb-6 ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
           Model Tree
         </h3>
         <div className="space-y-1">
@@ -450,30 +431,44 @@ const ModelTree = ({ isDark }: { isDark: boolean }) => {
 // Floating Toolbar Component
 const FloatingToolbar = ({ isDark }: { isDark: boolean }) => {
   return (
-    <div className={`absolute top-4 left-4 flex items-center gap-2 p-2 rounded-lg shadow-lg ${
-      isDark ? 'bg-zinc-800 border border-zinc-700' : 'bg-white border border-gray-200'
-    }`}>
-      <button className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-        <MousePointer className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+    <div className={`absolute top-6 left-6 flex items-center gap-1 p-1.5 rounded-xl shadow-lg backdrop-blur-sm border ${
+      isDark ? 'bg-zinc-800/90 border-zinc-700' : 'bg-white/90 border-gray-200'
+    }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+      }`}>
+        <MousePointer className="w-4 h-4" />
       </button>
-      <button className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-        <Move className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+      }`}>
+        <Move className="w-4 h-4" />
       </button>
-      <button className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-        <Square className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+      }`}>
+        <Square className="w-4 h-4" />
       </button>
-      <button className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-        <ArrowRight className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+      }`}>
+        <ArrowRight className="w-4 h-4" />
       </button>
-      <div className={`w-px h-6 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
-      <button className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-        <ZoomIn className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+      <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
+      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+      }`}>
+        <ZoomIn className="w-4 h-4" />
       </button>
-      <button className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-        <ZoomOut className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+      }`}>
+        <ZoomOut className="w-4 h-4" />
       </button>
-      <button className={`p-2 rounded-lg hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-        <Maximize2 className={`w-4 h-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+      }`}>
+        <Maximize2 className="w-4 h-4" />
       </button>
     </div>
   );
@@ -482,27 +477,29 @@ const FloatingToolbar = ({ isDark }: { isDark: boolean }) => {
 // Mini Map Component
 const MiniMap = ({ isDark }: { isDark: boolean }) => {
   return (
-    <div className={`absolute bottom-4 right-4 w-48 h-32 rounded-lg border shadow-lg ${
-      isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-gray-200'
-    }`}>
-      <div className="p-2">
-        <div className="flex items-center justify-between mb-2">
-          <span className={`text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+    <div className={`absolute bottom-6 right-6 w-52 h-36 rounded-xl border shadow-xl backdrop-blur-sm ${
+      isDark ? 'bg-zinc-800/90 border-zinc-700' : 'bg-white/90 border-gray-200'
+    }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-3">
+          <span className={`text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`} style={{ fontWeight: 500 }}>
             Mini Map
           </span>
-          <button className={`p-1 rounded hover:${isDark ? 'bg-zinc-700' : 'bg-gray-100'} transition-colors`}>
-            <X className={`w-3 h-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
+          <button className={`p-1.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+            isDark ? 'hover:bg-zinc-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'
+          }`}>
+            <X className="w-3 h-3" />
           </button>
         </div>
-        <div className={`w-full h-20 rounded border-2 border-dashed relative ${
-          isDark ? 'border-zinc-600 bg-zinc-900' : 'border-gray-300 bg-gray-50'
+        <div className={`w-full h-24 rounded-lg border-2 border-dashed relative transition-colors ${
+          isDark ? 'border-zinc-600 bg-zinc-900/50' : 'border-gray-300 bg-gray-50/50'
         }`}>
           {/* Viewport indicator */}
-          <div className="absolute top-2 left-2 w-8 h-6 border-2 border-indigo-500 bg-indigo-500/20 rounded"></div>
-          {/* Mock entities */}
-          <div className={`absolute top-1 right-1 w-3 h-2 rounded ${isDark ? 'bg-purple-400' : 'bg-purple-500'}`}></div>
-          <div className={`absolute bottom-1 left-1 w-4 h-2 rounded ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`}></div>
-          <div className={`absolute bottom-1 right-2 w-3 h-2 rounded ${isDark ? 'bg-green-400' : 'bg-green-500'}`}></div>
+          <div className="absolute top-2 left-2 w-10 h-7 border-2 border-indigo-500 bg-indigo-500/20 rounded-md shadow-sm"></div>
+          {/* Mock entities with improved styling */}
+          <div className={`absolute top-1 right-1 w-4 h-3 rounded-md shadow-sm ${isDark ? 'bg-purple-400' : 'bg-purple-500'}`}></div>
+          <div className={`absolute bottom-1 left-1 w-5 h-3 rounded-md shadow-sm ${isDark ? 'bg-blue-400' : 'bg-blue-500'}`}></div>
+          <div className={`absolute bottom-1 right-2 w-4 h-3 rounded-md shadow-sm ${isDark ? 'bg-green-400' : 'bg-green-500'}`}></div>
         </div>
       </div>
     </div>
@@ -530,18 +527,19 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
   return (
     <div className="flex-1 flex flex-col">
       {/* Model Tabs */}
-      <div className={`flex items-center gap-1 px-4 py-2 border-b ${
+      <div className={`flex items-center gap-1 px-4 py-3 border-b transition-colors ${
         isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'
-      }`}>
+      }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         {models.map((model) => (
           <button
             key={model.id}
             onClick={() => setActiveModel(model.id)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+            className={`flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-xl transition-all duration-200 shadow-sm ${
               activeModel === model.id
-                ? `${isDark ? 'bg-zinc-800 text-indigo-400' : 'bg-white text-indigo-600 shadow-sm'}`
-                : `${isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-600 hover:text-gray-900'}`
+                ? `${isDark ? 'bg-zinc-800 text-indigo-400 border border-zinc-700' : 'bg-white text-indigo-600 shadow-md border border-indigo-200'}`
+                : `${isDark ? 'text-gray-400 hover:text-gray-100 border border-transparent' : 'text-gray-600 hover:text-gray-900 border border-transparent'}`
             }`}
+            style={{ fontWeight: activeModel === model.id ? 600 : 500 }}
           >
             <Database className="w-4 h-4" />
             {model.name}
@@ -556,20 +554,21 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
       </div>
 
       {/* Diagram Tabs */}
-      <div className={`flex items-center gap-1 px-4 py-2 border-b ${
+      <div className={`flex items-center gap-1 px-4 py-3 border-b transition-colors ${
         isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'
-      }`}>
+      }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         {activeModelDiagrams.map((diagram) => (
           <button
             key={diagram.id}
             onClick={() => setActiveDiagram(diagram.id)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+            className={`flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-xl transition-all duration-200 shadow-sm ${
               activeDiagram === diagram.id
-                ? `${isDark ? 'bg-zinc-700 text-gray-100' : 'bg-white text-gray-900 shadow-sm'}`
-                : `${isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-600 hover:text-gray-900'}`
+                ? `${isDark ? 'bg-zinc-700 text-gray-100 border border-zinc-600' : 'bg-white text-gray-900 shadow-md border border-gray-200'}`
+                : `${isDark ? 'text-gray-400 hover:text-gray-100 border border-transparent' : 'text-gray-600 hover:text-gray-900 border border-transparent'}`
             }`}
+            style={{ fontWeight: activeDiagram === diagram.id ? 600 : 500 }}
           >
-            <Grid3X3 className="w-4 h-4" />
+            <Grid className="w-4 h-4" />
             {diagram.name}
             {activeDiagram === diagram.id && (
               <X className="w-3 h-3 ml-1 hover:bg-gray-200 rounded" />
@@ -582,15 +581,18 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
       </div>
 
       {/* Canvas */}
-      <div className={`flex-1 relative overflow-hidden ${
-        isDark ? 'bg-zinc-950' : 'bg-gray-100'
-      }`}>
-        {/* Grid background */}
+      <div className={`flex-1 relative overflow-hidden transition-colors ${
+        isDark ? 'bg-zinc-950' : 'bg-gray-50'
+      }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        {/* Premium Grid background */}
         <div
-          className={`absolute inset-0 opacity-50`}
+          className={`absolute inset-0 opacity-40`}
           style={{
-            backgroundImage: `radial-gradient(circle, ${isDark ? '#374151' : '#d1d5db'} 1px, transparent 1px)`,
-            backgroundSize: '20px 20px'
+            backgroundImage: `
+              linear-gradient(${isDark ? '#3A3A3A' : '#E5E7EB'} 1px, transparent 1px),
+              linear-gradient(90deg, ${isDark ? '#3A3A3A' : '#E5E7EB'} 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px'
           }}
         />
 
@@ -688,137 +690,361 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
   );
 };
 
-// Property Pane Component
+// Enhanced Property Pane Component with Linear.app Premium Design
 const PropertyPane = ({ isDark }: { isDark: boolean }) => {
-  const [activeTab, setActiveTab] = useState('entity');
+  const [selectedObject, setSelectedObject] = useState<'entity' | 'attribute'>('entity');
+  const [selectedEntity] = useState('Customer');
+  const [selectedAttribute] = useState('Email');
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['general']));
 
-  const tabs = [
-    { id: 'entity', label: 'Entity', icon: <Table className="w-4 h-4" /> },
-    { id: 'attribute', label: 'Attribute', icon: <Box className="w-4 h-4" /> },
-    { id: 'relationship', label: 'Relationship', icon: <Link className="w-4 h-4" /> },
-    { id: 'model', label: 'Model', icon: <Database className="w-4 h-4" /> }
+  const toggleSection = (sectionId: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId);
+    } else {
+      newExpanded.add(sectionId);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const propertyTabs = [
+    { id: 'general', icon: <ClipboardList className="w-4 h-4" />, label: 'General' },
+    { id: 'display', icon: <Palette className="w-4 h-4" />, label: 'Display' },
+    { id: 'keys', icon: <Key className="w-4 h-4" />, label: 'Keys' },
+    { id: 'data', icon: <BarChart3 className="w-4 h-4" />, label: 'Data' },
+    { id: 'relations', icon: <Link2 className="w-4 h-4" />, label: 'Relations' },
+    { id: 'rules', icon: <FileText className="w-4 h-4" />, label: 'Rules' },
+    { id: 'advanced', icon: <Settings className="w-4 h-4" />, label: 'Advanced' }
   ];
 
-  return (
-    <div className={`w-80 h-full border-l overflow-y-auto ${
-      isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
-    }`}>
-      {/* Vertical Tabs */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex gap-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                activeTab === tab.id
-                  ? `${isDark ? 'bg-zinc-800 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`
-                  : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`
-              }`}
-              title={tab.label}
-            >
-              {tab.icon}
-            </button>
-          ))}
+  const AccordionSection = ({ id, title, children, defaultExpanded = false }: {
+    id: string;
+    title: string;
+    children: React.ReactNode;
+    defaultExpanded?: boolean;
+  }) => {
+    const isExpanded = expandedSections.has(id);
+
+    return (
+      <div className={`border-b transition-colors ${
+        isDark ? 'border-zinc-800' : 'border-gray-200'
+      }`}>
+        <button
+          onClick={() => toggleSection(id)}
+          className={`w-full flex items-center justify-between p-4 text-left transition-all duration-200 ${
+            isDark
+              ? 'hover:bg-zinc-800/50 text-gray-100'
+              : 'hover:bg-indigo-50/50 text-gray-900'
+          }`}
+          style={{ fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 500 }}
+        >
+          <span className="text-sm">{title}</span>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-300 ${
+              isExpanded ? 'rotate-180' : ''
+            } ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+          />
+        </button>
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="p-4 pt-0">
+            {children}
+          </div>
         </div>
       </div>
+    );
+  };
 
-      {/* Properties Content */}
-      <div className="p-4">
-        <h3 className={`text-sm font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-          {tabs.find(t => t.id === activeTab)?.label} Properties
-        </h3>
+  const PremiumInput = ({ label, value, type = 'text', placeholder = '', rows }: {
+    label: string;
+    value: string;
+    type?: string;
+    placeholder?: string;
+    rows?: number;
+  }) => (
+    <div className="mb-4">
+      <label className={`block text-xs font-medium mb-2 ${
+        isDark ? 'text-gray-300' : 'text-gray-700'
+      }`} style={{ fontWeight: 500 }}>
+        {label}
+      </label>
+      {rows ? (
+        <textarea
+          value={value}
+          placeholder={placeholder}
+          rows={rows}
+          className={`w-full px-4 py-3 text-sm border rounded-lg resize-none transition-all duration-200 ${
+            isDark
+              ? 'bg-zinc-800 border-zinc-700 text-gray-100 focus:border-indigo-500 focus:bg-zinc-750'
+              : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:bg-gray-50'
+          } focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm hover:border-gray-400`}
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          className={`w-full px-4 py-3 text-sm border rounded-lg transition-all duration-200 ${
+            isDark
+              ? 'bg-zinc-800 border-zinc-700 text-gray-100 focus:border-indigo-500 focus:bg-zinc-750'
+              : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:bg-gray-50'
+          } focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm hover:border-gray-400`}
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        />
+      )}
+    </div>
+  );
 
-        {activeTab === 'entity' && (
-          <div className="space-y-4">
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                Name
-              </label>
-              <input
-                type="text"
-                value="Customer"
-                className={`w-full px-3 py-2 text-sm border rounded-lg ${
-                  isDark
-                    ? 'bg-zinc-800 border-zinc-700 text-gray-100'
-                    : 'bg-white border-gray-300 text-gray-900'
-                } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              />
-            </div>
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                Description
-              </label>
-              <textarea
-                value="Customer entity storing customer information"
-                rows={3}
-                className={`w-full px-3 py-2 text-sm border rounded-lg ${
-                  isDark
-                    ? 'bg-zinc-800 border-zinc-700 text-gray-100'
-                    : 'bg-white border-gray-300 text-gray-900'
-                } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              />
-            </div>
-            <div>
-              <label className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                <input type="checkbox" className="rounded" />
-                Abstract Entity
-              </label>
-            </div>
-            <div>
-              <label className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                <input type="checkbox" className="rounded" />
-                Auditable
-              </label>
-            </div>
+  const PremiumSelect = ({ label, value, options }: {
+    label: string;
+    value: string;
+    options: { value: string; label: string }[];
+  }) => (
+    <div className="mb-4">
+      <label className={`block text-xs font-medium mb-2 ${
+        isDark ? 'text-gray-300' : 'text-gray-700'
+      }`} style={{ fontWeight: 500 }}>
+        {label}
+      </label>
+      <select
+        value={value}
+        className={`w-full px-4 py-3 text-sm border rounded-lg transition-all duration-200 ${
+          isDark
+            ? 'bg-zinc-800 border-zinc-700 text-gray-100 focus:border-indigo-500'
+            : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
+        } focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm hover:border-gray-400`}
+        style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+      >
+        {options.map(option => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+    </div>
+  );
+
+  const PremiumCheckbox = ({ label, checked = false }: {
+    label: string;
+    checked?: boolean;
+  }) => (
+    <label className={`flex items-center gap-3 text-sm cursor-pointer py-2 ${
+      isDark ? 'text-gray-300 hover:text-gray-100' : 'text-gray-700 hover:text-gray-900'
+    } transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <input
+        type="checkbox"
+        checked={checked}
+        className={`w-4 h-4 rounded border-2 transition-colors ${
+          isDark
+            ? 'border-zinc-600 bg-zinc-800 checked:bg-indigo-500 checked:border-indigo-500'
+            : 'border-gray-300 bg-white checked:bg-indigo-600 checked:border-indigo-600'
+        }`}
+        style={{ accentColor: isDark ? '#818CF8' : '#6366F1' }}
+      />
+      {label}
+    </label>
+  );
+
+  return (
+    <div className="flex h-full">
+      {/* Left Icon Strip */}
+      <div className={`w-6 border-r transition-colors flex flex-col ${
+        isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
+      }`}>
+        {propertyTabs.map((tab, index) => (
+          <div
+            key={tab.id}
+            className={`h-10 flex items-center justify-center cursor-pointer transition-all duration-200 ${
+              index === 0
+                ? `${isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white'} shadow-sm`
+                : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-indigo-50/50'}`
+            }`}
+            title={tab.label}
+            style={{ marginBottom: '2px' }}
+          >
+            {tab.icon}
           </div>
-        )}
+        ))}
+      </div>
 
-        {activeTab === 'attribute' && (
-          <div className="space-y-4">
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                Name
-              </label>
-              <input
-                type="text"
-                value="customer_id"
-                className={`w-full px-3 py-2 text-sm border rounded-lg ${
-                  isDark
-                    ? 'bg-zinc-800 border-zinc-700 text-gray-100'
-                    : 'bg-white border-gray-300 text-gray-900'
-                } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              />
-            </div>
-            <div>
-              <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                Data Type
-              </label>
-              <select className={`w-full px-3 py-2 text-sm border rounded-lg ${
-                isDark
-                  ? 'bg-zinc-800 border-zinc-700 text-gray-100'
-                  : 'bg-white border-gray-300 text-gray-900'
-              } focus:outline-none focus:ring-2 focus:ring-indigo-500`}>
-                <option>INT</option>
-                <option>VARCHAR</option>
-                <option>DATE</option>
-                <option>DECIMAL</option>
-              </select>
-            </div>
-            <div>
-              <label className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                <input type="checkbox" className="rounded" checked />
-                Primary Key
-              </label>
-            </div>
-            <div>
-              <label className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                <input type="checkbox" className="rounded" />
-                Nullable
-              </label>
-            </div>
+      {/* Main Content Area */}
+      <div className={`flex-1 overflow-y-auto transition-colors ${
+        isDark ? 'bg-zinc-900' : 'bg-white'
+      }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        {/* Context Header */}
+        <div className={`p-4 border-b transition-colors ${
+          isDark ? 'border-zinc-800 bg-zinc-900' : 'border-gray-200 bg-gray-50'
+        }`}>
+          <div className="flex items-center gap-3">
+            <ClipboardList className={`w-5 h-5 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
+            <h2 className={`text-lg font-semibold ${
+              isDark ? 'text-gray-100' : 'text-gray-900'
+            }`} style={{ fontWeight: 600 }}>
+              {selectedObject === 'entity' ? selectedEntity : selectedAttribute}
+            </h2>
           </div>
-        )}
+          <p className={`text-xs mt-1 ${
+            isDark ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            {selectedObject === 'entity' ? 'Entity Properties' : 'Attribute Properties'}
+          </p>
+        </div>
+
+        {/* Property Sections */}
+        <div>
+          {selectedObject === 'entity' ? (
+            <>
+              <AccordionSection id="general" title="▼ Entity Properties" defaultExpanded>
+                <PremiumInput label="Name" value="Customer" />
+                <PremiumInput label="Physical Name" value="CUSTOMER" />
+                <PremiumInput
+                  label="Definition"
+                  value="Core customer entity storing customer information and contact details for business operations"
+                  rows={4}
+                />
+                <PremiumSelect
+                  label="Owner"
+                  value="dbo"
+                  options={[
+                    { value: 'dbo', label: 'dbo' },
+                    { value: 'admin', label: 'admin' },
+                    { value: 'app_user', label: 'app_user' }
+                  ]}
+                />
+                <PremiumCheckbox label="Complete" checked />
+                <PremiumCheckbox label="Conceptual Only" />
+              </AccordionSection>
+
+              <AccordionSection id="naming" title="▼ Naming Standards">
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <PremiumInput label="Prefix" value="CUST_" />
+                  <PremiumInput label="Suffix" value="_TBL" />
+                </div>
+                <PremiumInput label="Abbreviation" value="CUST" />
+                <PremiumCheckbox label="Apply naming rules" checked />
+              </AccordionSection>
+
+              <AccordionSection id="display" title="▶ Display Options">
+                <PremiumSelect
+                  label="Color"
+                  value="blue"
+                  options={[
+                    { value: 'blue', label: '🔵 Blue' },
+                    { value: 'green', label: '🟢 Green' },
+                    { value: 'red', label: '🔴 Red' },
+                    { value: 'purple', label: '🟣 Purple' }
+                  ]}
+                />
+                <PremiumSelect
+                  label="Font Size"
+                  value="medium"
+                  options={[
+                    { value: 'small', label: 'Small' },
+                    { value: 'medium', label: 'Medium' },
+                    { value: 'large', label: 'Large' }
+                  ]}
+                />
+                <PremiumCheckbox label="Show in diagram" checked />
+                <PremiumCheckbox label="Show entity name" checked />
+                <PremiumCheckbox label="Show definition" />
+                <PremiumCheckbox label="Show attributes" checked />
+              </AccordionSection>
+
+              <AccordionSection id="keys" title="▶ Keys & Indexes">
+                <div className={`p-4 rounded-lg border mb-4 ${
+                  isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
+                }`}>
+                  <h4 className={`text-sm font-medium mb-3 ${
+                    isDark ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Primary Key</h4>
+                  <PremiumInput label="Key Name" value="PK_Customer" />
+                  <div className={`flex items-center gap-2 p-2 rounded border ${
+                    isDark ? 'bg-zinc-700 border-zinc-600' : 'bg-white border-gray-300'
+                  }`}>
+                    <Key className="w-4 h-4 text-yellow-500" />
+                    <span className={`text-sm ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>CustomerID</span>
+                  </div>
+                  <div className="mt-3">
+                    <PremiumCheckbox label="Generate constraint" checked />
+                    <PremiumCheckbox label="Create index" checked />
+                  </div>
+                </div>
+              </AccordionSection>
+            </>
+          ) : (
+            <>
+              <AccordionSection id="general" title="▼ Attribute Properties" defaultExpanded>
+                <PremiumInput label="Name" value="Email" />
+                <PremiumInput label="Physical Name" value="EMAIL" />
+                <PremiumInput
+                  label="Definition"
+                  value="Customer email address for communication purposes"
+                  rows={3}
+                />
+                <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
+                  Parent Entity: Customer
+                </div>
+                <PremiumCheckbox label="Complete" checked />
+              </AccordionSection>
+
+              <AccordionSection id="datatype" title="▼ Data Type">
+                <PremiumSelect
+                  label="Domain"
+                  value="emailaddress"
+                  options={[
+                    { value: 'emailaddress', label: 'EmailAddress' },
+                    { value: 'string', label: 'String' },
+                    { value: 'text', label: 'Text' }
+                  ]}
+                />
+                <div className="grid grid-cols-3 gap-4">
+                  <PremiumInput label="Length" value="255" />
+                  <PremiumInput label="Precision" value="" />
+                  <PremiumInput label="Scale" value="" />
+                </div>
+                <PremiumCheckbox label="Use domain settings" checked />
+
+                <div className="mt-6">
+                  <h4 className={`text-sm font-medium mb-3 ${
+                    isDark ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Null Options</h4>
+                  <div className="space-y-2">
+                    <label className={`flex items-center gap-3 text-sm cursor-pointer ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      <input type="radio" name="nullability" value="null" className={`${
+                        isDark ? 'accent-indigo-400' : 'accent-indigo-600'
+                      }`} />
+                      Null
+                    </label>
+                    <label className={`flex items-center gap-3 text-sm cursor-pointer ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      <input type="radio" name="nullability" value="not-null" checked className={`${
+                        isDark ? 'accent-indigo-400' : 'accent-indigo-600'
+                      }`} />
+                      Not Null
+                    </label>
+                    <label className={`flex items-center gap-3 text-sm cursor-pointer ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      <input type="radio" name="nullability" value="default-null" className={`${
+                        isDark ? 'accent-indigo-400' : 'accent-indigo-600'
+                      }`} />
+                      Default Null
+                    </label>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <PremiumInput label="Default Value" value="" />
+                </div>
+              </AccordionSection>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -834,9 +1060,9 @@ const ModelExplorer = () => {
   };
 
   return (
-    <div className={`h-screen flex flex-col ${
+    <div className={`h-full flex flex-col transition-colors ${
       isDark ? 'bg-zinc-950 text-gray-100' : 'bg-gray-50 text-gray-900'
-    }`}>
+    }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header Bar */}
       <HeaderBar isDark={isDark} toggleTheme={toggleTheme} />
 

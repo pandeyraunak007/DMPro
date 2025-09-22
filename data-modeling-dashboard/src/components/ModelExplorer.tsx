@@ -143,15 +143,15 @@ const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () =
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <div className={`h-16 px-6 flex items-center justify-between border-b ${
+    <div className={`h-12 px-4 flex items-center justify-between border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
     } shadow-sm transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Left: Logo */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
-          <Database className="w-5 h-5 text-white" />
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center shadow-sm">
+          <Database className="w-4 h-4 text-white" />
         </div>
-        <span className={`font-semibold text-lg tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
+        <span className={`font-semibold text-sm tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
           DMPro
         </span>
       </div>
@@ -176,7 +176,7 @@ const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () =
             placeholder="Search models, entities..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`pl-10 pr-4 py-2 w-64 text-sm rounded-lg border ${
+            className={`pl-8 pr-3 py-1.5 w-48 text-xs rounded-md border ${
               isDark
                 ? 'bg-zinc-800 border-zinc-700 text-gray-100 placeholder-gray-400'
                 : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
@@ -203,7 +203,7 @@ const MainTabs = ({ isDark }: { isDark: boolean }) => {
   ];
 
   return (
-    <div className={`h-14 px-6 flex items-center border-b ${
+    <div className={`h-10 px-4 flex items-center border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
     } transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div className="flex items-center gap-1">
@@ -211,7 +211,7 @@ const MainTabs = ({ isDark }: { isDark: boolean }) => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
               activeTab === tab.id
                 ? `${isDark ? 'bg-zinc-800 text-indigo-400 shadow-sm' : 'bg-indigo-50 text-indigo-600 shadow-sm'}`
                 : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/70'}`
@@ -269,13 +269,13 @@ const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: 
   const toolbarItems = getToolbarContent();
 
   return (
-    <div className={`h-16 px-6 flex items-center gap-3 border-b ${
+    <div className={`h-12 px-4 flex items-center gap-2 border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'
     } transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {toolbarItems.map((item, index) => (
         <button
           key={index}
-          className={`flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-xl transition-all duration-200 shadow-sm ${
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg transition-all duration-200 shadow-sm ${
             isDark
               ? 'text-gray-300 hover:text-gray-100 hover:bg-zinc-800 hover:shadow-md border border-zinc-800 bg-zinc-900'
               : 'text-gray-700 hover:text-gray-900 hover:bg-white hover:shadow-md border border-gray-200 bg-gray-50'
@@ -291,7 +291,7 @@ const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: 
 };
 
 // Model Tree Component
-const ModelTree = ({ isDark }: { isDark: boolean }) => {
+const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCollapsed: boolean; onToggle: () => void }) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['models', 'model-1', 'diagrams']));
 
   const toggleExpanded = (id: string) => {
@@ -411,18 +411,33 @@ const ModelTree = ({ isDark }: { isDark: boolean }) => {
   ];
 
   return (
-    <div className={`w-80 h-full border-r overflow-y-auto transition-colors ${
+    <div className={`${isCollapsed ? 'w-12' : 'w-80'} h-full border-r overflow-y-auto transition-all duration-300 ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
     }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div className="p-4">
-        <h3 className={`text-sm font-semibold mb-6 ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
-          Model Tree
-        </h3>
-        <div className="space-y-1">
-          {treeData.map((item) => (
-            <TreeItem key={item.id} {...item} />
-          ))}
+        <div className="flex items-center justify-between mb-6">
+          {!isCollapsed && (
+            <h3 className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
+              Model Tree
+            </h3>
+          )}
+          <button
+            onClick={onToggle}
+            className={`p-1.5 rounded-lg transition-all duration-200 ${
+              isDark ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+            }`}
+            title={isCollapsed ? 'Expand Tree' : 'Collapse Tree'}
+          >
+            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronUp className="w-4 h-4 rotate-90" />}
+          </button>
         </div>
+        {!isCollapsed && (
+          <div className="space-y-1">
+            {treeData.map((item) => (
+              <TreeItem key={item.id} {...item} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -527,14 +542,14 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
   return (
     <div className="flex-1 flex flex-col">
       {/* Model Tabs */}
-      <div className={`flex items-center gap-1 px-4 py-3 border-b transition-colors ${
+      <div className={`flex items-center gap-1 px-3 py-2 border-b transition-colors ${
         isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'
       }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         {models.map((model) => (
           <button
             key={model.id}
             onClick={() => setActiveModel(model.id)}
-            className={`flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-xl transition-all duration-200 shadow-sm ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg transition-all duration-200 shadow-sm ${
               activeModel === model.id
                 ? `${isDark ? 'bg-zinc-800 text-indigo-400 border border-zinc-700' : 'bg-white text-indigo-600 shadow-md border border-indigo-200'}`
                 : `${isDark ? 'text-gray-400 hover:text-gray-100 border border-transparent' : 'text-gray-600 hover:text-gray-900 border border-transparent'}`
@@ -554,14 +569,14 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
       </div>
 
       {/* Diagram Tabs */}
-      <div className={`flex items-center gap-1 px-4 py-3 border-b transition-colors ${
+      <div className={`flex items-center gap-1 px-3 py-2 border-b transition-colors ${
         isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'
       }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         {activeModelDiagrams.map((diagram) => (
           <button
             key={diagram.id}
             onClick={() => setActiveDiagram(diagram.id)}
-            className={`flex items-center gap-2.5 px-4 py-2.5 text-sm rounded-xl transition-all duration-200 shadow-sm ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg transition-all duration-200 shadow-sm ${
               activeDiagram === diagram.id
                 ? `${isDark ? 'bg-zinc-700 text-gray-100 border border-zinc-600' : 'bg-white text-gray-900 shadow-md border border-gray-200'}`
                 : `${isDark ? 'text-gray-400 hover:text-gray-100 border border-transparent' : 'text-gray-600 hover:text-gray-900 border border-transparent'}`
@@ -691,7 +706,7 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
 };
 
 // Enhanced Property Pane Component with Linear.app Premium Design
-const PropertyPane = ({ isDark }: { isDark: boolean }) => {
+const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCollapsed: boolean; onToggle: () => void }) => {
   const [selectedObject, setSelectedObject] = useState<'entity' | 'attribute'>('entity');
   const [selectedEntity] = useState('Customer');
   const [selectedAttribute] = useState('Email');
@@ -848,11 +863,29 @@ const PropertyPane = ({ isDark }: { isDark: boolean }) => {
   );
 
   return (
-    <div className="flex h-full">
-      {/* Left Icon Strip */}
-      <div className={`w-6 border-r transition-colors flex flex-col ${
-        isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
+    <div className={`${isCollapsed ? 'w-12' : 'w-96'} border-l transition-all duration-300 ${
+      isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
+    }`}>
+      {/* Collapse Toggle Button */}
+      <div className={`h-12 border-b flex items-center justify-center ${
+        isDark ? 'border-zinc-800' : 'border-gray-200'
       }`}>
+        <button
+          onClick={onToggle}
+          className={`p-2 rounded-lg transition-all duration-200 ${
+            isDark ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+          }`}
+          title={isCollapsed ? 'Expand Properties' : 'Collapse Properties'}
+        >
+          {isCollapsed ? <ChevronUp className="w-4 h-4 -rotate-90" /> : <ChevronUp className="w-4 h-4 rotate-90" />}
+        </button>
+      </div>
+      {!isCollapsed && (
+        <div className="flex h-full">
+          {/* Left Icon Strip */}
+          <div className={`w-6 border-r transition-colors flex flex-col ${
+            isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
+          }`}>
         {propertyTabs.map((tab, index) => (
           <div
             key={tab.id}
@@ -1045,7 +1078,9 @@ const PropertyPane = ({ isDark }: { isDark: boolean }) => {
             </>
           )}
         </div>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1054,6 +1089,8 @@ const PropertyPane = ({ isDark }: { isDark: boolean }) => {
 const ModelExplorer = () => {
   const [isDark, setIsDark] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
+  const [isTreeCollapsed, setIsTreeCollapsed] = useState(false);
+  const [isPropertyCollapsed, setIsPropertyCollapsed] = useState(false);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -1075,13 +1112,13 @@ const ModelExplorer = () => {
       {/* Main Workspace */}
       <div className="flex-1 flex overflow-hidden">
         {/* Model Tree */}
-        <ModelTree isDark={isDark} />
+        <ModelTree isDark={isDark} isCollapsed={isTreeCollapsed} onToggle={() => setIsTreeCollapsed(!isTreeCollapsed)} />
 
         {/* Diagram Canvas */}
         <DiagramCanvas isDark={isDark} />
 
         {/* Property Pane */}
-        <PropertyPane isDark={isDark} />
+        <PropertyPane isDark={isDark} isCollapsed={isPropertyCollapsed} onToggle={() => setIsPropertyCollapsed(!isPropertyCollapsed)} />
       </div>
     </div>
   );

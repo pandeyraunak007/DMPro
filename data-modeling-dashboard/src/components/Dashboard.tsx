@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import ReverseEngineering from './ReverseEngineering';
+import ModelExplorer from './ModelExplorer';
 import {
   LayoutDashboard,
   Database,
@@ -800,13 +801,6 @@ export default function Dashboard() {
           )}
 
           {currentPage === 'reverse-engineering' && <ReverseEngineering />}
-
-          {currentPage === 'model-explorer' && (
-            <div className="p-6">
-              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Model Explorer</h1>
-              <p className="text-zinc-400">Model Explorer functionality coming soon...</p>
-            </div>
-          )}
 
           {currentPage === 'complete-compare' && (
             <div className="p-6">

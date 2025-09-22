@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import ReverseEngineering from './ReverseEngineering';
 import {
   LayoutDashboard,
   Database,
@@ -79,7 +80,6 @@ const NavTab = ({ label, active = false, onClick }: NavTabProps) => (
     {label}
   </div>
 );
-
 
 // Linear-style Toolbar for Quick Actions
 const LinearToolbar = () => {
@@ -166,7 +166,6 @@ const LinearToolbar = () => {
         <FolderOpen className="w-4 h-4" />
         Open
       </button>
-
     </div>
   );
 };
@@ -485,8 +484,8 @@ const ModelsPanel = () => {
   );
 };
 
-// Reverse Engineering Card
-const ReverseEngineeringCard = () => {
+// Reverse Engineering Quick Action Card
+const ReverseEngineeringCard = ({ onClick }: { onClick?: () => void }) => {
   return (
     <div className="panel">
       <div className="flex items-center justify-between mb-4">
@@ -494,45 +493,43 @@ const ReverseEngineeringCard = () => {
           <RefreshCw className="w-4 h-4 text-blue-500" />
           Reverse Engineering
         </h3>
-        <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">Beta</span>
+        <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">New</span>
       </div>
 
       <div className="space-y-4">
         <div className="p-3 bg-zinc-800 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <Database className="w-4 h-4 text-blue-500" />
-            <span className="text-sm font-medium text-zinc-100">Connect Database</span>
+            <span className="text-sm font-medium text-zinc-100">Import Database Schema</span>
           </div>
           <p className="text-xs text-zinc-400 mb-3">
-            Import existing database schemas and generate ERD models automatically.
+            Connect to databases and automatically generate visual data models with full entity relationships.
           </p>
           <div className="flex gap-2">
-            <div className="text-xs bg-zinc-700 px-2 py-1 rounded">PostgreSQL</div>
-            <div className="text-xs bg-zinc-700 px-2 py-1 rounded">MySQL</div>
-            <div className="text-xs bg-zinc-700 px-2 py-1 rounded">SQL Server</div>
+            <div className="text-xs bg-blue-600 text-white px-2 py-1 rounded">MS Fabric</div>
+            <div className="text-xs bg-zinc-700 px-2 py-1 rounded opacity-50">MySQL</div>
+            <div className="text-xs bg-zinc-700 px-2 py-1 rounded opacity-50">PostgreSQL</div>
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-zinc-400">Recent Connections</span>
-            <button className="text-blue-400 hover:text-blue-300">Manage</button>
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 p-2 bg-zinc-800 rounded text-xs">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-              <span className="text-zinc-100">prod-db.company.com</span>
-              <span className="text-zinc-400 ml-auto">PostgreSQL</span>
+          <div className="text-xs text-zinc-400 mb-2">Quick Actions</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="p-2 bg-zinc-800 rounded text-center">
+              <Database className="w-4 h-4 mx-auto mb-1 text-blue-500" />
+              <div className="text-zinc-300">Connect DB</div>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-zinc-800 rounded text-xs">
-              <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-              <span className="text-zinc-100">staging-mysql</span>
-              <span className="text-zinc-400 ml-auto">MySQL</span>
+            <div className="p-2 bg-zinc-800 rounded text-center">
+              <Upload className="w-4 h-4 mx-auto mb-1 text-emerald-500" />
+              <div className="text-zinc-300">Upload SQL</div>
             </div>
           </div>
         </div>
 
-        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm transition-colors">
+        <button
+          onClick={onClick}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-sm transition-colors"
+        >
           Start Reverse Engineering
         </button>
       </div>
@@ -597,14 +594,45 @@ const CompleteCompareCard = () => {
 
 export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'model-explorer' | 'reverse-engineering' | 'complete-compare' | 'users' | 'settings'>('dashboard');
 
   const sidebarItems = [
-    { icon: <LayoutDashboard className="w-4 h-4" />, label: 'Dashboard', active: true },
-    { icon: <Database className="w-4 h-4" />, label: 'Model Explorer' },
-    { icon: <RefreshCw className="w-4 h-4" />, label: 'Reverse Engineering' },
-    { icon: <Scale className="w-4 h-4" />, label: 'Complete Compare' },
-    { icon: <Users className="w-4 h-4" />, label: 'Users' },
-    { icon: <Settings className="w-4 h-4" />, label: 'Settings' }
+    {
+      icon: <LayoutDashboard className="w-4 h-4" />,
+      label: 'Dashboard',
+      page: 'dashboard' as const,
+      active: currentPage === 'dashboard'
+    },
+    {
+      icon: <Database className="w-4 h-4" />,
+      label: 'Model Explorer',
+      page: 'model-explorer' as const,
+      active: currentPage === 'model-explorer'
+    },
+    {
+      icon: <RefreshCw className="w-4 h-4" />,
+      label: 'Reverse Engineering',
+      page: 'reverse-engineering' as const,
+      active: currentPage === 'reverse-engineering'
+    },
+    {
+      icon: <Scale className="w-4 h-4" />,
+      label: 'Complete Compare',
+      page: 'complete-compare' as const,
+      active: currentPage === 'complete-compare'
+    },
+    {
+      icon: <Users className="w-4 h-4" />,
+      label: 'Users',
+      page: 'users' as const,
+      active: currentPage === 'users'
+    },
+    {
+      icon: <Settings className="w-4 h-4" />,
+      label: 'Settings',
+      page: 'settings' as const,
+      active: currentPage === 'settings'
+    }
   ];
 
   const bottomLinks = [
@@ -647,6 +675,7 @@ export default function Dashboard() {
               label={item.label}
               active={item.active}
               collapsed={sidebarCollapsed}
+              onClick={() => setCurrentPage(item.page)}
             />
           ))}
         </div>
@@ -680,93 +709,127 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Linear Toolbar */}
-        <LinearToolbar />
+        {/* Linear Toolbar - only show on dashboard */}
+        {currentPage === 'dashboard' && <LinearToolbar />}
 
         {/* Page Content */}
-        <div className="flex-1 p-6 overflow-auto">
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-2xl font-bold text-zinc-100">Data Models Dashboard</h1>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-zinc-400">Last updated 2 minutes ago</span>
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-              </div>
-            </div>
-            <p className="text-zinc-400">
-              Monitor and manage your data modeling workspace
-            </p>
-          </div>
-
-          {/* Stats Overview Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-zinc-400 text-sm">Total Models</p>
-                  <p className="text-2xl font-bold text-zinc-100">24</p>
+        <div className="flex-1 overflow-auto">
+          {currentPage === 'dashboard' && (
+            <div className="p-6">
+              {/* Header Section */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-2">
+                  <h1 className="text-2xl font-bold text-zinc-100">Data Models Dashboard</h1>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-zinc-400">Last updated 2 minutes ago</span>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  </div>
                 </div>
-                <Database className="w-8 h-8 text-violet-500" />
+                <p className="text-zinc-400">
+                  Monitor and manage your data modeling workspace
+                </p>
               </div>
-              <div className="text-xs text-emerald-400 mt-2">+3 this week</div>
-            </div>
 
-            <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-zinc-400 text-sm">Active Users</p>
-                  <p className="text-2xl font-bold text-zinc-100">12</p>
+              {/* Stats Overview Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-zinc-400 text-sm">Total Models</p>
+                      <p className="text-2xl font-bold text-zinc-100">24</p>
+                    </div>
+                    <Database className="w-8 h-8 text-violet-500" />
+                  </div>
+                  <div className="text-xs text-emerald-400 mt-2">+3 this week</div>
                 </div>
-                <Users className="w-8 h-8 text-blue-500" />
-              </div>
-              <div className="text-xs text-emerald-400 mt-2">+2 today</div>
-            </div>
 
-            <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-zinc-400 text-sm">Entities</p>
-                  <p className="text-2xl font-bold text-zinc-100">158</p>
+                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-zinc-400 text-sm">Active Users</p>
+                      <p className="text-2xl font-bold text-zinc-100">12</p>
+                    </div>
+                    <Users className="w-8 h-8 text-blue-500" />
+                  </div>
+                  <div className="text-xs text-emerald-400 mt-2">+2 today</div>
                 </div>
-                <Boxes className="w-8 h-8 text-amber-500" />
-              </div>
-              <div className="text-xs text-emerald-400 mt-2">+15 this week</div>
-            </div>
 
-            <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-zinc-400 text-sm">AI Suggestions</p>
-                  <p className="text-2xl font-bold text-zinc-100">73%</p>
+                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-zinc-400 text-sm">Entities</p>
+                      <p className="text-2xl font-bold text-zinc-100">158</p>
+                    </div>
+                    <Boxes className="w-8 h-8 text-amber-500" />
+                  </div>
+                  <div className="text-xs text-emerald-400 mt-2">+15 this week</div>
                 </div>
-                <Brain className="w-8 h-8 text-emerald-500" />
+
+                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-zinc-400 text-sm">AI Suggestions</p>
+                      <p className="text-2xl font-bold text-zinc-100">73%</p>
+                    </div>
+                    <Brain className="w-8 h-8 text-emerald-500" />
+                  </div>
+                  <div className="text-xs text-emerald-400 mt-2">Accepted rate</div>
+                </div>
               </div>
-              <div className="text-xs text-emerald-400 mt-2">Accepted rate</div>
-            </div>
-          </div>
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-            {/* Left Column - Models */}
-            <div className="xl:col-span-2 space-y-6">
-              <ModelsPanel />
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                {/* Left Column - Models */}
+                <div className="xl:col-span-2 space-y-6">
+                  <ModelsPanel />
 
-              {/* Tools Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ReverseEngineeringCard />
-                <CompleteCompareCard />
+                  {/* Tools Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <ReverseEngineeringCard onClick={() => setCurrentPage('reverse-engineering')} />
+                    <CompleteCompareCard />
+                  </div>
+                </div>
+
+                {/* Right Column - Insights & AI */}
+                <div className="space-y-6">
+                  <SystemInsightsPanel />
+                  <AIAssistantPreview />
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Right Column - Insights & AI */}
-            <div className="space-y-6">
-              <SystemInsightsPanel />
-              <AIAssistantPreview />
+          {currentPage === 'reverse-engineering' && <ReverseEngineering />}
+
+          {currentPage === 'model-explorer' && (
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Model Explorer</h1>
+              <p className="text-zinc-400">Model Explorer functionality coming soon...</p>
             </div>
-          </div>
+          )}
+
+          {currentPage === 'complete-compare' && (
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Complete Compare</h1>
+              <p className="text-zinc-400">Model comparison functionality coming soon...</p>
+            </div>
+          )}
+
+          {currentPage === 'users' && (
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Users</h1>
+              <p className="text-zinc-400">User management functionality coming soon...</p>
+            </div>
+          )}
+
+          {currentPage === 'settings' && (
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Settings</h1>
+              <p className="text-zinc-400">Settings functionality coming soon...</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
-}
+};

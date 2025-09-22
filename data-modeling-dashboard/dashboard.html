@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMPro - Data Modeling Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        background: '#0D0D0D',
+                        foreground: '#FFFFFF',
+                        muted: '#6B7280',
+                        border: '#2A2A2A',
+                        primary: '#7C3AED',
+                        secondary: '#4B5563',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0D0D0D;
+            color: #FFFFFF;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .sidebar-item {
+            @apply flex items-center gap-3 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer;
+        }
+        .sidebar-item.active {
+            @apply text-white bg-white/10;
+        }
+        .nav-tab {
+            @apply px-4 py-2 text-sm text-gray-400 hover:text-white border-b-2 border-transparent hover:border-purple-500/50 transition-colors cursor-pointer;
+        }
+        .nav-tab.active {
+            @apply text-white border-purple-500;
+        }
+        .card {
+            @apply bg-white/5 border border-gray-800 rounded-xl p-6 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-200;
+        }
+        .btn-primary {
+            @apply bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2;
+        }
+        .btn-secondary {
+            @apply bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2;
+        }
+    </style>
+</head>
+<body>
+    <div class="h-screen flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="w-64 bg-white/5 border-r border-gray-800 flex flex-col transition-all duration-200">
+            <!-- Logo & Workspace -->
+            <div class="p-4 border-b border-gray-800">
+                <div class="flex items-center justify-between">
+                    <div id="logo-section">
+                        <h1 class="text-lg font-semibold text-white">DMPro</h1>
+                        <p class="text-xs text-gray-400">Data Modeling Studio</p>
+                    </div>
+                    <button onclick="toggleSidebar()" class="p-1 hover:bg-white/10 rounded transition-colors">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Items -->
+            <div class="flex-1 p-4 space-y-1">
+                <div class="sidebar-item active">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Dashboard</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="database" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Data Models</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="boxes" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Entities</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="git-branch" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Relationships</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="globe" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Domains</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Reports</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Settings</span>
+                </div>
+            </div>
+
+            <!-- Bottom Links -->
+            <div id="bottom-links" class="p-4 border-t border-gray-800 space-y-1">
+                <div class="sidebar-item">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Invite Team</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Import Models</span>
+                </div>
+                <div class="sidebar-item">
+                    <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    <span class="sidebar-label">Help</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Top Navigation -->
+            <div class="border-b border-gray-800 bg-white/5">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex space-x-6">
+                        <div class="nav-tab active">Overview</div>
+                        <div class="nav-tab">Activity</div>
+                        <div class="nav-tab">Reports</div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <button class="btn-secondary">
+                            <i data-lucide="settings-2" class="w-4 h-4"></i>
+                            Display
+                        </button>
+                        <button class="btn-primary" onclick="toggleDashboardView()">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            New Model
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="flex-1 p-6">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-semibold text-white mb-2">Dashboard</h1>
+                    <p class="text-gray-400">
+                        Monitor the health and activity of your data models. View entity counts, relationships, and recent changes.
+                    </p>
+                </div>
+
+                <!-- Quick Actions Panel -->
+                <div class="mb-8">
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn-primary" onclick="handleQuickAction('Create New Model')">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Create New Model
+                        </button>
+                        <button class="btn-secondary" onclick="handleQuickAction('Open Model')">
+                            <i data-lucide="folder-open" class="w-4 h-4"></i>
+                            Open Model
+                        </button>
+                        <button class="btn-secondary" onclick="handleQuickAction('Reverse Engineering')">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            Reverse Engineering
+                        </button>
+                        <button class="btn-secondary" onclick="handleQuickAction('Complete Compare')">
+                            <i data-lucide="scale" class="w-4 h-4"></i>
+                            Complete Compare
+                        </button>
+                        <div class="relative">
+                            <button class="btn-secondary" onclick="toggleDropdown('recent')">
+                                <i data-lucide="clock" class="w-4 h-4"></i>
+                                Recent Models
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                            </button>
+                            <div id="recent-dropdown" class="hidden absolute top-full left-0 mt-2 w-64 bg-black/80 backdrop-blur-sm border border-gray-800 rounded-lg shadow-xl z-50">
+                                <div class="py-2">
+                                    <button class="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-sm" onclick="selectModel('E-Commerce Platform')">
+                                        <div class="text-white font-medium">E-Commerce Platform</div>
+                                        <div class="text-gray-400 text-xs mt-1">Updated 2 hours ago</div>
+                                    </button>
+                                    <button class="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-sm" onclick="selectModel('Customer Management System')">
+                                        <div class="text-white font-medium">Customer Management System</div>
+                                        <div class="text-gray-400 text-xs mt-1">Updated yesterday</div>
+                                    </button>
+                                    <button class="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-sm" onclick="selectModel('Inventory Database')">
+                                        <div class="text-white font-medium">Inventory Database</div>
+                                        <div class="text-gray-400 text-xs mt-1">Updated 3 days ago</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button class="btn-secondary" onclick="toggleDropdown('favorites')">
+                                <i data-lucide="star" class="w-4 h-4"></i>
+                                Favorite Models
+                                <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                            </button>
+                            <div id="favorites-dropdown" class="hidden absolute top-full left-0 mt-2 w-64 bg-black/80 backdrop-blur-sm border border-gray-800 rounded-lg shadow-xl z-50">
+                                <div class="py-2">
+                                    <button class="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-sm" onclick="selectModel('Core Business Model')">
+                                        <div class="text-white font-medium">Core Business Model</div>
+                                        <div class="text-gray-400 text-xs mt-1">⭐ Most used</div>
+                                    </button>
+                                    <button class="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-sm" onclick="selectModel('User Management Schema')">
+                                        <div class="text-white font-medium">User Management Schema</div>
+                                        <div class="text-gray-400 text-xs mt-1">⭐ Frequently accessed</div>
+                                    </button>
+                                    <button class="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors text-sm" onclick="selectModel('Payment Processing Model')">
+                                        <div class="text-white font-medium">Payment Processing Model</div>
+                                        <div class="text-gray-400 text-xs mt-1">⭐ Critical system</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="flex flex-col items-center justify-center min-h-[400px] text-center">
+                    <div class="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mb-6">
+                        <i data-lucide="database" class="w-8 h-8 text-purple-500"></i>
+                    </div>
+
+                    <h2 class="text-xl font-semibold text-white mb-2">Welcome to DMPro</h2>
+                    <p class="text-gray-400 max-w-md mb-8">
+                        Monitor the health and activity of your data models. View entity counts, relationships, and recent changes.
+                    </p>
+
+                    <div class="flex gap-3">
+                        <button class="btn-primary" onclick="toggleDashboardView()">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Create New Model
+                        </button>
+                        <button class="btn-secondary">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            Documentation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Cards -->
+                <div id="dashboard-cards" class="hidden grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <!-- Total Entities Card -->
+                    <div class="card">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-400 mb-1">Total Entities</h3>
+                                <div class="text-2xl font-semibold text-white">247</div>
+                                <p class="text-xs text-gray-400 mt-1">+12 this week</p>
+                            </div>
+                            <div class="text-purple-500">
+                                <i data-lucide="boxes" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Relationships Health Card -->
+                    <div class="card">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-400 mb-1">Relationships Health</h3>
+                                <div class="text-2xl font-semibold text-white">94%</div>
+                                <p class="text-xs text-gray-400 mt-1">2 issues detected</p>
+                            </div>
+                            <div class="text-purple-500">
+                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="w-full bg-white/10 rounded-full h-2">
+                                <div class="bg-purple-500 h-2 rounded-full transition-all duration-300" style="width: 94%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Card -->
+                    <div class="card">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-400 mb-1">Recent Activity</h3>
+                                <div class="text-2xl font-semibold text-white">15</div>
+                                <p class="text-xs text-gray-400 mt-1">changes today</p>
+                            </div>
+                            <div class="text-purple-500">
+                                <i data-lucide="activity" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-purple-600/20 rounded-full flex items-center justify-center text-xs font-medium text-purple-500">JS</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-white truncate">Updated Customer entity</p>
+                                    <p class="text-xs text-gray-400">2m ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-purple-600/20 rounded-full flex items-center justify-center text-xs font-medium text-purple-500">AS</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-white truncate">Created Order relationship</p>
+                                    <p class="text-xs text-gray-400">5m ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-purple-600/20 rounded-full flex items-center justify-center text-xs font-medium text-purple-500">MD</div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-white truncate">Added Product domain</p>
+                                    <p class="text-xs text-gray-400">12m ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Users Card -->
+                    <div class="card">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-400 mb-1">Active Users</h3>
+                                <div class="text-2xl font-semibold text-white">6</div>
+                                <p class="text-xs text-gray-400 mt-1">online now</p>
+                            </div>
+                            <div class="text-purple-500">
+                                <i data-lucide="users" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 bg-purple-600/20 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-medium text-purple-500">JS</div>
+                                <div class="w-8 h-8 bg-purple-600/20 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-medium text-purple-500">AS</div>
+                                <div class="w-8 h-8 bg-purple-600/20 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-medium text-purple-500">MD</div>
+                                <div class="w-8 h-8 bg-purple-600/20 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-medium text-purple-500">LK</div>
+                            </div>
+                            <span class="text-xs text-gray-400 ml-2">+2 more</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        let sidebarCollapsed = false;
+        let showingCards = false;
+
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            const sidebar = document.getElementById('sidebar');
+            const logoSection = document.getElementById('logo-section');
+            const bottomLinks = document.getElementById('bottom-links');
+            const labels = document.querySelectorAll('.sidebar-label');
+
+            if (sidebarCollapsed) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-16');
+                logoSection.style.display = 'none';
+                bottomLinks.style.display = 'none';
+                labels.forEach(label => label.style.display = 'none');
+            } else {
+                sidebar.classList.remove('w-16');
+                sidebar.classList.add('w-64');
+                logoSection.style.display = 'block';
+                bottomLinks.style.display = 'block';
+                labels.forEach(label => label.style.display = 'inline');
+            }
+        }
+
+        function toggleDashboardView() {
+            showingCards = !showingCards;
+            const emptyState = document.getElementById('empty-state');
+            const dashboardCards = document.getElementById('dashboard-cards');
+
+            if (showingCards) {
+                emptyState.style.display = 'none';
+                dashboardCards.style.display = 'grid';
+            } else {
+                emptyState.style.display = 'flex';
+                dashboardCards.style.display = 'none';
+            }
+        }
+
+        function handleQuickAction(action) {
+            console.log('Quick Action:', action);
+            if (action === 'Create New Model') {
+                toggleDashboardView();
+            }
+            // Placeholder for actual action implementation
+        }
+
+        function toggleDropdown(type) {
+            const recentDropdown = document.getElementById('recent-dropdown');
+            const favoritesDropdown = document.getElementById('favorites-dropdown');
+
+            if (type === 'recent') {
+                recentDropdown.classList.toggle('hidden');
+                favoritesDropdown.classList.add('hidden');
+            } else if (type === 'favorites') {
+                favoritesDropdown.classList.toggle('hidden');
+                recentDropdown.classList.add('hidden');
+            }
+        }
+
+        function selectModel(modelName) {
+            console.log('Selected model:', modelName);
+            // Hide all dropdowns
+            document.getElementById('recent-dropdown').classList.add('hidden');
+            document.getElementById('favorites-dropdown').classList.add('hidden');
+            // Placeholder for actual model loading
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const recentDropdown = document.getElementById('recent-dropdown');
+            const favoritesDropdown = document.getElementById('favorites-dropdown');
+
+            if (!event.target.closest('.relative')) {
+                recentDropdown.classList.add('hidden');
+                favoritesDropdown.classList.add('hidden');
+            }
+        });
+
+        // Tab switching
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Sidebar item switching
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

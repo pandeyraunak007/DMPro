@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-md transition-colors cursor-pointer;
+  }
+
+  .sidebar-item.active {
+    @apply text-zinc-100 bg-zinc-800;
+  }
+
+  .nav-tab {
+    @apply px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 border-b border-transparent hover:border-zinc-600 transition-colors cursor-pointer;
+  }
+
+  .nav-tab.active {
+    @apply text-zinc-100 border-zinc-100;
+  }
+
+  .panel {
+    @apply bg-zinc-900 border border-zinc-800 rounded-lg p-4;
+  }
+
+  .toolbar-btn {
+    @apply flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-150;
+  }
+
+  .toolbar-btn.primary {
+    @apply bg-violet-600 hover:bg-violet-700 text-white;
+  }
+
+  .toolbar-btn.secondary {
+    @apply text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800;
+  }
+
+  .model-row {
+    @apply flex items-center justify-between px-3 py-2 rounded-md hover:bg-zinc-800 transition-colors cursor-pointer;
+  }
+
+  .model-row:hover .model-actions {
+    @apply opacity-100;
+  }
+
+  .model-actions {
+    @apply opacity-0 transition-opacity;
+  }
+
+  .search-input {
+    @apply w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-md text-sm placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-colors;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium bg-zinc-700 text-zinc-100 rounded-full;
+  }
+
+  .separator {
+    @apply border-t border-zinc-800 my-4;
+  }
+}

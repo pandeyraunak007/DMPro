@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/pande/OneDrive/Documents/Raunak/forGit/data-modeling-fullstack/**)",
+      "Bash(npx create-next-app:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm install)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(refreshenv)",
+      "Bash(where node)",
+      "Bash(echo $PATH)",
+      "Read(//c/Program Files/nodejs/**)",
+      "Bash(\"/c/Program Files/nodejs/node.exe\" --version)",
+      "Bash(./run-dev.bat)",
+      "Bash(dir:*)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js\" run dev)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" node_modulesnextdistbinnext dev)",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" node_modules.binnext dev)",
+      "Bash(powershell -Command \"$env:PATH = ''C:\\Program Files\\nodejs;'' + $env:PATH; npm run dev\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\next\\dist\\bin\\next\" dev)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git rm:*)",
+      "Bash(git checkout:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

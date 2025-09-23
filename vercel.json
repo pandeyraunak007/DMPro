@@ -1,6 +1,18 @@
 {
-  "buildCommand": "npm run build --prefix data-modeling-dashboard",
-  "outputDirectory": "data-modeling-dashboard/.next",
-  "installCommand": "npm install --prefix data-modeling-dashboard",
-  "framework": "nextjs"
+  "version": 2,
+  "builds": [
+    {
+      "src": "data-modeling-dashboard/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "distDir": ".next"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/data-modeling-dashboard/$1"
+    }
+  ]
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ReverseEngineering from './ReverseEngineering';
 import ModelExplorer from './ModelExplorer';
+import CompleteCompare from './CompleteCompare';
 import {
   LayoutDashboard,
   Database,
@@ -733,12 +734,7 @@ export default function Dashboard() {
 
           {currentPage === 'reverse-engineering' && <ReverseEngineering />}
 
-          {currentPage === 'complete-compare' && (
-            <div className="p-6">
-              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Complete Compare</h1>
-              <p className="text-zinc-400">Model comparison functionality coming soon...</p>
-            </div>
-          )}
+          {currentPage === 'complete-compare' && <CompleteCompare />}
 
           {currentPage === 'users' && (
             <div className="p-6">

@@ -325,7 +325,7 @@ const ReverseEngineering: React.FC = () => {
             icon={<Database className="w-4 h-4 text-blue-500" />}
             isExpanded={expandedSections.source}
             onToggle={() => toggleSection('source')}
-            completed={(sourceType === 'database' && selectedSource && connectionTested) || (sourceType === 'script' && scriptFile)}
+            completed={Boolean((sourceType === 'database' && selectedSource && connectionTested) || (sourceType === 'script' && scriptFile))}
           >
             <div className="space-y-6 mt-4">
               {/* Source Type Selection - ERwin Style */}
@@ -592,7 +592,7 @@ const ReverseEngineering: React.FC = () => {
               {((sourceType === 'database' && selectedSource && connectionTested) || (sourceType === 'script' && scriptFile)) && (
                 <div className="flex justify-end pt-4 border-t border-zinc-700">
                   <button
-                    onClick={() => goToNextStep('source', 'objects')}
+                    onClick={() => goToNextStep('source', 'schemas')}
                     className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
                   >
                     Next: Select Objects
@@ -608,8 +608,8 @@ const ReverseEngineering: React.FC = () => {
             title="Schema & Object Selection"
             subtitle="Select database schemas and objects to reverse engineer"
             icon={<Table className="w-4 h-4 text-emerald-500" />}
-            isExpanded={expandedSections.objects}
-            onToggle={() => toggleSection('objects')}
+            isExpanded={expandedSections.schemas}
+            onToggle={() => toggleSection('schemas')}
             badge={selectedObjects.length > 0 ? selectedObjects.length.toString() : undefined}
           >
             <div className="space-y-4 mt-4">
@@ -759,14 +759,14 @@ const ReverseEngineering: React.FC = () => {
               {/* Next Button */}
               <div className="flex justify-between pt-4 border-t border-zinc-700">
                 <button
-                  onClick={() => goToNextStep('objects', 'source')}
+                  onClick={() => goToNextStep('schemas', 'source')}
                   className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-4 h-4 rotate-180" />
                   Back: Source Selection
                 </button>
                 <button
-                  onClick={() => goToNextStep('objects', 'entities')}
+                  onClick={() => goToNextStep('schemas', 'options')}
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
                 >
                   Next: Configure Options
@@ -781,8 +781,8 @@ const ReverseEngineering: React.FC = () => {
             title="Reverse Engineering Options"
             subtitle="Configure option sets, sampling, and modeling preferences"
             icon={<Settings className="w-4 h-4 text-amber-500" />}
-            isExpanded={expandedSections.entities}
-            onToggle={() => toggleSection('entities')}
+            isExpanded={expandedSections.options}
+            onToggle={() => toggleSection('options')}
           >
             <div className="space-y-6 mt-4">
               {/* Option Sets - ERwin Style */}
@@ -853,7 +853,9 @@ const ReverseEngineering: React.FC = () => {
                       className="rounded border-zinc-600 bg-zinc-700 text-blue-600"
                     />
                     <span className="text-sm text-zinc-100">Enable Deep Search Algorithm</span>
-                    <HelpCircle className="w-4 h-4 text-zinc-400" title="Uses advanced pattern recognition to detect complex relationships and data types" />
+                    <span title="Uses advanced pattern recognition to detect complex relationships and data types">
+                      <HelpCircle className="w-4 h-4 text-zinc-400" />
+                    </span>
                   </label>
                   <p className="text-xs text-zinc-400 ml-6">
                     Analyzes data patterns, relationship structures, and naming conventions for enhanced schema detection
@@ -975,14 +977,14 @@ const ReverseEngineering: React.FC = () => {
               {/* Next Button */}
               <div className="flex justify-between pt-4 border-t border-zinc-700">
                 <button
-                  onClick={() => goToNextStep('entities', 'objects')}
+                  onClick={() => goToNextStep('options', 'schemas')}
                   className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-4 h-4 rotate-180" />
                   Back: Object Selection
                 </button>
                 <button
-                  onClick={() => goToNextStep('entities', 'relationships')}
+                  onClick={() => goToNextStep('options', 'glossary')}
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
                 >
                   Next: Relationships
@@ -997,8 +999,8 @@ const ReverseEngineering: React.FC = () => {
             title="Relationships"
             subtitle="Configure entity relationships and foreign keys"
             icon={<Link className="w-4 h-4 text-purple-500" />}
-            isExpanded={expandedSections.relationships}
-            onToggle={() => toggleSection('relationships')}
+            isExpanded={expandedSections.glossary}
+            onToggle={() => toggleSection('glossary')}
             badge="5"
           >
             <div className="space-y-4 mt-4">
@@ -1046,14 +1048,14 @@ const ReverseEngineering: React.FC = () => {
               {/* Next Button */}
               <div className="flex justify-between pt-4 border-t border-zinc-700">
                 <button
-                  onClick={() => goToNextStep('relationships', 'entities')}
+                  onClick={() => goToNextStep('glossary', 'options')}
                   className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-4 h-4 rotate-180" />
                   Back: Configure Options
                 </button>
                 <button
-                  onClick={() => goToNextStep('relationships', 'rules')}
+                  onClick={() => goToNextStep('glossary', 'system')}
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
                 >
                   Next: Import Rules
@@ -1068,8 +1070,8 @@ const ReverseEngineering: React.FC = () => {
             title="Import Rules & System Configuration"
             subtitle="Configure naming conventions, permissions, and system catalog access"
             icon={<Key className="w-4 h-4 text-orange-500" />}
-            isExpanded={expandedSections.rules}
-            onToggle={() => toggleSection('rules')}
+            isExpanded={expandedSections.system}
+            onToggle={() => toggleSection('system')}
           >
             <div className="space-y-6 mt-4">
               {/* System Catalog Configuration - ERwin Style */}
@@ -1088,7 +1090,9 @@ const ReverseEngineering: React.FC = () => {
                         className="rounded border-zinc-600 bg-zinc-700 text-blue-600"
                       />
                       <span className="text-sm text-zinc-100">Query system catalog</span>
-                      <HelpCircle className="w-4 h-4 text-zinc-400" title="ERwin queries system catalog instead of individual objects for better performance" />
+                      <span title="ERwin queries system catalog instead of individual objects for better performance">
+                        <HelpCircle className="w-4 h-4 text-zinc-400" />
+                      </span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -1313,14 +1317,14 @@ const ReverseEngineering: React.FC = () => {
               {/* Next Button */}
               <div className="flex justify-between pt-4 border-t border-zinc-700">
                 <button
-                  onClick={() => goToNextStep('rules', 'relationships')}
+                  onClick={() => goToNextStep('system', 'glossary')}
                   className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-4 h-4 rotate-180" />
                   Back: Relationships
                 </button>
                 <button
-                  onClick={() => goToNextStep('rules', 'summary')}
+                  onClick={() => goToNextStep('system', 'summary')}
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
                 >
                   Next: Review Summary
@@ -1383,7 +1387,7 @@ const ReverseEngineering: React.FC = () => {
               {/* Next Button */}
               <div className="flex justify-between pt-4 border-t border-zinc-700">
                 <button
-                  onClick={() => goToNextStep('summary', 'rules')}
+                  onClick={() => goToNextStep('summary', 'system')}
                   className="flex items-center gap-2 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-4 h-4 rotate-180" />

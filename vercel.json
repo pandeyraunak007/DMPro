@@ -1,12 +1,7 @@
 {
-  "buildCommand": "cd data-modeling-dashboard && npm run build",
-  "outputDirectory": "data-modeling-dashboard/.next",
-  "installCommand": "cd data-modeling-dashboard && npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
   "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ]
+  "rootDirectory": "data-modeling-dashboard"
 }

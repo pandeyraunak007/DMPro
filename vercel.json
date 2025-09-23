@@ -3,16 +3,13 @@
   "builds": [
     {
       "src": "data-modeling-dashboard/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": ".next"
-      }
+      "use": "@vercel/next"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/data-modeling-dashboard/$1"
+      "dest": "data-modeling-dashboard/$1"
     }
   ]
 }

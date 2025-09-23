@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   ChevronDown,
@@ -10,7 +10,6 @@ import {
   Table,
   Key,
   Link,
-  Layers3,
   Box,
   Grid,
   Maximize2,
@@ -69,7 +68,37 @@ import {
   Calendar,
   CheckSquare,
   Radio,
-  Hash
+  Hash,
+  Bell,
+  Sun,
+  Moon,
+  User,
+  FolderPlus,
+  FilePlus,
+  GitBranch,
+  PenTool,
+  Users,
+  GitMerge,
+  LayoutGrid,
+  AlignJustify,
+  FileCode,
+  Import,
+  MessageCircle,
+  Shield,
+  FileCode2,
+  Workflow,
+  Component,
+  Archive,
+  HardDrive,
+  Network,
+  TreePine,
+  Globe,
+  Server,
+  Command,
+  CreditCard,
+  Crown,
+  UserPlus,
+  KeyRound
 } from 'lucide-react';
 
 // Linear.app-inspired Premium UI Color Theme
@@ -141,34 +170,35 @@ interface Model {
 // Header Bar Component
 const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => void }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [hasNotifications, setHasNotifications] = useState(true);
 
   return (
-    <div className={`h-12 px-4 flex items-center justify-between border-b ${
+    <div className={`h-10 px-4 flex items-center justify-between border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
     } shadow-sm transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Left: Logo */}
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center shadow-sm">
-          <Database className="w-4 h-4 text-white" />
+      {/* Left: Logo and Model Name */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center shadow-sm">
+            <Database className="w-4 h-4 text-white" />
+          </div>
+          <span className={`font-semibold text-sm tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
+            DMPro
+          </span>
         </div>
-        <span className={`font-semibold text-sm tracking-tight ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
-          DMPro
-        </span>
+        <div className={`h-4 w-px ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
+        <div className="flex items-center gap-1.5">
+          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Model:</span>
+          <span className={`text-xs font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+            E-Commerce Platform
+          </span>
+        </div>
       </div>
 
-      {/* Center: Model Name */}
-      <div className="flex items-center gap-2">
-        <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Model:</span>
-        <span className={`font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-          E-Commerce Platform
-        </span>
-      </div>
-
-      {/* Right: Search */}
-      <div className="flex items-center">
-        {/* Global Search */}
-        <div className="relative">
-          <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+      {/* Center: Search */}
+      <div className="flex-1 flex items-center justify-center max-w-md mx-auto">
+        <div className="relative w-full">
+          <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 ${
             isDark ? 'text-gray-400' : 'text-gray-500'
           }`} />
           <input
@@ -176,30 +206,66 @@ const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () =
             placeholder="Search models, entities..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`pl-8 pr-3 py-1.5 w-48 text-xs rounded-md border ${
+            className={`pl-8 pr-3 py-1 w-full text-xs rounded-md border ${
               isDark
-                ? 'bg-zinc-800 border-zinc-700 text-gray-100 placeholder-gray-400'
-                : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500'
-            } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                ? 'bg-zinc-800 border-zinc-700 text-gray-100 placeholder-gray-400 focus:bg-zinc-750'
+                : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white'
+            } focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all duration-200`}
           />
         </div>
+      </div>
+
+      {/* Right: Action Buttons */}
+      <div className="flex items-center gap-2">
+        {/* Notification Button */}
+        <button
+          className={`relative p-1.5 rounded-lg transition-all duration-200 ${
+            isDark ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+          }`}
+          title="Notifications"
+        >
+          <Bell className="w-4 h-4" />
+          {hasNotifications && (
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          )}
+        </button>
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className={`p-1.5 rounded-lg transition-all duration-200 ${
+            isDark ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+          }`}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </button>
+
+        {/* Profile Button */}
+        <button
+          className={`p-1.5 rounded-lg transition-all duration-200 ${
+            isDark ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+          }`}
+          title="Profile"
+        >
+          <User className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
 };
 
 // Main Tabs Component
-const MainTabs = ({ isDark }: { isDark: boolean }) => {
-  const [activeTab, setActiveTab] = useState('erwin');
+const MainTabs = ({ isDark, activeTab, setActiveTab }: { isDark: boolean; activeTab: string; setActiveTab: (tab: string) => void }) => {
 
   const tabs = [
-    { id: 'erwin', label: 'erwin Data Modeler', icon: <Database className="w-4 h-4" /> },
-    { id: 'file', label: 'File', icon: <FileText className="w-4 h-4" /> },
-    { id: 'home', label: 'Home', icon: <Folder className="w-4 h-4" /> },
-    { id: 'view', label: 'View', icon: <Eye className="w-4 h-4" /> },
-    { id: 'diagram', label: 'Diagram', icon: <Grid className="w-4 h-4" /> },
-    { id: 'actions', label: 'Actions', icon: <Zap className="w-4 h-4" /> },
-    { id: 'help', label: 'Help', icon: <HelpCircle className="w-4 h-4" /> }
+    { id: 'file', label: 'File' },
+    { id: 'home', label: 'Home' },
+    { id: 'view', label: 'View' },
+    { id: 'diagram', label: 'Diagram' },
+    { id: 'actions', label: 'Actions' },
+    { id: 'tools', label: 'Tools' },
+    { id: 'help', label: 'Help' }
   ];
 
   return (
@@ -211,14 +277,13 @@ const MainTabs = ({ isDark }: { isDark: boolean }) => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-t-lg transition-all duration-200 ${
               activeTab === tab.id
-                ? `${isDark ? 'bg-zinc-800 text-indigo-400 shadow-sm' : 'bg-indigo-50 text-indigo-600 shadow-sm'}`
+                ? `${isDark ? 'bg-zinc-800 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`
                 : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/70'}`
             }`}
             style={{ fontWeight: activeTab === tab.id ? 600 : 500 }}
           >
-            {tab.icon}
             {tab.label}
           </button>
         ))}
@@ -229,61 +294,95 @@ const MainTabs = ({ isDark }: { isDark: boolean }) => {
 
 // Contextual Toolbar Component
 const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: string }) => {
-  const getToolbarContent = () => {
-    switch (activeTab) {
-      case 'home':
-        return [
-          { icon: <Plus className="w-4 h-4" />, label: 'Add Entity' },
-          { icon: <Link className="w-4 h-4" />, label: 'Add Relationship' },
-          { icon: <FileText className="w-4 h-4" />, label: 'Add Annotation' },
-          { icon: <Copy className="w-4 h-4" />, label: 'Copy' },
-          { icon: <ClipboardPaste className="w-4 h-4" />, label: 'Paste' }
-        ];
-      case 'view':
-        return [
-          { icon: <ZoomIn className="w-4 h-4" />, label: 'Zoom In' },
-          { icon: <ZoomOut className="w-4 h-4" />, label: 'Zoom Out' },
-          { icon: <Eye className="w-4 h-4" />, label: 'Show Grid' },
-          { icon: <Filter className="w-4 h-4" />, label: 'Filter' },
-          { icon: <Layers className="w-4 h-4" />, label: 'Layers' }
-        ];
-      case 'diagram':
-        return [
-          { icon: <Square className="w-4 h-4" />, label: 'Entity Tool' },
-          { icon: <ArrowRight className="w-4 h-4" />, label: 'Relationship Tool' },
-          { icon: <Type className="w-4 h-4" />, label: 'Text Tool' },
-          { icon: <AlignLeft className="w-4 h-4" />, label: 'Align' },
-          { icon: <Palette className="w-4 h-4" />, label: 'Format' }
-        ];
-      default:
-        return [
-          { icon: <Save className="w-4 h-4" />, label: 'Save' },
-          { icon: <Undo2 className="w-4 h-4" />, label: 'Undo' },
-          { icon: <Redo2 className="w-4 h-4" />, label: 'Redo' },
-          { icon: <Download className="w-4 h-4" />, label: 'Export' },
-          { icon: <Share2 className="w-4 h-4" />, label: 'Share' }
-        ];
-    }
+  const menuItems = {
+    file: [
+      { icon: <FolderOpen className="w-4 h-4" />, label: 'Open', shortcut: 'Ctrl+O' },
+      { icon: <Save className="w-4 h-4" />, label: 'Save', shortcut: 'Ctrl+S' },
+      { icon: <Download className="w-4 h-4" />, label: 'Save As', shortcut: 'Ctrl+Shift+S' },
+      { icon: <FilePlus className="w-4 h-4" />, label: 'New Model', shortcut: 'Ctrl+N' }
+    ],
+    home: [
+      { icon: <Plus className="w-4 h-4" />, label: 'Add Entity' },
+      { icon: <FolderPlus className="w-4 h-4" />, label: 'Add Sub Category' },
+      { icon: <GitBranch className="w-4 h-4" />, label: 'Identifying Relationship' },
+      { icon: <Link className="w-4 h-4" />, label: 'Non-Identifying Relationship' },
+      { icon: <GitMerge className="w-4 h-4" />, label: 'Many to Many' },
+      { icon: <PenTool className="w-4 h-4" />, label: 'Annotations' },
+      { icon: <Square className="w-4 h-4" />, label: 'Rectangle' },
+      { icon: <Circle className="w-4 h-4" />, label: 'Circle' }
+    ],
+    view: [
+      { icon: <Table className="w-4 h-4" />, label: 'Entity View' },
+      { icon: <Layers className="w-4 h-4" />, label: 'Attribute View' },
+      { icon: <Key className="w-4 h-4" />, label: 'PK View' },
+      { icon: <Lock className="w-4 h-4" />, label: 'Key View' },
+      { icon: <FileText className="w-4 h-4" />, label: 'Definition View' },
+      { icon: <LayoutGrid className="w-4 h-4" />, label: 'Icons View' },
+      { icon: <ZoomIn className="w-4 h-4" />, label: 'Zoom In' },
+      { icon: <ZoomOut className="w-4 h-4" />, label: 'Zoom Out' },
+      { icon: <Maximize2 className="w-4 h-4" />, label: 'Fit to Screen' }
+    ],
+    diagram: [
+      { icon: <Plus className="w-4 h-4" />, label: 'New Diagram' },
+      { icon: <Trash2 className="w-4 h-4" />, label: 'Delete Diagram' },
+      { icon: <AlignLeft className="w-4 h-4" />, label: 'Align Left' },
+      { icon: <AlignJustify className="w-4 h-4" />, label: 'Align Right' },
+      { icon: <AlignCenter className="w-4 h-4" />, label: 'Align Center' },
+      { icon: <Box className="w-4 h-4" />, label: 'Align Top' },
+      { icon: <LayoutGrid className="w-4 h-4" />, label: 'Align Middle' },
+      { icon: <AlignJustify className="w-4 h-4" />, label: 'Align Bottom' },
+      { icon: <Layers className="w-4 h-4" />, label: 'Group' },
+      { icon: <Layers className="w-4 h-4" />, label: 'Ungroup' },
+      { icon: <Layers className="w-4 h-4" />, label: 'Layout' },
+      { icon: <EyeOff className="w-4 h-4" />, label: 'Hide' },
+      { icon: <Users className="w-4 h-4" />, label: 'Hide Neighborhood' },
+      { icon: <Eye className="w-4 h-4" />, label: 'Unhide' }
+    ],
+    actions: [
+      { icon: <RefreshCw className="w-4 h-4" />, label: 'Complete Compare' },
+      { icon: <Upload className="w-4 h-4" />, label: 'Reverse Engineering' },
+      { icon: <Download className="w-4 h-4" />, label: 'Forward Engineering' }
+    ],
+    tools: [
+      { icon: <Type className="w-4 h-4" />, label: 'Naming Standards' },
+      { icon: <Database className="w-4 h-4" />, label: 'Datatype Standards' },
+      { icon: <FileCode className="w-4 h-4" />, label: 'Report' },
+      { icon: <Import className="w-4 h-4" />, label: 'Import' }
+    ],
+    help: [
+      { icon: <BookOpen className="w-4 h-4" />, label: 'Help Topics' },
+      { icon: <Zap className="w-4 h-4" />, label: "What's New" },
+      { icon: <MessageCircle className="w-4 h-4" />, label: 'Support' },
+      { icon: <BookOpen className="w-4 h-4" />, label: 'Training' },
+      { icon: <Users className="w-4 h-4" />, label: 'Community' },
+      { icon: <Shield className="w-4 h-4" />, label: 'License' },
+      { icon: <Info className="w-4 h-4" />, label: 'About' }
+    ]
   };
 
-  const toolbarItems = getToolbarContent();
+  const toolbarItems = menuItems[activeTab as keyof typeof menuItems] || [];
 
   return (
-    <div className={`h-12 px-4 flex items-center gap-2 border-b ${
+    <div className={`h-12 px-4 flex items-center gap-1 border-b ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'
     } transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {toolbarItems.map((item, index) => (
         <button
           key={index}
-          className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg transition-all duration-200 shadow-sm ${
+          className={`group relative p-2 rounded-lg transition-all duration-200 ${
             isDark
-              ? 'text-gray-300 hover:text-gray-100 hover:bg-zinc-800 hover:shadow-md border border-zinc-800 bg-zinc-900'
-              : 'text-gray-700 hover:text-gray-900 hover:bg-white hover:shadow-md border border-gray-200 bg-gray-50'
+              ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200'
+              : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
           }`}
-          style={{ fontWeight: 500 }}
+          title={item.label}
         >
           {item.icon}
-          {item.label}
+          <span className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 ${
+            isDark ? 'bg-zinc-700 text-gray-200' : 'bg-gray-800 text-white'
+          }`}>
+            {item.label}
+            {item.shortcut && <span className="ml-2 opacity-60">{item.shortcut}</span>}
+          </span>
         </button>
       ))}
     </div>
@@ -292,7 +391,13 @@ const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: 
 
 // Model Tree Component
 const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCollapsed: boolean; onToggle: () => void }) => {
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['models', 'model-1', 'diagrams']));
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['model-root', 'model-properties', 'entities-tables', 'relationships']));
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuType, setContextMenuType] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addModalType, setAddModalType] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleExpanded = (id: string) => {
     const newExpanded = new Set(expandedItems);
@@ -304,44 +409,736 @@ const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isColla
     setExpandedItems(newExpanded);
   };
 
+  const handleAddNew = (type: string, parentId: string) => {
+    setAddModalType(type);
+    setShowAddModal(true);
+  };
+
+  const handleShowMenu = (e: React.MouseEvent, type: string, id: string) => {
+    setContextMenuPosition({ x: e.clientX, y: e.clientY });
+    setContextMenuType(type);
+    setShowContextMenu(true);
+  };
+
+  const treeData = [
+    {
+      id: 'model-root',
+      label: 'E-Commerce Platform',
+      icon: <Database className="w-4 h-4 text-blue-500" />,
+      type: 'model',
+      canAddNew: true,
+      hasMenu: true,
+      children: [
+        {
+          id: 'model-properties',
+          label: 'Model Properties',
+          icon: <Settings className="w-4 h-4 text-gray-500" />,
+          type: 'folder',
+          hasMenu: true
+        },
+        {
+          id: 'subject-areas',
+          label: 'Subject Areas',
+          icon: <Component className="w-4 h-4 text-purple-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'sa-customer-mgmt',
+              label: 'Customer Management',
+              icon: <Box className="w-4 h-4 text-purple-400" />,
+              type: 'subject-area',
+              hasMenu: true
+            },
+            {
+              id: 'sa-order-processing',
+              label: 'Order Processing',
+              icon: <Box className="w-4 h-4 text-purple-400" />,
+              type: 'subject-area',
+              hasMenu: true
+            }
+          ]
+        },
+        {
+          id: 'diagrams-root',
+          label: 'Diagrams',
+          icon: <Workflow className="w-4 h-4 text-blue-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'logical-diagrams',
+              label: 'Logical Diagram(s)',
+              icon: <FileText className="w-4 h-4 text-green-500" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'diagram-logical-main',
+                  label: 'Main Logical Model',
+                  icon: <FileText className="w-4 h-4 text-green-400" />,
+                  type: 'diagram',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'physical-diagrams',
+              label: 'Physical Diagram(s)',
+              icon: <FileText className="w-4 h-4 text-orange-500" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'diagram-physical-main',
+                  label: 'Main Physical Model',
+                  icon: <FileText className="w-4 h-4 text-orange-400" />,
+                  type: 'diagram',
+                  hasMenu: true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'domains',
+          label: 'Domains',
+          icon: <Type className="w-4 h-4 text-blue-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'domain-email',
+              label: 'EmailAddress',
+              icon: <Type className="w-4 h-4 text-blue-400" />,
+              type: 'domain',
+              hasMenu: true
+            },
+            {
+              id: 'domain-currency',
+              label: 'Currency',
+              icon: <Type className="w-4 h-4 text-blue-400" />,
+              type: 'domain',
+              hasMenu: true
+            }
+          ]
+        },
+        {
+          id: 'entities-tables',
+          label: 'Entities / Tables',
+          icon: <Database className="w-4 h-4 text-purple-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'entity-table-list',
+              label: 'Entity/Table list',
+              icon: <LayoutGrid className="w-4 h-4 text-purple-400" />,
+              type: 'folder',
+              children: [
+                {
+                  id: 'entity-customer',
+                  label: 'Customer',
+                  icon: <Box className="w-4 h-4 text-purple-500" />,
+                  type: 'entity',
+                  hasMenu: true,
+                  children: [
+                    {
+                      id: 'customer-attributes',
+                      label: 'Attributes / Columns',
+                      icon: <Hash className="w-4 h-4 text-gray-500" />,
+                      type: 'folder',
+                      children: [
+                        {
+                          id: 'customer-pk',
+                          label: 'Primary Keys (PK)',
+                          icon: <Key className="w-4 h-4 text-yellow-500" />,
+                          type: 'folder',
+                          children: [
+                            {
+                              id: 'attr-customer-id',
+                              label: 'customer_id',
+                              icon: <Key className="w-3.5 h-3.5 text-yellow-500" />,
+                              type: 'attribute',
+                              hasMenu: true
+                            }
+                          ]
+                        },
+                        {
+                          id: 'customer-fk',
+                          label: 'Foreign Keys (FK)',
+                          icon: <Link className="w-4 h-4 text-blue-500" />,
+                          type: 'folder',
+                          children: []
+                        },
+                        {
+                          id: 'customer-other',
+                          label: 'Other attributes',
+                          icon: <Hash className="w-4 h-4 text-gray-500" />,
+                          type: 'folder',
+                          children: [
+                            {
+                              id: 'attr-first-name',
+                              label: 'first_name',
+                              icon: <Hash className="w-3.5 h-3.5 text-gray-500" />,
+                              type: 'attribute',
+                              hasMenu: true
+                            },
+                            {
+                              id: 'attr-email',
+                              label: 'email',
+                              icon: <Hash className="w-3.5 h-3.5 text-gray-500" />,
+                              type: 'attribute',
+                              hasMenu: true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: 'entity-order',
+                  label: 'Order',
+                  icon: <Box className="w-4 h-4 text-purple-500" />,
+                  type: 'entity',
+                  hasMenu: true,
+                  children: [
+                    {
+                      id: 'order-attributes',
+                      label: 'Attributes / Columns',
+                      icon: <Hash className="w-4 h-4 text-gray-500" />,
+                      type: 'folder',
+                      children: [
+                        {
+                          id: 'order-pk',
+                          label: 'Primary Keys (PK)',
+                          icon: <Key className="w-4 h-4 text-yellow-500" />,
+                          type: 'folder',
+                          children: [
+                            {
+                              id: 'attr-order-id',
+                              label: 'order_id',
+                              icon: <Key className="w-3.5 h-3.5 text-yellow-500" />,
+                              type: 'attribute',
+                              hasMenu: true
+                            }
+                          ]
+                        },
+                        {
+                          id: 'order-fk',
+                          label: 'Foreign Keys (FK)',
+                          icon: <Link className="w-4 h-4 text-blue-500" />,
+                          type: 'folder',
+                          children: [
+                            {
+                              id: 'attr-customer-fk',
+                              label: 'customer_id',
+                              icon: <Link className="w-3.5 h-3.5 text-blue-500" />,
+                              type: 'attribute',
+                              hasMenu: true
+                            }
+                          ]
+                        },
+                        {
+                          id: 'order-other',
+                          label: 'Other attributes',
+                          icon: <Hash className="w-4 h-4 text-gray-500" />,
+                          type: 'folder',
+                          children: [
+                            {
+                              id: 'attr-order-date',
+                              label: 'order_date',
+                              icon: <Hash className="w-3.5 h-3.5 text-gray-500" />,
+                              type: 'attribute',
+                              hasMenu: true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'relationships',
+          label: 'Relationships',
+          icon: <GitBranch className="w-4 h-4 text-green-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'identifying-rel',
+              label: 'Identifying',
+              icon: <GitBranch className="w-4 h-4 text-green-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'rel-customer-order',
+                  label: 'Customer_Order',
+                  icon: <GitBranch className="w-4 h-4 text-green-500" />,
+                  type: 'relationship',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'non-identifying-rel',
+              label: 'Non-identifying',
+              icon: <GitMerge className="w-4 h-4 text-green-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'rel-order-product',
+                  label: 'Order_Product',
+                  icon: <GitMerge className="w-4 h-4 text-green-500" />,
+                  type: 'relationship',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'many-to-many-rel',
+              label: 'Many-to-Many',
+              icon: <Network className="w-4 h-4 text-green-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'rel-product-category',
+                  label: 'Product_Category',
+                  icon: <Network className="w-4 h-4 text-green-500" />,
+                  type: 'relationship',
+                  hasMenu: true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'views',
+          label: 'Views',
+          icon: <Eye className="w-4 h-4 text-cyan-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'logical-views',
+              label: 'Logical views',
+              icon: <Eye className="w-4 h-4 text-cyan-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'view-customer-summary',
+                  label: 'CustomerSummary',
+                  icon: <Eye className="w-4 h-4 text-cyan-500" />,
+                  type: 'view',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'physical-views',
+              label: 'Physical views (SQL)',
+              icon: <FileCode className="w-4 h-4 text-cyan-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'view-customer-orders',
+                  label: 'VW_CUSTOMER_ORDERS',
+                  icon: <FileCode className="w-4 h-4 text-cyan-500" />,
+                  type: 'view',
+                  hasMenu: true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'sequences-procedures-triggers',
+          label: 'Sequences / Procedures / Triggers',
+          icon: <Zap className="w-4 h-4 text-red-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'sequences',
+              label: 'Sequences',
+              icon: <Hash className="w-4 h-4 text-purple-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'seq-customer-id',
+                  label: 'SEQ_CUSTOMER_ID',
+                  icon: <Hash className="w-4 h-4 text-purple-500" />,
+                  type: 'sequence',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'stored-procedures',
+              label: 'Stored Procedures',
+              icon: <Command className="w-4 h-4 text-red-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'proc-get-orders',
+                  label: 'SP_GET_CUSTOMER_ORDERS',
+                  icon: <Command className="w-4 h-4 text-red-500" />,
+                  type: 'procedure',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'triggers',
+              label: 'Triggers',
+              icon: <Zap className="w-4 h-4 text-yellow-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'trigger-audit',
+                  label: 'TRG_CUSTOMER_AUDIT',
+                  icon: <Zap className="w-4 h-4 text-yellow-500" />,
+                  type: 'trigger',
+                  hasMenu: true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'users-roles',
+          label: 'Users / Roles',
+          icon: <Users className="w-4 h-4 text-indigo-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'users',
+              label: 'Users',
+              icon: <User className="w-4 h-4 text-indigo-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'user-admin',
+                  label: 'db_admin',
+                  icon: <Crown className="w-4 h-4 text-indigo-500" />,
+                  type: 'user',
+                  hasMenu: true
+                },
+                {
+                  id: 'user-app',
+                  label: 'app_user',
+                  icon: <User className="w-4 h-4 text-indigo-500" />,
+                  type: 'user',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'roles',
+              label: 'Roles',
+              icon: <UserPlus className="w-4 h-4 text-indigo-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'role-admin',
+                  label: 'ADMIN_ROLE',
+                  icon: <Crown className="w-4 h-4 text-indigo-500" />,
+                  type: 'role',
+                  hasMenu: true
+                },
+                {
+                  id: 'role-read',
+                  label: 'READ_ONLY_ROLE',
+                  icon: <Eye className="w-4 h-4 text-indigo-500" />,
+                  type: 'role',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'permissions',
+              label: 'Permissions',
+              icon: <KeyRound className="w-4 h-4 text-indigo-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'perm-select',
+                  label: 'SELECT_PERMISSION',
+                  icon: <Eye className="w-4 h-4 text-indigo-500" />,
+                  type: 'permission',
+                  hasMenu: true
+                },
+                {
+                  id: 'perm-insert',
+                  label: 'INSERT_PERMISSION',
+                  icon: <Plus className="w-4 h-4 text-indigo-500" />,
+                  type: 'permission',
+                  hasMenu: true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'other-objects',
+          label: 'Other Objects (depending on DBMS)',
+          icon: <Server className="w-4 h-4 text-gray-500" />,
+          type: 'folder',
+          canAddNew: true,
+          children: [
+            {
+              id: 'indexes',
+              label: 'Indexes',
+              icon: <Search className="w-4 h-4 text-yellow-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'idx-customer-email',
+                  label: 'IDX_CUSTOMER_EMAIL',
+                  icon: <Search className="w-4 h-4 text-yellow-500" />,
+                  type: 'index',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'constraints',
+              label: 'Constraints',
+              icon: <Lock className="w-4 h-4 text-red-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'chk-email-format',
+                  label: 'CHK_EMAIL_FORMAT',
+                  icon: <Lock className="w-4 h-4 text-red-500" />,
+                  type: 'constraint',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'synonyms',
+              label: 'Synonyms',
+              icon: <Link2 className="w-4 h-4 text-purple-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'syn-customer',
+                  label: 'SYN_CUSTOMER',
+                  icon: <Link2 className="w-4 h-4 text-purple-500" />,
+                  type: 'synonym',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'schemas',
+              label: 'Schemas',
+              icon: <Folder className="w-4 h-4 text-blue-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'schema-public',
+                  label: 'PUBLIC',
+                  icon: <Globe className="w-4 h-4 text-blue-500" />,
+                  type: 'schema',
+                  hasMenu: true
+                },
+                {
+                  id: 'schema-app',
+                  label: 'APP_SCHEMA',
+                  icon: <Folder className="w-4 h-4 text-blue-500" />,
+                  type: 'schema',
+                  hasMenu: true
+                }
+              ]
+            },
+            {
+              id: 'tablespaces-storage',
+              label: 'Tablespaces / Storage',
+              icon: <HardDrive className="w-4 h-4 text-gray-600" />,
+              type: 'folder',
+              canAddNew: true,
+              children: [
+                {
+                  id: 'ts-data',
+                  label: 'DATA_TABLESPACE',
+                  icon: <HardDrive className="w-4 h-4 text-gray-500" />,
+                  type: 'tablespace',
+                  hasMenu: true
+                },
+                {
+                  id: 'ts-index',
+                  label: 'INDEX_TABLESPACE',
+                  icon: <Archive className="w-4 h-4 text-gray-500" />,
+                  type: 'tablespace',
+                  hasMenu: true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  // Filter tree items based on search term
+  const filterTreeItems = (items: any[], searchTerm: string): any[] => {
+    if (!searchTerm) return items;
+
+    const filtered: any[] = [];
+
+    for (const item of items) {
+      const matchesSearch = item.label.toLowerCase().includes(searchTerm.toLowerCase());
+      const filteredChildren = item.children ? filterTreeItems(item.children, searchTerm) : [];
+
+      if (matchesSearch || filteredChildren.length > 0) {
+        filtered.push({
+          ...item,
+          children: filteredChildren
+        });
+      }
+    }
+
+    return filtered;
+  };
+
+  // Auto-expand items when searching
+  const getExpandedItemsForSearch = (items: any[], searchTerm: string, expandedSet: Set<string>): Set<string> => {
+    if (!searchTerm) return expandedSet;
+
+    const newExpanded = new Set(expandedSet);
+
+    const addExpandedItems = (treeItems: any[]) => {
+      for (const item of treeItems) {
+        if (item.children && item.children.length > 0) {
+          const hasMatchingChild = item.children.some((child: any) =>
+            child.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (child.children && child.children.length > 0)
+          );
+
+          if (hasMatchingChild || item.label.toLowerCase().includes(searchTerm.toLowerCase())) {
+            newExpanded.add(item.id);
+          }
+
+          addExpandedItems(item.children);
+        }
+      }
+    };
+
+    addExpandedItems(items);
+    return newExpanded;
+  };
+
+  const filteredTreeData = filterTreeItems(treeData, searchTerm);
+
+  // Update expanded items when searching
+  const effectiveExpandedItems = searchTerm
+    ? getExpandedItemsForSearch(treeData, searchTerm, expandedItems)
+    : expandedItems;
+
   const TreeItem = ({
     id,
     label,
     icon,
     children,
-    level = 0
+    level = 0,
+    type = 'folder',
+    canAddNew = false,
+    hasMenu = false
   }: {
     id: string;
     label: string;
     icon: React.ReactNode;
     children?: any[];
     level?: number;
+    type?: 'folder' | 'model' | 'entity' | 'attribute' | 'relationship' | 'domain' | 'table' | 'view' | 'procedure';
+    canAddNew?: boolean;
+    hasMenu?: boolean;
   }) => {
-    const isExpanded = expandedItems.has(id);
+    const isExpanded = effectiveExpandedItems.has(id);
     const hasChildren = children && children.length > 0;
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
       <div>
         <div
-          className={`flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-xl cursor-pointer transition-all duration-200 ${
+          className={`group flex items-center gap-2 px-2 py-1.5 text-sm rounded-md cursor-pointer transition-all duration-200 ${
             isDark
               ? 'text-gray-300 hover:text-gray-100 hover:bg-zinc-800/70'
               : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/70'
           }`}
-          style={{ paddingLeft: `${12 + level * 20}px`, fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 500 }}
+          style={{ paddingLeft: `${8 + level * 16}px`, fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 400 }}
           onClick={() => hasChildren && toggleExpanded(id)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDown className="w-4 h-4" />
+              <ChevronDown className="w-3.5 h-3.5 flex-shrink-0" />
             ) : (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
             )
           ) : (
-            <div className="w-4 h-4" />
+            <div className="w-3.5 h-3.5 flex-shrink-0" />
           )}
-          {icon}
-          <span className="flex-1">{label}</span>
+          <div className="flex-shrink-0">{icon}</div>
+          <span className="flex-1 truncate">{label}</span>
+
+          {/* Hover Controls */}
+          {(isHovered || canAddNew || hasMenu) && (
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {canAddNew && (
+                <button
+                  className={`p-1 rounded hover:bg-opacity-20 transition-colors ${
+                    isDark ? 'hover:bg-white' : 'hover:bg-black'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddNew(type, id);
+                  }}
+                  title="Add New"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              )}
+              {hasMenu && (
+                <button
+                  className={`p-1 rounded hover:bg-opacity-20 transition-colors ${
+                    isDark ? 'hover:bg-white' : 'hover:bg-black'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleShowMenu(e, type, id);
+                  }}
+                  title="Options"
+                >
+                  <MoreHorizontal className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          )}
         </div>
         {hasChildren && isExpanded && (
           <div>
@@ -353,62 +1150,6 @@ const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isColla
       </div>
     );
   };
-
-  const treeData = [
-    {
-      id: 'models',
-      label: 'Models',
-      icon: <FolderOpen className="w-4 h-4 text-indigo-500" />,
-      children: [
-        {
-          id: 'model-1',
-          label: 'E-Commerce Platform',
-          icon: <Database className="w-4 h-4 text-blue-500" />,
-          children: [
-            {
-              id: 'diagrams',
-              label: 'Diagrams',
-              icon: <Folder className="w-4 h-4 text-gray-500" />,
-              children: [
-                {
-                  id: 'diagram-1',
-                  label: 'Logical Model',
-                  icon: <Grid className="w-4 h-4 text-green-500" />
-                },
-                {
-                  id: 'diagram-2',
-                  label: 'Physical Model',
-                  icon: <Grid className="w-4 h-4 text-orange-500" />
-                }
-              ]
-            },
-            {
-              id: 'entities',
-              label: 'Entities',
-              icon: <Folder className="w-4 h-4 text-gray-500" />,
-              children: [
-                {
-                  id: 'entity-1',
-                  label: 'Customer',
-                  icon: <Table className="w-4 h-4 text-purple-500" />
-                },
-                {
-                  id: 'entity-2',
-                  label: 'Order',
-                  icon: <Table className="w-4 h-4 text-purple-500" />
-                },
-                {
-                  id: 'entity-3',
-                  label: 'Product',
-                  icon: <Table className="w-4 h-4 text-purple-500" />
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ];
 
   return (
     <div className={`${isCollapsed ? 'w-12' : 'w-80'} h-full border-r overflow-y-auto transition-all duration-300 ${
@@ -432,13 +1173,144 @@ const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isColla
           </button>
         </div>
         {!isCollapsed && (
-          <div className="space-y-1">
-            {treeData.map((item) => (
-              <TreeItem key={item.id} {...item} />
-            ))}
-          </div>
+          <>
+            {/* Search Box */}
+            <div className="mb-4">
+              <div className="relative">
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                }`} />
+                <input
+                  type="text"
+                  placeholder="Search tree..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full pl-10 pr-4 py-2 text-sm rounded-lg border transition-all duration-200 ${
+                    isDark
+                      ? 'bg-zinc-800 border-zinc-700 text-gray-100 placeholder-gray-500 focus:border-blue-500'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+                  style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                />
+              </div>
+            </div>
+
+            {/* Tree Items */}
+            <div className="space-y-1">
+              {filteredTreeData.map((item) => (
+                <TreeItem key={item.id} {...item} />
+              ))}
+            </div>
+          </>
         )}
       </div>
+
+      {/* Context Menu */}
+      {showContextMenu && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowContextMenu(false)}
+          />
+          <div
+            className={`fixed z-50 min-w-48 py-2 rounded-lg shadow-xl border ${
+              isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-gray-200'
+            }`}
+            style={{
+              left: contextMenuPosition.x,
+              top: contextMenuPosition.y,
+              fontFamily: 'Inter, system-ui, sans-serif'
+            }}
+          >
+            <div className={`px-3 py-1.5 text-xs font-medium ${
+              isDark ? 'text-gray-400' : 'text-gray-500'
+            }`}>
+              {contextMenuType.charAt(0).toUpperCase() + contextMenuType.slice(1)} Options
+            </div>
+            <div className="border-t border-zinc-700 my-1" />
+            <button className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-opacity-10 transition-colors ${
+              isDark ? 'text-gray-300 hover:bg-white' : 'text-gray-700 hover:bg-black'
+            }`}>
+              <Edit3 className="w-4 h-4" />
+              Edit Properties
+            </button>
+            <button className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-opacity-10 transition-colors ${
+              isDark ? 'text-gray-300 hover:bg-white' : 'text-gray-700 hover:bg-black'
+            }`}>
+              <Copy className="w-4 h-4" />
+              Duplicate
+            </button>
+            <button className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-opacity-10 transition-colors ${
+              isDark ? 'text-gray-300 hover:bg-white' : 'text-gray-700 hover:bg-black'
+            }`}>
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Add New Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowAddModal(false)}
+          />
+          <div className={`relative w-96 p-6 rounded-lg shadow-xl ${
+            isDark ? 'bg-zinc-900' : 'bg-white'
+          }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className={`text-lg font-semibold ${
+                isDark ? 'text-gray-100' : 'text-gray-900'
+              }`}>
+                Add New {addModalType.charAt(0).toUpperCase() + addModalType.slice(1)}
+              </h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className={`p-1 rounded-lg hover:bg-opacity-10 transition-colors ${
+                  isDark ? 'hover:bg-white text-gray-400' : 'hover:bg-black text-gray-600'
+                }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Name
+                </label>
+                <input
+                  type="text"
+                  placeholder={`Enter ${addModalType} name`}
+                  className={`w-full px-3 py-2 rounded-lg border ${
+                    isDark ? 'bg-zinc-800 border-zinc-700 text-gray-100 placeholder-gray-500'
+                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className={`px-4 py-2 rounded-lg border transition-colors ${
+                    isDark ? 'border-zinc-600 text-gray-300 hover:bg-zinc-800'
+                           : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Create
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1091,6 +1963,11 @@ const ModelExplorer = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [isTreeCollapsed, setIsTreeCollapsed] = useState(false);
   const [isPropertyCollapsed, setIsPropertyCollapsed] = useState(false);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuType, setContextMenuType] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addModalType, setAddModalType] = useState('');
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -1104,7 +1981,7 @@ const ModelExplorer = () => {
       <HeaderBar isDark={isDark} toggleTheme={toggleTheme} />
 
       {/* Main Tabs */}
-      <MainTabs isDark={isDark} />
+      <MainTabs isDark={isDark} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Contextual Toolbar */}
       <ContextualToolbar isDark={isDark} activeTab={activeTab} />

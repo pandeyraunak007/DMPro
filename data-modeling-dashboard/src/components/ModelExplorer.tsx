@@ -89,7 +89,6 @@ import {
   Workflow,
   Component,
   Archive,
-  HardDrive,
   Network,
   TreePine,
   Globe,
@@ -98,7 +97,11 @@ import {
   CreditCard,
   Crown,
   UserPlus,
-  KeyRound
+  KeyRound,
+  ToggleLeft,
+  ToggleRight,
+  Cpu,
+  Monitor
 } from 'lucide-react';
 
 // Linear.app-inspired Premium UI Color Theme
@@ -165,12 +168,40 @@ interface Model {
   created: string;
   modified: string;
   status: 'active' | 'locked' | 'readonly';
+  targetDatabase: 'sqlserver' | 'oracle' | 'mysql' | 'postgresql' | 'db2' | 'sqlite';
 }
+
+// Database type icons mapping
+const getDatabaseIcon = (dbType: string) => {
+  const iconProps = { className: "w-4 h-4" };
+  switch (dbType) {
+    case 'sqlserver':
+      return <Monitor {...iconProps} style={{ color: '#00BCF2' }} />;
+    case 'oracle':
+      return <Server {...iconProps} style={{ color: '#F80000' }} />;
+    case 'mysql':
+      return <Server {...iconProps} style={{ color: '#00758F' }} />;
+    case 'postgresql':
+      return <Cpu {...iconProps} style={{ color: '#336791' }} />;
+    case 'db2':
+      return <Database {...iconProps} style={{ color: '#1F70C1' }} />;
+    case 'sqlite':
+      return <Server {...iconProps} style={{ color: '#7DD3FC' }} />;
+    default:
+      return <Database {...iconProps} />;
+  }
+};
 
 // Header Bar Component
 const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => void }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [hasNotifications, setHasNotifications] = useState(true);
+
+  // Mock model data
+  const currentModel = {
+    name: 'E-Commerce Platform',
+    targetDatabase: 'sqlserver' as const
+  };
 
   return (
     <div className={`h-10 px-4 flex items-center justify-between border-b ${
@@ -189,9 +220,12 @@ const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () =
         <div className={`h-4 w-px ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
         <div className="flex items-center gap-1.5">
           <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Model:</span>
-          <span className={`text-xs font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-            E-Commerce Platform
-          </span>
+          <div className="flex items-center gap-1">
+            {getDatabaseIcon(currentModel.targetDatabase)}
+            <span className={`text-xs font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+              {currentModel.name}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -293,7 +327,12 @@ const MainTabs = ({ isDark, activeTab, setActiveTab }: { isDark: boolean; active
 };
 
 // Contextual Toolbar Component
-const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: string }) => {
+const ContextualToolbar = ({ isDark, activeTab, isPhysicalView, setIsPhysicalView }: {
+  isDark: boolean;
+  activeTab: string;
+  isPhysicalView: boolean;
+  setIsPhysicalView: (value: boolean) => void;
+}) => {
   const menuItems = {
     file: [
       { icon: <FolderOpen className="w-4 h-4" />, label: 'Open', shortcut: 'Ctrl+O' },
@@ -385,12 +424,55 @@ const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: 
           </span>
         </button>
       ))}
+
+      {/* Physical/Logical Toggle - Right Side */}
+      <div className="ml-auto flex items-center">
+        <div className={`flex items-center rounded-lg p-1 ${
+          isDark ? 'bg-zinc-800' : 'bg-gray-200'
+        }`}>
+          <button
+            onClick={() => setIsPhysicalView(false)}
+            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-all ${
+              !isPhysicalView
+                ? isDark
+                  ? 'bg-zinc-700 text-zinc-100'
+                  : 'bg-white text-gray-900 shadow-sm'
+                : isDark
+                  ? 'text-zinc-400 hover:text-zinc-200'
+                  : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Layers className="w-3 h-3" />
+            Logical
+          </button>
+          <button
+            onClick={() => setIsPhysicalView(true)}
+            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-all ${
+              isPhysicalView
+                ? isDark
+                  ? 'bg-zinc-700 text-zinc-100'
+                  : 'bg-white text-gray-900 shadow-sm'
+                : isDark
+                  ? 'text-zinc-400 hover:text-zinc-200'
+                  : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Server className="w-3 h-3" />
+            Physical
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
 // Model Tree Component
-const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCollapsed: boolean; onToggle: () => void }) => {
+const ModelTree = ({ isDark, isCollapsed, onToggle, isPhysicalView }: {
+  isDark: boolean;
+  isCollapsed: boolean;
+  onToggle: () => void;
+  isPhysicalView: boolean;
+}) => {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['model-root', 'model-properties', 'entities-tables', 'relationships']));
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -525,14 +607,14 @@ const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isColla
         },
         {
           id: 'entities-tables',
-          label: 'Entities / Tables',
+          label: isPhysicalView ? 'Tables' : 'Entities',
           icon: <Database className="w-4 h-4 text-purple-500" />,
           type: 'folder',
           canAddNew: true,
           children: [
             {
               id: 'entity-table-list',
-              label: 'Entity/Table list',
+              label: isPhysicalView ? 'Table list' : 'Entity list',
               icon: <LayoutGrid className="w-4 h-4 text-purple-400" />,
               type: 'folder',
               children: [
@@ -545,7 +627,7 @@ const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isColla
                   children: [
                     {
                       id: 'customer-attributes',
-                      label: 'Attributes / Columns',
+                      label: isPhysicalView ? 'Columns' : 'Attributes',
                       icon: <Hash className="w-4 h-4 text-gray-500" />,
                       type: 'folder',
                       children: [
@@ -606,7 +688,7 @@ const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isColla
                   children: [
                     {
                       id: 'order-attributes',
-                      label: 'Attributes / Columns',
+                      label: isPhysicalView ? 'Columns' : 'Attributes',
                       icon: <Hash className="w-4 h-4 text-gray-500" />,
                       type: 'folder',
                       children: [
@@ -977,14 +1059,14 @@ const ModelTree = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isColla
             {
               id: 'tablespaces-storage',
               label: 'Tablespaces / Storage',
-              icon: <HardDrive className="w-4 h-4 text-gray-600" />,
+              icon: <Server className="w-4 h-4 text-gray-600" />,
               type: 'folder',
               canAddNew: true,
               children: [
                 {
                   id: 'ts-data',
                   label: 'DATA_TABLESPACE',
-                  icon: <HardDrive className="w-4 h-4 text-gray-500" />,
+                  icon: <Server className="w-4 h-4 text-gray-500" />,
                   type: 'tablespace',
                   hasMenu: true
                 },
@@ -1963,6 +2045,7 @@ const ModelExplorer = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [isTreeCollapsed, setIsTreeCollapsed] = useState(false);
   const [isPropertyCollapsed, setIsPropertyCollapsed] = useState(false);
+  const [isPhysicalView, setIsPhysicalView] = useState(true);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const [contextMenuType, setContextMenuType] = useState('');
@@ -1984,12 +2067,12 @@ const ModelExplorer = () => {
       <MainTabs isDark={isDark} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Contextual Toolbar */}
-      <ContextualToolbar isDark={isDark} activeTab={activeTab} />
+      <ContextualToolbar isDark={isDark} activeTab={activeTab} isPhysicalView={isPhysicalView} setIsPhysicalView={setIsPhysicalView} />
 
       {/* Main Workspace */}
       <div className="flex-1 flex overflow-hidden">
         {/* Model Tree */}
-        <ModelTree isDark={isDark} isCollapsed={isTreeCollapsed} onToggle={() => setIsTreeCollapsed(!isTreeCollapsed)} />
+        <ModelTree isDark={isDark} isCollapsed={isTreeCollapsed} onToggle={() => setIsTreeCollapsed(!isTreeCollapsed)} isPhysicalView={isPhysicalView} />
 
         {/* Diagram Canvas */}
         <DiagramCanvas isDark={isDark} />

@@ -482,7 +482,7 @@ const ReverseEngineeringCard = ({ onClick }: { onClick?: () => void }) => {
 };
 
 // Complete Compare Card
-const CompleteCompareCard = () => {
+const CompleteCompareCard = ({ onClick }: { onClick?: () => void }) => {
   return (
     <div className="panel">
       <div className="flex items-center justify-between mb-4">

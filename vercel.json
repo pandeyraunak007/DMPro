@@ -1,7 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "rootDirectory": "data-modeling-dashboard"
+  "buildCommand": "cd data-modeling-dashboard && npm run build",
+  "outputDirectory": "data-modeling-dashboard/.next",
+  "installCommand": "cd data-modeling-dashboard && npm install",
+  "framework": "nextjs"
 }

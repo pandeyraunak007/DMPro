@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd data-modeling-dashboard && npm run build",
+  "buildCommand": "npm run build --prefix data-modeling-dashboard",
   "outputDirectory": "data-modeling-dashboard/.next",
-  "installCommand": "cd data-modeling-dashboard && npm install",
+  "installCommand": "npm install --prefix data-modeling-dashboard",
   "framework": "nextjs"
 }

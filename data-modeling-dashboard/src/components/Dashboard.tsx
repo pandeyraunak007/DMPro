@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ReverseEngineering from './ReverseEngineering';
 import ModelExplorer from './ModelExplorer';
 import CompleteCompare from './CompleteCompare';
+import Users from './Users';
 import {
   LayoutDashboard,
   Database,
@@ -18,7 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  Users,
+  Users as UsersIcon,
   Activity,
   TrendingUp,
   CheckCircle2,
@@ -262,7 +263,7 @@ const SearchInput = ({ placeholder, value, onChange }: SearchInputProps) => (
 const SystemInsightsPanel = () => {
   const insights = [
     { label: 'Models Created Today', value: '8', trend: '+12%', icon: <Database className="w-4 h-4" /> },
-    { label: 'Active Users', value: '24', trend: '+8%', icon: <Users className="w-4 h-4" /> },
+    { label: 'Active Users', value: '24', trend: '+8%', icon: <UsersIcon className="w-4 h-4" /> },
     { label: 'AI Suggestions Accepted', value: '73%', trend: '+5%', icon: <Brain className="w-4 h-4" /> },
     { label: 'System Health', value: '99.8%', trend: 'Stable', icon: <Activity className="w-4 h-4" /> }
   ];
@@ -565,7 +566,7 @@ export default function Dashboard() {
       active: currentPage === 'complete-compare'
     },
     {
-      icon: <Users className="w-4 h-4" />,
+      icon: <UsersIcon className="w-4 h-4" />,
       label: 'Users',
       page: 'users' as const,
       active: currentPage === 'users'
@@ -640,25 +641,83 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
 
-        {/* Linear Toolbar - only show on dashboard */}
-        {currentPage === 'dashboard' && <LinearToolbar />}
+        {/* No toolbar needed for new layout */}
 
         {/* Page Content */}
         <div className="flex-1 overflow-auto">
           {currentPage === 'dashboard' && (
             <div className="p-6">
-              {/* Header Section */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-2">
-                  <h1 className="text-2xl font-bold text-zinc-100">Data Models Dashboard</h1>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-400">Last updated 2 minutes ago</span>
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                  </div>
-                </div>
-                <p className="text-zinc-400">
-                  Monitor and manage your data modeling workspace
+              {/* Welcome Section */}
+              <div className="text-center mb-12">
+                <h1 className="text-3xl font-bold text-zinc-100 mb-4">
+                  Welcome to DMPro
+                </h1>
+                <p className="text-lg text-zinc-400 mb-8">
+                  Your comprehensive data modeling workspace
                 </p>
+
+                {/* Quick Action Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto mb-12">
+                  <button
+                    onClick={() => setCurrentPage('model-explorer')}
+                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-800/50 transition-all duration-200"
+                  >
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="p-3 bg-purple-500/20 rounded-lg group-hover:bg-purple-500/30 transition-colors">
+                        <FolderOpen className="w-6 h-6 text-purple-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-zinc-100">Open Model</h3>
+                        <p className="text-xs text-zinc-500 mt-1">Browse and edit existing models</p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPage('model-explorer')}
+                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-800/50 transition-all duration-200"
+                  >
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="p-3 bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/30 transition-colors">
+                        <Plus className="w-6 h-6 text-emerald-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-zinc-100">New Model</h3>
+                        <p className="text-xs text-zinc-500 mt-1">Create a new data model</p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPage('reverse-engineering')}
+                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800/50 transition-all duration-200"
+                  >
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="p-3 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
+                        <RefreshCw className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-zinc-100">Reverse Engineer</h3>
+                        <p className="text-xs text-zinc-500 mt-1">Import from database</p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPage('complete-compare')}
+                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-amber-500/50 hover:bg-zinc-800/50 transition-all duration-200"
+                  >
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="p-3 bg-amber-500/20 rounded-lg group-hover:bg-amber-500/30 transition-colors">
+                        <Scale className="w-6 h-6 text-amber-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-zinc-100">Compare Models</h3>
+                        <p className="text-xs text-zinc-500 mt-1">Compare and merge models</p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
               </div>
 
               {/* Stats Overview Row */}
@@ -680,7 +739,7 @@ export default function Dashboard() {
                       <p className="text-zinc-400 text-sm">Active Users</p>
                       <p className="text-2xl font-bold text-zinc-100">12</p>
                     </div>
-                    <Users className="w-8 h-8 text-blue-500" />
+                    <UsersIcon className="w-8 h-8 text-blue-500" />
                   </div>
                   <div className="text-xs text-emerald-400 mt-2">+2 today</div>
                 </div>
@@ -717,7 +776,7 @@ export default function Dashboard() {
                   {/* Tools Row */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <ReverseEngineeringCard onClick={() => setCurrentPage('reverse-engineering')} />
-                    <CompleteCompareCard />
+                    <CompleteCompareCard onClick={() => setCurrentPage('complete-compare')} />
                   </div>
                 </div>
 
@@ -736,12 +795,7 @@ export default function Dashboard() {
 
           {currentPage === 'complete-compare' && <CompleteCompare />}
 
-          {currentPage === 'users' && (
-            <div className="p-6">
-              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Users</h1>
-              <p className="text-zinc-400">User management functionality coming soon...</p>
-            </div>
-          )}
+          {currentPage === 'users' && <Users />}
 
           {currentPage === 'settings' && (
             <div className="p-6">

@@ -31,7 +31,9 @@
       "Bash(del \"C:\\Users\\pande\\OneDrive\\Documents\\Raunak\\forGit\\DMPro\\data-modeling-dashboard\\src\\components\\ModelExplorer.tsx\")",
       "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\.bin\\next\" dev)",
       "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\.bin\\next.cmd\" dev)",
-      "Bash(powershell -Command \"$env:PATH = ''C:\\Program Files\\nodejs;'' + $env:PATH; & npm run dev\")"
+      "Bash(powershell -Command \"$env:PATH = ''C:\\Program Files\\nodejs;'' + $env:PATH; & npm run dev\")",
+      "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\next\\dist\\bin\\next\" build)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []

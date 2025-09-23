@@ -52,9 +52,49 @@ interface SettingsProps {
   toggleTheme: () => void;
 }
 
+interface SettingsState {
+  autoSave: boolean;
+  autoSaveInterval: number;
+  confirmOnDelete: boolean;
+  showWelcomeScreen: boolean;
+  defaultView: string;
+  defaultDatabase: string;
+  connectionTimeout: number;
+  maxConnections: number;
+  enableSSL: boolean;
+  defaultNamingConvention: string;
+  generatePrimaryKeys: boolean;
+  defaultKeyType: string;
+  enforceRelationships: boolean;
+  theme: string;
+  fontSize: string;
+  showGrid: boolean;
+  snapToGrid: boolean;
+  gridSize: number;
+  generateComments: boolean;
+  includeIndexes: boolean;
+  generateConstraints: boolean;
+  scriptFormat: string;
+  importViews: boolean;
+  importProcedures: boolean;
+  importTriggers: boolean;
+  preserveCase: boolean;
+  ignoreComments: boolean;
+  ignoreWhitespace: boolean;
+  caseSensitive: boolean;
+  compareIndexes: boolean;
+  defaultExportFormat: string;
+  includeData: boolean;
+  compressExport: boolean;
+  emailNotifications: boolean;
+  desktopNotifications: boolean;
+  notifyOnComplete: boolean;
+  notifyOnError: boolean;
+}
+
 const Settings: React.FC<SettingsProps> = ({ isDark, toggleTheme }) => {
   const [activeSection, setActiveSection] = useState('general');
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<SettingsState>({
     // General Settings
     autoSave: true,
     autoSaveInterval: 5,
@@ -125,11 +165,11 @@ const Settings: React.FC<SettingsProps> = ({ isDark, toggleTheme }) => {
     { id: 'advanced', label: 'Advanced', icon: <Cpu className="w-4 h-4" /> }
   ];
 
-  const handleToggle = (key: string) => {
+  const handleToggle = (key: keyof SettingsState) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleChange = (key: string, value: any) => {
+  const handleChange = (key: keyof SettingsState, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 

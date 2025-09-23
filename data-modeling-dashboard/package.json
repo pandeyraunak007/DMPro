@@ -1,6 +1,7 @@
 {
   "name": "data-modeling-dashboard",
   "version": "0.1.0",
+  "description": "Data Modeling Studio Pro - Professional data modeling dashboard",
   "private": true,
   "scripts": {
     "dev": "next dev",

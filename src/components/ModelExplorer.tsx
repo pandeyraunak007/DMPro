@@ -193,12 +193,7 @@ const getDatabaseIcon = (dbType: string) => {
 };
 
 // Header Bar Component
-const HeaderBar = ({ isDark, toggleTheme, isPhysicalView, setIsPhysicalView }: {
-  isDark: boolean;
-  toggleTheme: () => void;
-  isPhysicalView: boolean;
-  setIsPhysicalView: (value: boolean) => void;
-}) => {
+const HeaderBar = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => void }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [hasNotifications, setHasNotifications] = useState(true);
 
@@ -234,9 +229,9 @@ const HeaderBar = ({ isDark, toggleTheme, isPhysicalView, setIsPhysicalView }: {
         </div>
       </div>
 
-      {/* Center: Search & View Toggle */}
-      <div className="flex-1 flex items-center justify-center max-w-2xl mx-auto gap-4">
-        <div className="relative flex-1 max-w-md">
+      {/* Center: Search */}
+      <div className="flex-1 flex items-center justify-center max-w-md mx-auto">
+        <div className="relative w-full">
           <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 ${
             isDark ? 'text-gray-400' : 'text-gray-500'
           }`} />
@@ -251,42 +246,6 @@ const HeaderBar = ({ isDark, toggleTheme, isPhysicalView, setIsPhysicalView }: {
                 : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500 focus:bg-white'
             } focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all duration-200`}
           />
-        </div>
-
-        {/* Physical/Logical Toggle */}
-        <div className={`flex items-center rounded-md p-0.5 ${
-          isDark ? 'bg-zinc-800' : 'bg-gray-200'
-        }`}>
-          <button
-            onClick={() => setIsPhysicalView(false)}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all ${
-              !isPhysicalView
-                ? isDark
-                  ? 'bg-zinc-700 text-zinc-100'
-                  : 'bg-white text-gray-900 shadow-sm'
-                : isDark
-                  ? 'text-zinc-400 hover:text-zinc-200'
-                  : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Layers className="w-3 h-3" />
-            Logical
-          </button>
-          <button
-            onClick={() => setIsPhysicalView(true)}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all ${
-              isPhysicalView
-                ? isDark
-                  ? 'bg-zinc-700 text-zinc-100'
-                  : 'bg-white text-gray-900 shadow-sm'
-                : isDark
-                  ? 'text-zinc-400 hover:text-zinc-200'
-                  : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <Server className="w-3 h-3" />
-            Physical
-          </button>
         </div>
       </div>
 
@@ -368,9 +327,11 @@ const MainTabs = ({ isDark, activeTab, setActiveTab }: { isDark: boolean; active
 };
 
 // Contextual Toolbar Component
-const ContextualToolbar = ({ isDark, activeTab }: {
+const ContextualToolbar = ({ isDark, activeTab, isPhysicalView, setIsPhysicalView }: {
   isDark: boolean;
   activeTab: string;
+  isPhysicalView: boolean;
+  setIsPhysicalView: (value: boolean) => void;
 }) => {
   const menuItems = {
     file: [
@@ -463,6 +424,44 @@ const ContextualToolbar = ({ isDark, activeTab }: {
           </span>
         </button>
       ))}
+
+      {/* Physical/Logical Toggle - Right Side */}
+      <div className="ml-auto flex items-center">
+        <div className={`flex items-center rounded-lg p-1 ${
+          isDark ? 'bg-zinc-800' : 'bg-gray-200'
+        }`}>
+          <button
+            onClick={() => setIsPhysicalView(false)}
+            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-all ${
+              !isPhysicalView
+                ? isDark
+                  ? 'bg-zinc-700 text-zinc-100'
+                  : 'bg-white text-gray-900 shadow-sm'
+                : isDark
+                  ? 'text-zinc-400 hover:text-zinc-200'
+                  : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Layers className="w-3 h-3" />
+            Logical
+          </button>
+          <button
+            onClick={() => setIsPhysicalView(true)}
+            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-all ${
+              isPhysicalView
+                ? isDark
+                  ? 'bg-zinc-700 text-zinc-100'
+                  : 'bg-white text-gray-900 shadow-sm'
+                : isDark
+                  ? 'text-zinc-400 hover:text-zinc-200'
+                  : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Server className="w-3 h-3" />
+            Physical
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -1666,7 +1665,6 @@ const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCo
   const [selectedEntity] = useState('Customer');
   const [selectedAttribute] = useState('Email');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['general']));
-  const [activePropertyTab, setActivePropertyTab] = useState('general');
 
   const toggleSection = (sectionId: string) => {
     const newExpanded = new Set(expandedSections);
@@ -1822,23 +1820,18 @@ const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCo
     <div className={`${isCollapsed ? 'w-12' : 'w-96'} border-l transition-all duration-300 ${
       isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
     }`}>
-      {/* Header with Collapse Toggle Button */}
-      <div className={`h-8 border-b flex items-center justify-between px-3 ${
+      {/* Collapse Toggle Button */}
+      <div className={`h-12 border-b flex items-center justify-center ${
         isDark ? 'border-zinc-800' : 'border-gray-200'
       }`}>
-        {!isCollapsed && (
-          <h3 className={`text-xs font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
-            Properties
-          </h3>
-        )}
         <button
           onClick={onToggle}
-          className={`p-1 rounded transition-all duration-200 ${
+          className={`p-2 rounded-lg transition-all duration-200 ${
             isDark ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
           }`}
           title={isCollapsed ? 'Expand Properties' : 'Collapse Properties'}
         >
-          {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5 rotate-90" />}
+          {isCollapsed ? <ChevronUp className="w-4 h-4 -rotate-90" /> : <ChevronUp className="w-4 h-4 rotate-90" />}
         </button>
       </div>
       {!isCollapsed && (
@@ -1847,19 +1840,18 @@ const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCo
           <div className={`w-6 border-r transition-colors flex flex-col ${
             isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
           }`}>
-        {propertyTabs.map((tab) => (
+        {propertyTabs.map((tab, index) => (
           <div
             key={tab.id}
-            onClick={() => setActivePropertyTab(tab.id)}
-            className={`h-8 flex items-center justify-center cursor-pointer transition-all duration-200 ${
-              activePropertyTab === tab.id
+            className={`h-10 flex items-center justify-center cursor-pointer transition-all duration-200 ${
+              index === 0
                 ? `${isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white'} shadow-sm`
                 : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-indigo-50/50'}`
             }`}
             title={tab.label}
-            style={{ marginBottom: '1px' }}
+            style={{ marginBottom: '2px' }}
           >
-            <div className="w-3.5 h-3.5">{React.cloneElement(tab.icon as React.ReactElement, { className: 'w-3.5 h-3.5' })}</div>
+            {tab.icon}
           </div>
         ))}
       </div>
@@ -1869,33 +1861,29 @@ const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCo
         isDark ? 'bg-zinc-900' : 'bg-white'
       }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         {/* Context Header */}
-        <div className={`p-3 border-b transition-colors ${
+        <div className={`p-4 border-b transition-colors ${
           isDark ? 'border-zinc-800 bg-zinc-900' : 'border-gray-200 bg-gray-50'
         }`}>
-          <div className="flex items-center gap-2">
-            {propertyTabs.find(tab => tab.id === activePropertyTab)?.icon &&
-              React.cloneElement(propertyTabs.find(tab => tab.id === activePropertyTab)!.icon as React.ReactElement, {
-                className: `w-4 h-4 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`
-              })
-            }
-            <h2 className={`text-sm font-semibold ${
+          <div className="flex items-center gap-3">
+            <ClipboardList className={`w-5 h-5 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
+            <h2 className={`text-lg font-semibold ${
               isDark ? 'text-gray-100' : 'text-gray-900'
             }`} style={{ fontWeight: 600 }}>
               {selectedObject === 'entity' ? selectedEntity : selectedAttribute}
             </h2>
           </div>
-          <p className={`text-xs mt-0.5 ${
+          <p className={`text-xs mt-1 ${
             isDark ? 'text-gray-400' : 'text-gray-600'
           }`}>
-            {propertyTabs.find(tab => tab.id === activePropertyTab)?.label} - {selectedObject === 'entity' ? 'Entity' : 'Attribute'}
+            {selectedObject === 'entity' ? 'Entity Properties' : 'Attribute Properties'}
           </p>
         </div>
 
-        {/* Tab Content */}
-        <div className="p-4">
-          {activePropertyTab === 'general' && (
-            selectedObject === 'entity' ? (
-              <div className="space-y-4">
+        {/* Property Sections */}
+        <div>
+          {selectedObject === 'entity' ? (
+            <>
+              <AccordionSection id="general" title="▼ Entity Properties" defaultExpanded>
                 <PremiumInput label="Name" value="Customer" />
                 <PremiumInput label="Physical Name" value="CUSTOMER" />
                 <PremiumInput
@@ -1912,15 +1900,69 @@ const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCo
                     { value: 'app_user', label: 'app_user' }
                   ]}
                 />
-                <div className="space-y-2">
-                  <PremiumCheckbox label="Complete" checked />
-                  <PremiumCheckbox label="Conceptual Only" />
-                  <PremiumCheckbox label="Generate in forward engineering" checked />
-                  <PremiumCheckbox label="Include in impact analysis" checked />
+                <PremiumCheckbox label="Complete" checked />
+                <PremiumCheckbox label="Conceptual Only" />
+              </AccordionSection>
+
+              <AccordionSection id="naming" title="▼ Naming Standards">
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <PremiumInput label="Prefix" value="CUST_" />
+                  <PremiumInput label="Suffix" value="_TBL" />
                 </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
+                <PremiumInput label="Abbreviation" value="CUST" />
+                <PremiumCheckbox label="Apply naming rules" checked />
+              </AccordionSection>
+
+              <AccordionSection id="display" title="▶ Display Options">
+                <PremiumSelect
+                  label="Color"
+                  value="blue"
+                  options={[
+                    { value: 'blue', label: '🔵 Blue' },
+                    { value: 'green', label: '🟢 Green' },
+                    { value: 'red', label: '🔴 Red' },
+                    { value: 'purple', label: '🟣 Purple' }
+                  ]}
+                />
+                <PremiumSelect
+                  label="Font Size"
+                  value="medium"
+                  options={[
+                    { value: 'small', label: 'Small' },
+                    { value: 'medium', label: 'Medium' },
+                    { value: 'large', label: 'Large' }
+                  ]}
+                />
+                <PremiumCheckbox label="Show in diagram" checked />
+                <PremiumCheckbox label="Show entity name" checked />
+                <PremiumCheckbox label="Show definition" />
+                <PremiumCheckbox label="Show attributes" checked />
+              </AccordionSection>
+
+              <AccordionSection id="keys" title="▶ Keys & Indexes">
+                <div className={`p-4 rounded-lg border mb-4 ${
+                  isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
+                }`}>
+                  <h4 className={`text-sm font-medium mb-3 ${
+                    isDark ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Primary Key</h4>
+                  <PremiumInput label="Key Name" value="PK_Customer" />
+                  <div className={`flex items-center gap-2 p-2 rounded border ${
+                    isDark ? 'bg-zinc-700 border-zinc-600' : 'bg-white border-gray-300'
+                  }`}>
+                    <Key className="w-4 h-4 text-yellow-500" />
+                    <span className={`text-sm ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>CustomerID</span>
+                  </div>
+                  <div className="mt-3">
+                    <PremiumCheckbox label="Generate constraint" checked />
+                    <PremiumCheckbox label="Create index" checked />
+                  </div>
+                </div>
+              </AccordionSection>
+            </>
+          ) : (
+            <>
+              <AccordionSection id="general" title="▼ Attribute Properties" defaultExpanded>
                 <PremiumInput label="Name" value="Email" />
                 <PremiumInput label="Physical Name" value="EMAIL" />
                 <PremiumInput
@@ -1931,92 +1973,10 @@ const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCo
                 <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
                   Parent Entity: Customer
                 </div>
-                <div className="space-y-2">
-                  <PremiumCheckbox label="Complete" checked />
-                  <PremiumCheckbox label="Primary Key" />
-                  <PremiumCheckbox label="Foreign Key" />
-                  <PremiumCheckbox label="Required" checked />
-                </div>
-              </div>
-            )
-          )}
+                <PremiumCheckbox label="Complete" checked />
+              </AccordionSection>
 
-          {activePropertyTab === 'display' && (
-            <div className="space-y-4">
-              <PremiumSelect
-                label="Color"
-                value="blue"
-                options={[
-                  { value: 'blue', label: '🔵 Blue' },
-                  { value: 'green', label: '🟢 Green' },
-                  { value: 'red', label: '🔴 Red' },
-                  { value: 'purple', label: '🟣 Purple' },
-                  { value: 'orange', label: '🟠 Orange' }
-                ]}
-              />
-              <PremiumSelect
-                label="Font Size"
-                value="medium"
-                options={[
-                  { value: 'small', label: 'Small' },
-                  { value: 'medium', label: 'Medium' },
-                  { value: 'large', label: 'Large' }
-                ]}
-              />
-              <div className="space-y-2">
-                <PremiumCheckbox label="Show in diagram" checked />
-                <PremiumCheckbox label="Show entity name" checked />
-                <PremiumCheckbox label="Show definition" />
-                <PremiumCheckbox label="Show attributes" checked />
-                <PremiumCheckbox label="Show data types" />
-                <PremiumCheckbox label="Show constraints" checked />
-              </div>
-            </div>
-          )}
-
-          {activePropertyTab === 'keys' && (
-            <div className="space-y-4">
-              <div className={`p-4 rounded-lg border ${
-                isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
-              }`}>
-                <h4 className={`text-sm font-medium mb-3 ${
-                  isDark ? 'text-gray-100' : 'text-gray-900'
-                }`}>Primary Key</h4>
-                <PremiumInput label="Key Name" value="PK_Customer" />
-                <div className={`flex items-center gap-2 p-2 rounded border mb-3 ${
-                  isDark ? 'bg-zinc-700 border-zinc-600' : 'bg-white border-gray-300'
-                }`}>
-                  <Key className="w-4 h-4 text-yellow-500" />
-                  <span className={`text-sm ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>CustomerID</span>
-                </div>
-                <div className="space-y-2">
-                  <PremiumCheckbox label="Generate constraint" checked />
-                  <PremiumCheckbox label="Create index" checked />
-                  <PremiumCheckbox label="Clustered index" />
-                </div>
-              </div>
-
-              <div className={`p-4 rounded-lg border ${
-                isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
-              }`}>
-                <h4 className={`text-sm font-medium mb-3 ${
-                  isDark ? 'text-gray-100' : 'text-gray-900'
-                }`}>Foreign Keys</h4>
-                <div className="space-y-2">
-                  <div className={`flex items-center gap-2 p-2 rounded border ${
-                    isDark ? 'bg-zinc-700 border-zinc-600' : 'bg-white border-gray-300'
-                  }`}>
-                    <Link className="w-4 h-4 text-blue-500" />
-                    <span className={`text-sm ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>FK_Customer_Region</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activePropertyTab === 'data' && (
-            selectedObject === 'attribute' ? (
-              <div className="space-y-4">
+              <AccordionSection id="datatype" title="▼ Data Type">
                 <PremiumSelect
                   label="Domain"
                   value="emailaddress"
@@ -2065,135 +2025,11 @@ const PropertyPane = ({ isDark, isCollapsed, onToggle }: { isDark: boolean; isCo
                   </div>
                 </div>
 
-                <PremiumInput label="Default Value" value="" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <PremiumSelect
-                  label="Table Type"
-                  value="base_table"
-                  options={[
-                    { value: 'base_table', label: 'Base Table' },
-                    { value: 'view', label: 'View' },
-                    { value: 'materialized_view', label: 'Materialized View' }
-                  ]}
-                />
-                <PremiumInput label="Tablespace" value="DATA_TS" />
-                <div className="grid grid-cols-2 gap-4">
-                  <PremiumInput label="Initial Extent" value="64KB" />
-                  <PremiumInput label="Next Extent" value="64KB" />
+                <div className="mt-4">
+                  <PremiumInput label="Default Value" value="" />
                 </div>
-                <div className="space-y-2">
-                  <PremiumCheckbox label="Enable compression" />
-                  <PremiumCheckbox label="Enable partitioning" />
-                  <PremiumCheckbox label="Enable auditing" checked />
-                </div>
-              </div>
-            )
-          )}
-
-          {activePropertyTab === 'relations' && (
-            <div className="space-y-4">
-              <h4 className={`text-sm font-medium mb-3 ${
-                isDark ? 'text-gray-100' : 'text-gray-900'
-              }`}>Relationships</h4>
-
-              <div className={`p-3 rounded-lg border ${
-                isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
-              }`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <GitBranch className="w-4 h-4 text-green-500" />
-                  <span className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-                    Customer → Order
-                  </span>
-                </div>
-                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Identifying relationship (1:M)
-                </p>
-              </div>
-
-              <div className={`p-3 rounded-lg border ${
-                isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
-              }`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <GitMerge className="w-4 h-4 text-blue-500" />
-                  <span className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-                    Customer → Address
-                  </span>
-                </div>
-                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Non-identifying relationship (1:M)
-                </p>
-              </div>
-            </div>
-          )}
-
-          {activePropertyTab === 'rules' && (
-            <div className="space-y-4">
-              <h4 className={`text-sm font-medium mb-3 ${
-                isDark ? 'text-gray-100' : 'text-gray-900'
-              }`}>Business Rules</h4>
-
-              <PremiumInput
-                label="Check Constraint"
-                value="email LIKE '%@%'"
-                placeholder="Enter SQL constraint expression"
-              />
-
-              <div className="space-y-2">
-                <h5 className={`text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Validation Rules
-                </h5>
-                <PremiumCheckbox label="Email format validation" checked />
-                <PremiumCheckbox label="Unique constraint" checked />
-                <PremiumCheckbox label="Required field validation" checked />
-              </div>
-
-              <PremiumInput
-                label="Custom Rule"
-                value=""
-                placeholder="Define custom business rule"
-                rows={3}
-              />
-            </div>
-          )}
-
-          {activePropertyTab === 'advanced' && (
-            <div className="space-y-4">
-              <h4 className={`text-sm font-medium mb-3 ${
-                isDark ? 'text-gray-100' : 'text-gray-900'
-              }`}>Advanced Properties</h4>
-
-              <div className="grid grid-cols-2 gap-4">
-                <PremiumInput label="Version" value="1.0" />
-                <PremiumInput label="Created By" value="system" />
-              </div>
-
-              <PremiumInput label="Notes" value="" rows={4} placeholder="Additional notes..." />
-
-              <div className="space-y-2">
-                <h5 className={`text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Generation Options
-                </h5>
-                <PremiumCheckbox label="Include in DDL generation" checked />
-                <PremiumCheckbox label="Include in documentation" checked />
-                <PremiumCheckbox label="Include in reports" checked />
-                <PremiumCheckbox label="Track changes" />
-              </div>
-
-              <div className={`p-3 rounded-lg border ${
-                isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
-              }`}>
-                <h5 className={`text-xs font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Metadata
-                </h5>
-                <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} space-y-1`}>
-                  <div>Created: 2024-01-15 10:30 AM</div>
-                  <div>Modified: 2024-01-20 3:45 PM</div>
-                  <div>Last Modified By: admin</div>
-                </div>
-              </div>
-            </div>
+              </AccordionSection>
+            </>
           )}
         </div>
           </div>
@@ -2225,13 +2061,13 @@ const ModelExplorer = () => {
       isDark ? 'bg-zinc-950 text-gray-100' : 'bg-gray-50 text-gray-900'
     }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header Bar */}
-      <HeaderBar isDark={isDark} toggleTheme={toggleTheme} isPhysicalView={isPhysicalView} setIsPhysicalView={setIsPhysicalView} />
+      <HeaderBar isDark={isDark} toggleTheme={toggleTheme} />
 
       {/* Main Tabs */}
       <MainTabs isDark={isDark} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Contextual Toolbar */}
-      <ContextualToolbar isDark={isDark} activeTab={activeTab} />
+      <ContextualToolbar isDark={isDark} activeTab={activeTab} isPhysicalView={isPhysicalView} setIsPhysicalView={setIsPhysicalView} />
 
       {/* Main Workspace */}
       <div className="flex-1 flex overflow-hidden">

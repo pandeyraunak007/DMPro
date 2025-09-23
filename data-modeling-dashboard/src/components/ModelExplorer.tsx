@@ -381,7 +381,7 @@ const ContextualToolbar = ({ isDark, activeTab }: { isDark: boolean; activeTab: 
             isDark ? 'bg-zinc-700 text-gray-200' : 'bg-gray-800 text-white'
           }`}>
             {item.label}
-            {item.shortcut && <span className="ml-2 opacity-60">{item.shortcut}</span>}
+            {(item as any).shortcut && <span className="ml-2 opacity-60">{(item as any).shortcut}</span>}
           </span>
         </button>
       ))}

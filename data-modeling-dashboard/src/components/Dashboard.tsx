@@ -671,62 +671,99 @@ export default function Dashboard() {
                   </h3>
 
                   <div className="bg-gradient-to-br from-violet-500/20 to-violet-600/10 rounded-lg p-4 border border-violet-500/30">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-violet-500/20 rounded">
-                          <Folder className="w-4 h-4 text-violet-400" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-400">Total Models</p>
-                          <p className="text-xl font-bold text-zinc-100">24</p>
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-violet-500/20 rounded">
+                        <Folder className="w-4 h-4 text-violet-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-zinc-400">Total Models</p>
+                        <p className="text-xl font-bold text-zinc-100">24</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <TrendingUp className="w-3 h-3 text-emerald-400" />
+                          <span className="text-xs text-emerald-400">+3 this week</span>
                         </div>
                       </div>
-                      <span className="text-xs text-emerald-400">+3</span>
                     </div>
                   </div>
 
                   <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-lg p-4 border border-blue-500/30">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-blue-500/20 rounded">
-                          <UsersIcon className="w-4 h-4 text-blue-400" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-400">Active Users</p>
-                          <p className="text-xl font-bold text-zinc-100">12</p>
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-blue-500/20 rounded">
+                        <UsersIcon className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-zinc-400">Active Users</p>
+                        <p className="text-xl font-bold text-zinc-100">12</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Activity className="w-3 h-3 text-emerald-400" />
+                          <span className="text-xs text-emerald-400">+2 today</span>
                         </div>
                       </div>
-                      <span className="text-xs text-emerald-400">+2</span>
                     </div>
                   </div>
 
                   <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg p-4 border border-emerald-500/30">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-emerald-500/20 rounded">
-                          <Database className="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-400">Total Entities</p>
-                          <p className="text-xl font-bold text-zinc-100">158</p>
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-emerald-500/20 rounded">
+                        <Database className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-zinc-400">Total Entities</p>
+                        <p className="text-xl font-bold text-zinc-100">158</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <TrendingUp className="w-3 h-3 text-emerald-400" />
+                          <span className="text-xs text-emerald-400">+15 this week</span>
                         </div>
                       </div>
-                      <span className="text-xs text-emerald-400">+15</span>
                     </div>
                   </div>
 
                   <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-4 border border-amber-500/30">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-amber-500/20 rounded">
-                          <Sparkles className="w-4 h-4 text-amber-400" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-400">AI Suggestions</p>
-                          <p className="text-xl font-bold text-zinc-100">73%</p>
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-amber-500/20 rounded">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-zinc-400">AI Suggestions</p>
+                        <p className="text-xl font-bold text-zinc-100">73%</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Target className="w-3 h-3 text-amber-400" />
+                          <span className="text-xs text-amber-400">acceptance rate</span>
                         </div>
                       </div>
-                      <span className="text-xs text-zinc-500">rate</span>
+                    </div>
+                  </div>
+
+                  {/* Additional Metrics */}
+                  <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg p-4 border border-purple-500/30">
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-purple-500/20 rounded">
+                        <GitBranch className="w-4 h-4 text-purple-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-zinc-400">Relationships</p>
+                        <p className="text-xl font-bold text-zinc-100">342</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <TrendingUp className="w-3 h-3 text-emerald-400" />
+                          <span className="text-xs text-emerald-400">+28 this week</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-rose-500/20 to-rose-600/10 rounded-lg p-4 border border-rose-500/30">
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 bg-rose-500/20 rounded">
+                        <CheckCircle className="w-4 h-4 text-rose-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-zinc-400">Completed Tasks</p>
+                        <p className="text-xl font-bold text-zinc-100">95%</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Zap className="w-3 h-3 text-rose-400" />
+                          <span className="text-xs text-rose-400">this month</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

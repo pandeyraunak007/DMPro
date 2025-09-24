@@ -647,143 +647,171 @@ export default function Dashboard() {
         <div className="flex-1 overflow-auto">
           {currentPage === 'dashboard' && (
             <div className="p-6">
-              {/* Welcome Section */}
-              <div className="text-center mb-12">
-                <h1 className="text-3xl font-bold text-zinc-100 mb-4">
-                  Welcome to DMPro
+              {/* Personalized Welcome Header */}
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-zinc-100 mb-2">
+                  {(() => {
+                    const hour = new Date().getHours();
+                    if (hour < 12) return 'Good morning! ☀️';
+                    if (hour < 18) return 'Good afternoon! 👋';
+                    return 'Good evening! 🌙';
+                  })()}
                 </h1>
-                <p className="text-lg text-zinc-400 mb-8">
-                  Your comprehensive data modeling workspace
+                <p className="text-lg text-zinc-400">
+                  Ready to build something amazing today?
                 </p>
-
-                {/* Quick Action Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto mb-12">
-                  <button
-                    onClick={() => setCurrentPage('model-explorer')}
-                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-800/50 transition-all duration-200"
-                  >
-                    <div className="flex flex-col items-center space-y-3">
-                      <div className="p-3 bg-purple-500/20 rounded-lg group-hover:bg-purple-500/30 transition-colors">
-                        <FolderOpen className="w-6 h-6 text-purple-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-zinc-100">Open Model</h3>
-                        <p className="text-xs text-zinc-500 mt-1">Browse and edit existing models</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentPage('model-explorer')}
-                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-800/50 transition-all duration-200"
-                  >
-                    <div className="flex flex-col items-center space-y-3">
-                      <div className="p-3 bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/30 transition-colors">
-                        <Plus className="w-6 h-6 text-emerald-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-zinc-100">New Model</h3>
-                        <p className="text-xs text-zinc-500 mt-1">Create a new data model</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentPage('reverse-engineering')}
-                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800/50 transition-all duration-200"
-                  >
-                    <div className="flex flex-col items-center space-y-3">
-                      <div className="p-3 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
-                        <RefreshCw className="w-6 h-6 text-blue-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-zinc-100">Reverse Engineer</h3>
-                        <p className="text-xs text-zinc-500 mt-1">Import from database</p>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentPage('complete-compare')}
-                    className="group p-6 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-amber-500/50 hover:bg-zinc-800/50 transition-all duration-200"
-                  >
-                    <div className="flex flex-col items-center space-y-3">
-                      <div className="p-3 bg-amber-500/20 rounded-lg group-hover:bg-amber-500/30 transition-colors">
-                        <Scale className="w-6 h-6 text-amber-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-zinc-100">Compare Models</h3>
-                        <p className="text-xs text-zinc-500 mt-1">Compare and merge models</p>
-                      </div>
-                    </div>
-                  </button>
-                </div>
               </div>
 
-              {/* Stats Overview Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-zinc-400 text-sm">Total Models</p>
-                      <p className="text-2xl font-bold text-zinc-100">24</p>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Side - Stats Cards */}
+                <div className="lg:col-span-1 space-y-4">
+                  <div className="bg-gradient-to-br from-violet-500/20 to-violet-600/10 rounded-lg p-5 border border-violet-500/30">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="p-2 bg-violet-500/20 rounded-lg">
+                        <Database className="w-6 h-6 text-violet-400" />
+                      </div>
+                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
+                        +3 this week
+                      </span>
                     </div>
-                    <Database className="w-8 h-8 text-violet-500" />
-                  </div>
-                  <div className="text-xs text-emerald-400 mt-2">+3 this week</div>
-                </div>
-
-                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-zinc-400 text-sm">Active Users</p>
-                      <p className="text-2xl font-bold text-zinc-100">12</p>
+                      <p className="text-sm text-zinc-400 mb-1">Total Models</p>
+                      <p className="text-3xl font-bold text-zinc-100">24</p>
                     </div>
-                    <UsersIcon className="w-8 h-8 text-blue-500" />
                   </div>
-                  <div className="text-xs text-emerald-400 mt-2">+2 today</div>
-                </div>
 
-                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-                  <div className="flex items-center justify-between">
+                  <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-lg p-5 border border-blue-500/30">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="p-2 bg-blue-500/20 rounded-lg">
+                        <UsersIcon className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
+                        +2 today
+                      </span>
+                    </div>
                     <div>
-                      <p className="text-zinc-400 text-sm">Entities</p>
-                      <p className="text-2xl font-bold text-zinc-100">158</p>
+                      <p className="text-sm text-zinc-400 mb-1">Active Users</p>
+                      <p className="text-3xl font-bold text-zinc-100">12</p>
                     </div>
-                    <Boxes className="w-8 h-8 text-amber-500" />
                   </div>
-                  <div className="text-xs text-emerald-400 mt-2">+15 this week</div>
-                </div>
 
-                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-                  <div className="flex items-center justify-between">
+                  <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg p-5 border border-emerald-500/30">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="p-2 bg-emerald-500/20 rounded-lg">
+                        <Boxes className="w-6 h-6 text-emerald-400" />
+                      </div>
+                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
+                        +15 this week
+                      </span>
+                    </div>
                     <div>
-                      <p className="text-zinc-400 text-sm">AI Suggestions</p>
-                      <p className="text-2xl font-bold text-zinc-100">73%</p>
+                      <p className="text-sm text-zinc-400 mb-1">Total Entities</p>
+                      <p className="text-3xl font-bold text-zinc-100">158</p>
                     </div>
-                    <Brain className="w-8 h-8 text-emerald-500" />
                   </div>
-                  <div className="text-xs text-emerald-400 mt-2">Accepted rate</div>
-                </div>
-              </div>
 
-              {/* Main Content Grid */}
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-                {/* Left Column - Models */}
-                <div className="xl:col-span-2 space-y-6">
-                  <ModelsPanel />
-
-                  {/* Tools Row */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <ReverseEngineeringCard onClick={() => setCurrentPage('reverse-engineering')} />
-                    <CompleteCompareCard onClick={() => setCurrentPage('complete-compare')} />
+                  <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-5 border border-amber-500/30">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="p-2 bg-amber-500/20 rounded-lg">
+                        <Brain className="w-6 h-6 text-amber-400" />
+                      </div>
+                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
+                        +5% today
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-zinc-400 mb-1">AI Suggestions</p>
+                      <p className="text-3xl font-bold text-zinc-100">73%</p>
+                      <p className="text-xs text-zinc-500 mt-1">acceptance rate</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right Column - Insights & AI */}
-                <div className="space-y-6">
-                  <SystemInsightsPanel />
-                  <AIAssistantPreview />
+                {/* Right Side - Quick Actions & Content */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Quick Action Cards */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-zinc-100 mb-4 flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-violet-500" />
+                      Quick Actions
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <button
+                        onClick={() => setCurrentPage('model-explorer')}
+                        className="group p-4 bg-zinc-900 rounded-lg border border-zinc-800 hover:border-violet-500/50 hover:bg-zinc-800/50 transition-all duration-200 text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-violet-500/20 rounded-lg group-hover:bg-violet-500/30 transition-colors">
+                            <Plus className="w-5 h-5 text-violet-400" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-sm font-medium text-zinc-100 mb-1">Create New Model</h3>
+                            <p className="text-xs text-zinc-500">Start from scratch or use a template</p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-violet-400 transition-colors" />
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentPage('model-explorer')}
+                        className="group p-4 bg-zinc-900 rounded-lg border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-800/50 transition-all duration-200 text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/30 transition-colors">
+                            <FolderOpen className="w-5 h-5 text-emerald-400" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-sm font-medium text-zinc-100 mb-1">Open Recent</h3>
+                            <p className="text-xs text-zinc-500">Continue where you left off</p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-emerald-400 transition-colors" />
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentPage('reverse-engineering')}
+                        className="group p-4 bg-zinc-900 rounded-lg border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800/50 transition-all duration-200 text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
+                            <RefreshCw className="w-5 h-5 text-blue-400" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-sm font-medium text-zinc-100 mb-1">Import Database</h3>
+                            <p className="text-xs text-zinc-500">Reverse engineer your schema</p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-blue-400 transition-colors" />
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentPage('complete-compare')}
+                        className="group p-4 bg-zinc-900 rounded-lg border border-zinc-800 hover:border-amber-500/50 hover:bg-zinc-800/50 transition-all duration-200 text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-amber-500/20 rounded-lg group-hover:bg-amber-500/30 transition-colors">
+                            <Scale className="w-5 h-5 text-amber-400" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-sm font-medium text-zinc-100 mb-1">Compare Models</h3>
+                            <p className="text-xs text-zinc-500">Find differences and conflicts</p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-amber-400 transition-colors" />
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Models Panel */}
+                  <div>
+                    <ModelsPanel />
+                  </div>
+
+                  {/* Additional Panels */}
+                  <div className="grid grid-cols-1 gap-4">
+                    <SystemInsightsPanel />
+                    <AIAssistantPreview />
+                  </div>
                 </div>
               </div>
             </div>

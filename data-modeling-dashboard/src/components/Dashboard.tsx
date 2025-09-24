@@ -554,7 +554,7 @@ export default function Dashboard() {
       active: currentPage === 'model-explorer'
     },
     {
-      icon: <RefreshCw className="w-4 h-4" />,
+      icon: <GitBranch className="w-4 h-4" />,
       label: 'Reverse Engineering',
       page: 'reverse-engineering' as const,
       active: currentPage === 'reverse-engineering'
@@ -663,66 +663,70 @@ export default function Dashboard() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Side - Stats Cards */}
-                <div className="lg:col-span-1 space-y-4">
-                  <div className="bg-gradient-to-br from-violet-500/20 to-violet-600/10 rounded-lg p-5 border border-violet-500/30">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 bg-violet-500/20 rounded-lg">
-                        <Database className="w-6 h-6 text-violet-400" />
+                {/* Left Side - Key Metrics (Compact) */}
+                <div className="lg:col-span-1 space-y-3">
+                  <h3 className="text-sm font-semibold text-zinc-100 mb-3 flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-violet-500" />
+                    Key Metrics
+                  </h3>
+
+                  <div className="bg-gradient-to-br from-violet-500/20 to-violet-600/10 rounded-lg p-4 border border-violet-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-violet-500/20 rounded">
+                          <Folder className="w-4 h-4 text-violet-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-zinc-400">Total Models</p>
+                          <p className="text-xl font-bold text-zinc-100">24</p>
+                        </div>
                       </div>
-                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
-                        +3 this week
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-zinc-400 mb-1">Total Models</p>
-                      <p className="text-3xl font-bold text-zinc-100">24</p>
+                      <span className="text-xs text-emerald-400">+3</span>
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-lg p-5 border border-blue-500/30">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 bg-blue-500/20 rounded-lg">
-                        <UsersIcon className="w-6 h-6 text-blue-400" />
+                  <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-lg p-4 border border-blue-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-blue-500/20 rounded">
+                          <UsersIcon className="w-4 h-4 text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-zinc-400">Active Users</p>
+                          <p className="text-xl font-bold text-zinc-100">12</p>
+                        </div>
                       </div>
-                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
-                        +2 today
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-zinc-400 mb-1">Active Users</p>
-                      <p className="text-3xl font-bold text-zinc-100">12</p>
+                      <span className="text-xs text-emerald-400">+2</span>
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg p-5 border border-emerald-500/30">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 bg-emerald-500/20 rounded-lg">
-                        <Boxes className="w-6 h-6 text-emerald-400" />
+                  <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg p-4 border border-emerald-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-emerald-500/20 rounded">
+                          <Database className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-zinc-400">Total Entities</p>
+                          <p className="text-xl font-bold text-zinc-100">158</p>
+                        </div>
                       </div>
-                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
-                        +15 this week
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-zinc-400 mb-1">Total Entities</p>
-                      <p className="text-3xl font-bold text-zinc-100">158</p>
+                      <span className="text-xs text-emerald-400">+15</span>
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-5 border border-amber-500/30">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 bg-amber-500/20 rounded-lg">
-                        <Brain className="w-6 h-6 text-amber-400" />
+                  <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-4 border border-amber-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-amber-500/20 rounded">
+                          <Sparkles className="w-4 h-4 text-amber-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-zinc-400">AI Suggestions</p>
+                          <p className="text-xl font-bold text-zinc-100">73%</p>
+                        </div>
                       </div>
-                      <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
-                        +5% today
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-zinc-400 mb-1">AI Suggestions</p>
-                      <p className="text-3xl font-bold text-zinc-100">73%</p>
-                      <p className="text-xs text-zinc-500 mt-1">acceptance rate</p>
+                      <span className="text-xs text-zinc-500">rate</span>
                     </div>
                   </div>
                 </div>
@@ -742,7 +746,7 @@ export default function Dashboard() {
                       >
                         <div className="flex items-start gap-3">
                           <div className="p-2 bg-violet-500/20 rounded-lg group-hover:bg-violet-500/30 transition-colors">
-                            <Plus className="w-5 h-5 text-violet-400" />
+                            <FileText className="w-5 h-5 text-violet-400" />
                           </div>
                           <div className="flex-1">
                             <h3 className="text-sm font-medium text-zinc-100 mb-1">Create New Model</h3>
@@ -758,7 +762,7 @@ export default function Dashboard() {
                       >
                         <div className="flex items-start gap-3">
                           <div className="p-2 bg-emerald-500/20 rounded-lg group-hover:bg-emerald-500/30 transition-colors">
-                            <FolderOpen className="w-5 h-5 text-emerald-400" />
+                            <Clock className="w-5 h-5 text-emerald-400" />
                           </div>
                           <div className="flex-1">
                             <h3 className="text-sm font-medium text-zinc-100 mb-1">Open Recent</h3>
@@ -774,11 +778,11 @@ export default function Dashboard() {
                       >
                         <div className="flex items-start gap-3">
                           <div className="p-2 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
-                            <RefreshCw className="w-5 h-5 text-blue-400" />
+                            <GitBranch className="w-5 h-5 text-blue-400" />
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-sm font-medium text-zinc-100 mb-1">Import Database</h3>
-                            <p className="text-xs text-zinc-500">Reverse engineer your schema</p>
+                            <h3 className="text-sm font-medium text-zinc-100 mb-1">Reverse Engineer</h3>
+                            <p className="text-xs text-zinc-500">Import from existing database</p>
                           </div>
                           <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-blue-400 transition-colors" />
                         </div>
@@ -790,7 +794,7 @@ export default function Dashboard() {
                       >
                         <div className="flex items-start gap-3">
                           <div className="p-2 bg-amber-500/20 rounded-lg group-hover:bg-amber-500/30 transition-colors">
-                            <Scale className="w-5 h-5 text-amber-400" />
+                            <GitBranch className="w-5 h-5 text-amber-400" />
                           </div>
                           <div className="flex-1">
                             <h3 className="text-sm font-medium text-zinc-100 mb-1">Compare Models</h3>

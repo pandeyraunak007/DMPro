@@ -13,7 +13,7 @@ import {
   GitBranch,
   Globe,
   BarChart3,
-  Settings,
+  Settings as SettingsIcon,
   UserPlus,
   Upload,
   HelpCircle,
@@ -578,7 +578,7 @@ export default function Dashboard() {
       active: currentPage === 'users'
     },
     {
-      icon: <Settings className="w-4 h-4" />,
+      icon: <SettingsIcon className="w-4 h-4" />,
       label: 'Settings',
       page: 'settings' as const,
       active: currentPage === 'settings'

@@ -5,6 +5,7 @@ import ReverseEngineering from './ReverseEngineering';
 import ModelExplorer from './ModelExplorer';
 import CompleteCompare from './CompleteCompare';
 import Users from './Users';
+import Settings from './Settings';
 import {
   LayoutDashboard,
   Database,
@@ -539,6 +540,11 @@ const CompleteCompareCard = ({ onClick }: { onClick?: () => void }) => {
 export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentPage, setCurrentPage] = useState<'dashboard' | 'model-explorer' | 'reverse-engineering' | 'complete-compare' | 'users' | 'settings'>('dashboard');
+  const [isDark, setIsDark] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+  };
 
   const sidebarItems = [
     {
@@ -924,12 +930,7 @@ export default function Dashboard() {
 
           {currentPage === 'users' && <Users />}
 
-          {currentPage === 'settings' && (
-            <div className="p-6">
-              <h1 className="text-2xl font-bold text-zinc-100 mb-4">Settings</h1>
-              <p className="text-zinc-400">Settings functionality coming soon...</p>
-            </div>
-          )}
+          {currentPage === 'settings' && <Settings isDark={isDark} toggleTheme={toggleTheme} />}
         </div>
       </div>
     </div>

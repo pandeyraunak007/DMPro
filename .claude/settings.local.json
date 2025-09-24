@@ -33,7 +33,9 @@
       "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\.bin\\next.cmd\" dev)",
       "Bash(powershell -Command \"$env:PATH = ''C:\\Program Files\\nodejs;'' + $env:PATH; & npm run dev\")",
       "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\next\\dist\\bin\\next\" build)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(npx vercel:*)"
     ],
     "deny": [],
     "ask": []

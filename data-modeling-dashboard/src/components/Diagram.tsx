@@ -5,6 +5,7 @@ import {
   Search,
   ChevronDown,
   ChevronRight,
+  ChevronUp,
   Plus,
   Database,
   Table,
@@ -302,7 +303,7 @@ const ModelTree = ({
   onSelectEntity?: (entityId: string | null) => void;
   onSelectRelationship?: (relationshipId: string | null) => void;
 }) => {
-  const [expandedNodes, setExpandedNodes] = useState<string[]>(['model1', 'entities', 'relationships']);
+  const [expandedNodes, setExpandedNodes] = useState<string[]>(['model1', 'entities', 'relationships', 'domains', 'views', 'indexes']);
 
   const toggleNode = (nodeId: string) => {
     setExpandedNodes(prev =>
@@ -475,6 +476,190 @@ const ModelTree = ({
                   )}
                 </div>
               )}
+
+              {/* Domains Section */}
+              <button
+                onClick={() => toggleNode('domains')}
+                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
+                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                {expandedNodes.includes('domains') ? (
+                  <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronRight className="w-3 h-3" />
+                )}
+                <Box className="w-3.5 h-3.5 text-teal-500" />
+                <span>Domains</span>
+                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  4
+                </span>
+              </button>
+
+              {expandedNodes.includes('domains') && (
+                <div className="ml-3">
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Target className="w-3.5 h-3.5 text-teal-400" />
+                    <span>EmailDomain</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Target className="w-3.5 h-3.5 text-teal-400" />
+                    <span>PhoneDomain</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Target className="w-3.5 h-3.5 text-teal-400" />
+                    <span>CurrencyDomain</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Target className="w-3.5 h-3.5 text-teal-400" />
+                    <span>DateTimeDomain</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Views Section */}
+              <button
+                onClick={() => toggleNode('views')}
+                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
+                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                {expandedNodes.includes('views') ? (
+                  <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronRight className="w-3 h-3" />
+                )}
+                <Eye className="w-3.5 h-3.5 text-cyan-500" />
+                <span>Views</span>
+                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  3
+                </span>
+              </button>
+
+              {expandedNodes.includes('views') && (
+                <div className="ml-3">
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>CustomerOrdersView</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>ProductSalesView</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>InventoryStatusView</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Indexes Section */}
+              <button
+                onClick={() => toggleNode('indexes')}
+                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
+                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                {expandedNodes.includes('indexes') ? (
+                  <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronRight className="w-3 h-3" />
+                )}
+                <Activity className="w-3.5 h-3.5 text-orange-500" />
+                <span>Indexes</span>
+                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  6
+                </span>
+              </button>
+
+              {expandedNodes.includes('indexes') && (
+                <div className="ml-3">
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Activity className="w-3.5 h-3.5 text-orange-400" />
+                    <span>idx_customer_email</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Activity className="w-3.5 h-3.5 text-orange-400" />
+                    <span>idx_product_sku</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Activity className="w-3.5 h-3.5 text-orange-400" />
+                    <span>idx_order_date</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Activity className="w-3.5 h-3.5 text-orange-400" />
+                    <span>idx_category_name</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Activity className="w-3.5 h-3.5 text-orange-400" />
+                    <span>idx_payment_status</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Activity className="w-3.5 h-3.5 text-orange-400" />
+                    <span>idx_inventory_level</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Procedures Section */}
+              <button
+                onClick={() => toggleNode('procedures')}
+                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
+                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                {expandedNodes.includes('procedures') ? (
+                  <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronRight className="w-3 h-3" />
+                )}
+                <Zap className="w-3.5 h-3.5 text-yellow-500" />
+                <span>Procedures</span>
+                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  2
+                </span>
+              </button>
+
+              {expandedNodes.includes('procedures') && (
+                <div className="ml-3">
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Zap className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>sp_ProcessOrder</span>
+                  </div>
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Zap className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>sp_UpdateInventory</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Triggers Section */}
+              <button
+                onClick={() => toggleNode('triggers')}
+                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
+                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                {expandedNodes.includes('triggers') ? (
+                  <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronRight className="w-3 h-3" />
+                )}
+                <Activity className="w-3.5 h-3.5 text-red-500" />
+                <span>Triggers</span>
+                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                  1
+                </span>
+              </button>
+
+              {expandedNodes.includes('triggers') && (
+                <div className="ml-3">
+                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Activity className="w-3.5 h-3.5 text-red-400" />
+                    <span>trg_audit_changes</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -521,44 +706,55 @@ const PropertiesPanel = ({
 
       return (
         <div className="flex h-full">
-          {/* Left Sidebar with Vertical Tabs */}
-          <div className={`w-24 border-r flex flex-col ${isDark ? 'border-zinc-700 bg-zinc-800' : 'border-gray-200 bg-gray-50'}`}>
-            <div className={`p-2 border-b ${isDark ? 'border-zinc-700' : 'border-gray-200'}`}>
-              <h3 className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-900'} text-center`}>
-                Entity
-              </h3>
-            </div>
-            <div className="flex-1 p-1 space-y-1">
-              {entityTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex flex-col items-center gap-1 p-2 rounded text-xs transition-colors ${
-                    activeTab === tab.id
-                      ? isDark ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-700'
-                      : isDark ? 'hover:bg-zinc-700 text-gray-400' : 'hover:bg-gray-100 text-gray-600'
-                  }`}
-                  title={tab.label}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  <span className="text-xs leading-tight text-center">{tab.label}</span>
-                </button>
-              ))}
-            </div>
+          {/* Left Icon Strip */}
+          <div className={`w-6 border-r transition-colors flex flex-col ${
+            isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
+          }`}>
+            {entityTabs.map((tab) => (
+              <div
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`h-8 flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? `${isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white'} shadow-sm`
+                    : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-indigo-50/50'}`
+                }`}
+                title={tab.label}
+                style={{ marginBottom: '1px' }}
+              >
+                <div className="w-3.5 h-3.5">
+                  <tab.icon className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col">
-            <div className={`p-3 border-b ${isDark ? 'border-zinc-700' : 'border-gray-200'}`}>
-              <h3 className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <div className={`flex-1 overflow-y-auto transition-colors ${
+            isDark ? 'bg-zinc-900' : 'bg-white'
+          }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            {/* Context Header */}
+            <div className={`p-3 border-b transition-colors ${
+              isDark ? 'border-zinc-800 bg-zinc-900' : 'border-gray-200 bg-gray-50'
+            }`}>
+              <div className="flex items-center gap-2">
+                {entityTabs.find(tab => tab.id === activeTab)?.icon &&
+                  React.createElement(entityTabs.find(tab => tab.id === activeTab)!.icon, {
+                    className: `w-4 h-4 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`
+                  })
+                }
+                <h2 className={`text-sm font-semibold ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`} style={{ fontWeight: 600 }}>
+                  {entityTabs.find(t => t.id === activeTab)?.label} Properties
+                </h2>
+              </div>
+              <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 {currentEntity?.name || selectedEntity}
-              </h3>
-              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                {entityTabs.find(t => t.id === activeTab)?.label} Properties
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3 space-y-3">
+            <div className="p-3 space-y-3">
             {activeTab === 'general' && (
               <div className="space-y-2">
                 <div>

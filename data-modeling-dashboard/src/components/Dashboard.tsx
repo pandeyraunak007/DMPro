@@ -6,6 +6,7 @@ import ModelExplorer from './ModelExplorer';
 import CompleteCompare from './CompleteCompare';
 import Users from './Users';
 import Settings from './Settings';
+import Diagram from './Diagram';
 import {
   LayoutDashboard,
   Database,
@@ -15,6 +16,7 @@ import {
   BarChart3,
   Settings as SettingsIcon,
   UserPlus,
+  Layers,
   Upload,
   HelpCircle,
   ChevronLeft,
@@ -539,7 +541,7 @@ const CompleteCompareCard = ({ onClick }: { onClick?: () => void }) => {
 
 export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'model-explorer' | 'reverse-engineering' | 'complete-compare' | 'users' | 'settings'>('dashboard');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'model-explorer' | 'reverse-engineering' | 'complete-compare' | 'users' | 'settings' | 'diagram'>('dashboard');
   const [isDark, setIsDark] = useState(true);
 
   const toggleTheme = () => {
@@ -582,6 +584,12 @@ export default function Dashboard() {
       label: 'Settings',
       page: 'settings' as const,
       active: currentPage === 'settings'
+    },
+    {
+      icon: <Layers className="w-4 h-4" />,
+      label: 'Diagram',
+      page: 'diagram' as const,
+      active: currentPage === 'diagram'
     }
   ];
 
@@ -931,6 +939,8 @@ export default function Dashboard() {
           {currentPage === 'users' && <Users />}
 
           {currentPage === 'settings' && <Settings isDark={isDark} toggleTheme={toggleTheme} />}
+
+          {currentPage === 'diagram' && <Diagram isDark={isDark} toggleTheme={toggleTheme} />}
         </div>
       </div>
     </div>

@@ -35,7 +35,12 @@
       "Bash(\"C:\\Program Files\\nodejs\\node.exe\" \"node_modules\\next\\dist\\bin\\next\" build)",
       "Bash(git pull:*)",
       "Bash(git fetch:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:erwin.com)",
+      "WebSearch",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

@@ -27,6 +27,8 @@ import {
   Unlock,
   Copy,
   Trash2,
+  PlusCircle,
+  MinusCircle,
   Edit3,
   Save,
   Folder,
@@ -677,7 +679,9 @@ const PropertiesPanel = ({
   entities,
   relationships,
   onUpdateEntity,
-  onUpdateRelationship
+  onUpdateRelationship,
+  onAddEntity,
+  onRemoveEntity
 }: {
   isDark: boolean;
   onClose?: () => void;
@@ -687,6 +691,8 @@ const PropertiesPanel = ({
   relationships?: Relationship[];
   onUpdateEntity?: (entityId: string, updates: Partial<CanvasEntity>) => void;
   onUpdateRelationship?: (relationshipId: string, updates: Partial<Relationship>) => void;
+  onAddEntity?: () => void;
+  onRemoveEntity?: (entityId: string) => void;
 }) => {
   const [activeTab, setActiveTab] = useState('general');
 
@@ -696,6 +702,7 @@ const PropertiesPanel = ({
       const currentEntity = entities?.find(e => e.id === selectedEntity);
       const entityTabs = [
         { id: 'general', label: 'General', icon: FileText },
+        { id: 'attributes', label: 'Attributes', icon: Table },
         { id: 'display', label: 'Display', icon: Eye },
         { id: 'keys', label: 'Keys', icon: Key },
         { id: 'data', label: 'Data', icon: Database },
@@ -777,11 +784,7 @@ const PropertiesPanel = ({
                   </label>
                   <textarea
                     rows={2}
-                    className={`w-full p-1.5 text-xs rounded border ${
-                      isDark
-                        ? 'bg-zinc-800 border-zinc-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-900'
-                    }`}
+                    className={`w-full p-1.5 text-xs rounded border ${isDark ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                     placeholder="Entity definition..."
                   />
                 </div>
@@ -791,6 +794,268 @@ const PropertiesPanel = ({
                     Abstract Entity
                   </label>
                 </div>
+
+                {/* Entity Management Actions */}
+                <div className={`border-t pt-3 space-y-2 ${isDark ? 'border-zinc-700' : 'border-gray-200'}`}>
+                  <label className={`block text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Entity Actions
+                  </label>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={onAddEntity}
+                      className={`flex items-center gap-2 px-3 py-2 text-xs rounded-md transition-colors ${
+                        isDark
+                          ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                          : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                      }`}
+                    >
+                      <PlusCircle className="w-3 h-3" />
+                      Add New Entity
+                    </button>
+                    <button
+                      onClick={() => selectedEntity && onRemoveEntity?.(selectedEntity)}
+                      className={`flex items-center gap-2 px-3 py-2 text-xs rounded-md transition-colors ${
+                        isDark
+                          ? 'bg-red-600 hover:bg-red-700 text-white'
+                          : 'bg-red-600 hover:bg-red-700 text-white'
+                      }`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Remove Entity
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'attributes' && (
+              <div className="space-y-3">
+                {/* Header with attribute count and quick actions */}
+                <div className="flex items-center justify-between">
+                  <h4 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Attributes ({currentEntity?.attributes?.length || 0})
+                  </h4>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => {
+                        if (!currentEntity || !onUpdateEntity) return;
+                        const newAttributes = [...(currentEntity.attributes || [])];
+                        newAttributes.push({
+                          name: 'id',
+                          type: 'INT',
+                          isPrimaryKey: true,
+                          isForeignKey: false,
+                          isRequired: true
+                        });
+                        onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                      }}
+                      className={`px-2 py-1 text-xs rounded ${
+                        isDark ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      }`}
+                      title="Add Primary Key"
+                    >
+                      Add PK
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!currentEntity || !onUpdateEntity) return;
+                        const newAttributes = [...(currentEntity.attributes || [])];
+                        newAttributes.push(
+                          {
+                            name: 'created_at',
+                            type: 'TIMESTAMP',
+                            isPrimaryKey: false,
+                            isForeignKey: false,
+                            isRequired: true
+                          },
+                          {
+                            name: 'updated_at',
+                            type: 'TIMESTAMP',
+                            isPrimaryKey: false,
+                            isForeignKey: false,
+                            isRequired: true
+                          }
+                        );
+                        onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                      }}
+                      className={`px-2 py-1 text-xs rounded ${
+                        isDark ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
+                      title="Add Timestamps"
+                    >
+                      Add TS
+                    </button>
+                  </div>
+                </div>
+
+                {/* Add attribute button */}
+                <button
+                  onClick={() => {
+                    if (!currentEntity || !onUpdateEntity) return;
+                    const newAttributes = [...(currentEntity.attributes || [])];
+                    newAttributes.push({
+                      name: 'new_attribute',
+                      type: 'VARCHAR(255)',
+                      isPrimaryKey: false,
+                      isForeignKey: false,
+                      isRequired: false
+                    });
+                    onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                  }}
+                  className={`w-full flex items-center justify-center gap-2 py-2 px-3 rounded border border-dashed ${
+                    isDark
+                      ? 'border-zinc-600 hover:border-zinc-500 text-gray-300 hover:bg-zinc-700/50'
+                      : 'border-gray-300 hover:border-gray-400 text-gray-600 hover:bg-gray-50'
+                  } transition-colors duration-200`}
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  Add Attribute
+                </button>
+
+                {/* Attributes table */}
+                {currentEntity?.attributes && currentEntity.attributes.length > 0 ? (
+                  <div className={`border rounded-lg overflow-hidden ${isDark ? 'border-zinc-600' : 'border-gray-300'}`}>
+                    {/* Table header */}
+                    <div className={`grid grid-cols-7 gap-1 p-2 text-xs font-medium ${
+                      isDark ? 'bg-zinc-700 text-gray-300' : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      <div className="col-span-2">Name</div>
+                      <div>Type</div>
+                      <div className="text-center">PK</div>
+                      <div className="text-center">FK</div>
+                      <div className="text-center">Req</div>
+                      <div className="text-center">Del</div>
+                    </div>
+
+                    {/* Table body */}
+                    <div className="divide-y divide-gray-200 dark:divide-zinc-600">
+                      {currentEntity.attributes.map((attr, index) => (
+                        <div key={index} className={`grid grid-cols-7 gap-1 p-2 items-center ${
+                          isDark ? 'bg-zinc-800' : 'bg-white'
+                        }`}>
+                          {/* Attribute name */}
+                          <div className="col-span-2">
+                            <input
+                              type="text"
+                              value={attr.name}
+                              onChange={(e) => {
+                                if (!currentEntity || !onUpdateEntity) return;
+                                const newAttributes = [...(currentEntity.attributes || [])];
+                                newAttributes[index] = { ...attr, name: e.target.value };
+                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                              }}
+                              className={`w-full px-2 py-1 text-xs rounded border ${
+                                isDark
+                                  ? 'bg-zinc-700 border-zinc-600 text-gray-300 focus:border-blue-500'
+                                  : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                              } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                            />
+                          </div>
+
+                          {/* Attribute type */}
+                          <div>
+                            <select
+                              value={attr.type}
+                              onChange={(e) => {
+                                if (!currentEntity || !onUpdateEntity) return;
+                                const newAttributes = [...(currentEntity.attributes || [])];
+                                newAttributes[index] = { ...attr, type: e.target.value };
+                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                              }}
+                              className={`w-full px-1 py-1 text-xs rounded border ${
+                                isDark
+                                  ? 'bg-zinc-700 border-zinc-600 text-gray-300 focus:border-blue-500'
+                                  : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                              } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                            >
+                              <option value="INT">INT</option>
+                              <option value="BIGINT">BIGINT</option>
+                              <option value="VARCHAR(255)">VARCHAR(255)</option>
+                              <option value="VARCHAR(100)">VARCHAR(100)</option>
+                              <option value="VARCHAR(50)">VARCHAR(50)</option>
+                              <option value="TEXT">TEXT</option>
+                              <option value="DATE">DATE</option>
+                              <option value="TIMESTAMP">TIMESTAMP</option>
+                              <option value="BOOLEAN">BOOLEAN</option>
+                              <option value="DECIMAL(10,2)">DECIMAL(10,2)</option>
+                              <option value="FLOAT">FLOAT</option>
+                              <option value="DOUBLE">DOUBLE</option>
+                              <option value="CHAR(3)">CHAR(3)</option>
+                              <option value="JSON">JSON</option>
+                            </select>
+                          </div>
+
+                          {/* Primary Key checkbox */}
+                          <div className="text-center">
+                            <input
+                              type="checkbox"
+                              checked={attr.isPrimaryKey || false}
+                              onChange={(e) => {
+                                if (!currentEntity || !onUpdateEntity) return;
+                                const newAttributes = [...(currentEntity.attributes || [])];
+                                newAttributes[index] = { ...attr, isPrimaryKey: e.target.checked };
+                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                              }}
+                              className={`rounded ${isDark ? 'text-blue-400 focus:ring-blue-400' : 'text-blue-600 focus:ring-blue-600'}`}
+                            />
+                          </div>
+
+                          {/* Foreign Key checkbox */}
+                          <div className="text-center">
+                            <input
+                              type="checkbox"
+                              checked={attr.isForeignKey || false}
+                              onChange={(e) => {
+                                if (!currentEntity || !onUpdateEntity) return;
+                                const newAttributes = [...(currentEntity.attributes || [])];
+                                newAttributes[index] = { ...attr, isForeignKey: e.target.checked };
+                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                              }}
+                              className={`rounded ${isDark ? 'text-yellow-400 focus:ring-yellow-400' : 'text-yellow-600 focus:ring-yellow-600'}`}
+                            />
+                          </div>
+
+                          {/* Required checkbox */}
+                          <div className="text-center">
+                            <input
+                              type="checkbox"
+                              checked={attr.isRequired || false}
+                              onChange={(e) => {
+                                if (!currentEntity || !onUpdateEntity) return;
+                                const newAttributes = [...(currentEntity.attributes || [])];
+                                newAttributes[index] = { ...attr, isRequired: e.target.checked };
+                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                              }}
+                              className={`rounded ${isDark ? 'text-red-400 focus:ring-red-400' : 'text-red-600 focus:ring-red-600'}`}
+                            />
+                          </div>
+
+                          {/* Delete button */}
+                          <div className="text-center">
+                            <button
+                              onClick={() => {
+                                if (!currentEntity || !onUpdateEntity) return;
+                                const newAttributes = [...(currentEntity.attributes || [])];
+                                newAttributes.splice(index, 1);
+                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
+                              }}
+                              className={`p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 ${isDark ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-600'}`}
+                              title="Delete attribute"
+                            >
+                              <MinusCircle className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`text-center py-8 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <Table className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No attributes defined</p>
+                    <p className="text-xs mt-1">Click "Add Attribute" to get started</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -939,11 +1204,7 @@ const PropertiesPanel = ({
                   </label>
                   <textarea
                     rows={2}
-                    className={`w-full p-1.5 text-xs rounded border ${
-                      isDark
-                        ? 'bg-zinc-800 border-zinc-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-900'
-                    }`}
+                    className={`w-full p-1.5 text-xs rounded border ${isDark ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                     placeholder="Entity definition..."
                   />
                 </div>
@@ -1320,8 +1581,9 @@ interface CanvasEntity {
   y: number;
   width: number;
   height: number;
-  attributes?: Array<{ name: string; type: string; isPrimaryKey?: boolean; isForeignKey?: boolean; }>;
+  attributes?: Array<{ name: string; type: string; isPrimaryKey?: boolean; isForeignKey?: boolean; isRequired?: boolean; }>;
   text?: string; // For annotations
+  category?: 'standard' | 'lookup' | 'view' | 'junction'; // Entity categories for color coding
 }
 
 interface Relationship {
@@ -1340,8 +1602,82 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showTreePanel, setShowTreePanel] = useState(true);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(true);
-  const [entities, setEntities] = useState<CanvasEntity[]>([]);
-  const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [entities, setEntities] = useState<CanvasEntity[]>([
+    {
+      id: 'sample-customer',
+      type: 'entity',
+      name: 'Customer',
+      x: 100,
+      y: 100,
+      width: 220,
+      height: 180,
+      attributes: [
+        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isRequired: true },
+        { name: 'first_name', type: 'VARCHAR(50)', isRequired: true },
+        { name: 'last_name', type: 'VARCHAR(50)', isRequired: true },
+        { name: 'email', type: 'VARCHAR(100)', isRequired: true },
+        { name: 'phone', type: 'VARCHAR(20)' },
+        { name: 'created_at', type: 'TIMESTAMP', isRequired: true },
+      ]
+    },
+    {
+      id: 'sample-country',
+      type: 'entity',
+      name: 'Country',
+      x: 400,
+      y: 100,
+      width: 200,
+      height: 120,
+      attributes: [
+        { name: 'country_id', type: 'INT', isPrimaryKey: true, isRequired: true },
+        { name: 'country_name', type: 'VARCHAR(100)', isRequired: true },
+        { name: 'country_code', type: 'CHAR(3)', isRequired: true },
+        { name: 'is_active', type: 'BOOLEAN', isRequired: true },
+      ]
+    },
+    {
+      id: 'sample-order-summary',
+      type: 'entity',
+      name: 'OrderSummaryView',
+      x: 700,
+      y: 100,
+      width: 240,
+      height: 140,
+      attributes: [
+        { name: 'order_id', type: 'INT', isRequired: true },
+        { name: 'customer_name', type: 'VARCHAR(100)', isRequired: true },
+        { name: 'order_date', type: 'DATE', isRequired: true },
+        { name: 'total_amount', type: 'DECIMAL(10,2)', isRequired: true },
+        { name: 'order_status', type: 'VARCHAR(20)', isRequired: true },
+      ]
+    },
+    {
+      id: 'sample-customer-orders',
+      type: 'entity',
+      name: 'CustomerOrders',
+      x: 400,
+      y: 300,
+      width: 200,
+      height: 120,
+      attributes: [
+        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
+        { name: 'order_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
+        { name: 'order_date', type: 'TIMESTAMP', isRequired: true },
+        { name: 'relationship_type', type: 'VARCHAR(20)' },
+      ]
+    }
+  ]);
+  const [relationships, setRelationships] = useState<Relationship[]>([
+    {
+      id: 'rel-customer-orders',
+      type: 'identifying',
+      sourceEntityId: 'sample-customer',
+      targetEntityId: 'sample-customer-orders',
+      sourceCardinality: '1',
+      targetCardinality: 'M',
+      name: 'customer_places_orders'
+    }
+  ]);
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
   const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -1351,6 +1687,35 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   // Relationship creation state
   const [relationshipSourceId, setRelationshipSourceId] = useState<string | null>(null);
   const [relationshipType, setRelationshipType] = useState<'identifying' | 'non-identifying' | null>(null);
+
+  // Entity Management Functions
+  const handleAddEntity = () => {
+    const newEntity: CanvasEntity = {
+      id: `entity-${Date.now()}`,
+      type: 'entity',
+      name: 'NewEntity',
+      x: 300,
+      y: 300,
+      width: 200,
+      height: 100,
+      attributes: [
+        { name: 'id', type: 'INT', isPrimaryKey: true, isRequired: true }
+      ]
+    };
+
+    setEntities(prev => [...prev, newEntity]);
+    setSelectedEntity(newEntity.id);
+  };
+
+  const handleRemoveEntity = (entityId: string) => {
+    setEntities(prev => prev.filter(e => e.id !== entityId));
+    setRelationships(prev => prev.filter(r =>
+      r.sourceEntityId !== entityId && r.targetEntityId !== entityId
+    ));
+    if (selectedEntity === entityId) {
+      setSelectedEntity(null);
+    }
+  };
 
   const handleToggleFullScreen = () => {
     setIsFullScreen(!isFullScreen);
@@ -1395,11 +1760,13 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
         name: `Entity${entities.length + 1}`,
         x: x - 100,
         y: y - 60,
-        width: 200,
-        height: 120,
+        width: 220,
+        height: 140,
         attributes: [
-          { name: 'id', type: 'INT', isPrimaryKey: true },
-          { name: 'name', type: 'VARCHAR(255)' },
+          { name: 'id', type: 'INT', isPrimaryKey: true, isRequired: true },
+          { name: 'name', type: 'VARCHAR(255)', isRequired: true },
+          { name: 'email', type: 'VARCHAR(100)' },
+          { name: 'created_at', type: 'TIMESTAMP', isRequired: true },
         ]
       };
       setEntities([...entities, newEntity]);
@@ -1518,50 +1885,75 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   const EntityComponent = ({ entity }: { entity: CanvasEntity }) => {
     const isSelected = selectedEntity === entity.id;
     const isRelationshipSource = relationshipSourceId === entity.id;
+    const [isHovered, setIsHovered] = useState(false);
+
+    const headerHeight = 40;
+    const attributeRowHeight = 24;
+
+    // Separate PK and non-PK attributes
+    const pkAttributes = entity.attributes?.filter(attr => attr.isPrimaryKey) || [];
+    const nonPkAttributes = entity.attributes?.filter(attr => !attr.isPrimaryKey) || [];
+    const hasPrimaryKeys = pkAttributes.length > 0;
+
     return (
       <g
         className="cursor-move"
         onMouseDown={(e) => handleEntityMouseDown(e as any, entity.id)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => handleEntityClick(entity.id)}
       >
-        {/* Entity Box */}
+        {/* Entity Shadow */}
+        <rect
+          x={entity.x + 2}
+          y={entity.y + 2}
+          width={entity.width}
+          height={entity.height}
+          rx={6}
+          className="fill-black fill-opacity-10"
+        />
+
+        {/* Entity Main Box */}
         <rect
           x={entity.x}
           y={entity.y}
           width={entity.width}
           height={entity.height}
-          rx={8}
+          rx={6}
           className={`transition-all duration-200 ${
             isSelected
               ? isDark
-                ? 'fill-zinc-700 stroke-indigo-400 stroke-2'
-                : 'fill-white stroke-indigo-500 stroke-2'
+                ? 'fill-zinc-800 stroke-indigo-400'
+                : 'fill-white stroke-indigo-500'
               : isRelationshipSource
               ? isDark
-                ? 'fill-zinc-700 stroke-green-400 stroke-2'
-                : 'fill-white stroke-green-500 stroke-2'
+                ? 'fill-zinc-800 stroke-green-400'
+                : 'fill-white stroke-green-500'
               : isDark
-              ? 'fill-zinc-800 stroke-zinc-600 stroke-1 hover:stroke-zinc-500'
-              : 'fill-white stroke-gray-300 stroke-1 hover:stroke-gray-400'
+              ? 'fill-zinc-800 stroke-zinc-700 hover:stroke-zinc-600'
+              : 'fill-white stroke-gray-300 hover:stroke-gray-400'
           }`}
-          filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))"
+          strokeWidth={isSelected || isRelationshipSource ? "2" : "1"}
         />
 
-        {/* Entity Header */}
+        {/* Entity Header Background */}
         <rect
           x={entity.x}
           y={entity.y}
           width={entity.width}
-          height={35}
-          rx={8}
+          height={headerHeight}
+          rx={6}
           className={`${
-            isDark ? 'fill-zinc-700' : 'fill-gray-50'
+            isDark ? 'fill-zinc-700' : 'fill-indigo-50'
           }`}
         />
+
+        {/* Header bottom border */}
         <line
           x1={entity.x}
-          y1={entity.y + 35}
+          y1={entity.y + headerHeight}
           x2={entity.x + entity.width}
-          y2={entity.y + 35}
+          y2={entity.y + headerHeight}
           className={`${isDark ? 'stroke-zinc-600' : 'stroke-gray-300'}`}
           strokeWidth={1}
         />
@@ -1569,58 +1961,222 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
         {/* Entity Name */}
         <text
           x={entity.x + entity.width / 2}
-          y={entity.y + 22}
+          y={entity.y + 25}
           textAnchor="middle"
-          className={`text-sm font-semibold ${isDark ? 'fill-gray-100' : 'fill-gray-900'}`}
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          className={`text-sm font-bold ${isDark ? 'fill-white' : 'fill-gray-900'}`}
+          style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px' }}
         >
           {entity.name}
         </text>
 
-        {/* Attributes */}
-        {entity.attributes?.map((attr, index) => (
-          <g key={index}>
-            <text
-              x={entity.x + 12}
-              y={entity.y + 55 + index * 20}
-              className={`text-xs ${isDark ? 'fill-gray-300' : 'fill-gray-700'}`}
-              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
-            >
-              {attr.isPrimaryKey && (
-                <>
-                  <tspan className="fill-yellow-500">🔑 </tspan>
-                </>
+        {/* Primary Key Attributes Section */}
+        {pkAttributes.map((attr, index) => {
+          const yPos = entity.y + headerHeight + 8 + index * attributeRowHeight;
+          const isEvenRow = index % 2 === 0;
+
+          return (
+            <g key={`pk-${index}`}>
+              {/* Alternating row background */}
+              <rect
+                x={entity.x + 1}
+                y={yPos - 4}
+                width={entity.width - 2}
+                height={attributeRowHeight}
+                fill={isEvenRow
+                  ? 'transparent'
+                  : isDark ? '#27272a' : '#fafafa'}
+                className="opacity-50"
+              />
+
+              {/* Primary Key Icon - small key symbol */}
+              <path
+                d={`M ${entity.x + 10} ${yPos + 8}
+                    l 0 -2
+                    a 3 3 0 1 1 6 0
+                    l 0 2
+                    l -1 0
+                    l 0 4
+                    l -1 0
+                    l 0 -2
+                    l -1 0
+                    l 0 2
+                    l -1 0
+                    l 0 -4
+                    z`}
+                fill="#fbbf24"
+                strokeWidth={0.5}
+                stroke="#f59e0b"
+              />
+
+              {/* Attribute name */}
+              <text
+                x={entity.x + 24}
+                y={yPos + 12}
+                className={`text-xs font-semibold ${isDark ? 'fill-gray-100' : 'fill-gray-900'}`}
+                style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '11px' }}
+              >
+                {attr.name}
+              </text>
+
+              {/* Data type */}
+              <text
+                x={entity.x + entity.width - 8}
+                y={yPos + 12}
+                textAnchor="end"
+                className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
+                style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
+              >
+                {attr.type}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Separator line between PK and non-PK */}
+        {hasPrimaryKeys && nonPkAttributes.length > 0 && (
+          <line
+            x1={entity.x + 5}
+            y1={entity.y + headerHeight + 8 + pkAttributes.length * attributeRowHeight}
+            x2={entity.x + entity.width - 5}
+            y2={entity.y + headerHeight + 8 + pkAttributes.length * attributeRowHeight}
+            className={`${isDark ? 'stroke-zinc-600' : 'stroke-gray-300'}`}
+            strokeWidth={1}
+            strokeDasharray="2,2"
+          />
+        )}
+
+        {/* Non-Primary Key Attributes Section */}
+        {nonPkAttributes.map((attr, index) => {
+          const pkSectionHeight = hasPrimaryKeys ? (pkAttributes.length * attributeRowHeight + 8) : 0;
+          const yPos = entity.y + headerHeight + 8 + pkSectionHeight + index * attributeRowHeight;
+          const isEvenRow = index % 2 === 0;
+
+          return (
+            <g key={`non-pk-${index}`}>
+              {/* Alternating row background */}
+              <rect
+                x={entity.x + 1}
+                y={yPos - 4}
+                width={entity.width - 2}
+                height={attributeRowHeight}
+                fill={isEvenRow
+                  ? 'transparent'
+                  : isDark ? '#27272a' : '#fafafa'}
+                className="opacity-50"
+              />
+
+              {/* Foreign Key Icon */}
+              {attr.isForeignKey && (
+                <g>
+                  {/* Link icon for foreign key */}
+                  <path
+                    d={`M ${entity.x + 10} ${yPos + 10}
+                        a 2 2 0 0 1 2 -2
+                        l 2 0
+                        a 2 2 0 0 1 0 4
+                        l -2 0
+                        a 2 2 0 0 1 -2 -2
+                        m 3 -1
+                        l 2 0
+                        a 2 2 0 0 1 0 4
+                        l -2 0`}
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth={1.2}
+                  />
+                </g>
               )}
-              {attr.isForeignKey && !attr.isPrimaryKey && (
-                <>
-                  <tspan className="fill-blue-500">🔗 </tspan>
-                </>
+
+              {/* Required indicator */}
+              {attr.isRequired && !attr.isForeignKey && (
+                <circle
+                  cx={entity.x + 12}
+                  cy={yPos + 10}
+                  r={2}
+                  fill="#ef4444"
+                />
               )}
-              <tspan>{attr.name}</tspan>
-              <tspan className={`${isDark ? 'fill-gray-500' : 'fill-gray-500'}`}> : {attr.type}</tspan>
-            </text>
+
+              {/* Attribute name */}
+              <text
+                x={entity.x + (attr.isForeignKey || attr.isRequired ? 24 : 12)}
+                y={yPos + 12}
+                className={`text-xs ${isDark ? 'fill-gray-200' : 'fill-gray-800'}`}
+                style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '11px' }}
+              >
+                {attr.name}
+              </text>
+
+              {/* Data type */}
+              <text
+                x={entity.x + entity.width - 8}
+                y={yPos + 12}
+                textAnchor="end"
+                className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
+                style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
+              >
+                {attr.type}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Connection Points (visible on hover) */}
+        {isHovered && (
+          <g className="opacity-60">
+            {/* Top connection point */}
+            <circle
+              cx={entity.x + entity.width / 2}
+              cy={entity.y}
+              r={3}
+              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
+            />
+            {/* Bottom connection point */}
+            <circle
+              cx={entity.x + entity.width / 2}
+              cy={entity.y + entity.height}
+              r={3}
+              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
+            />
+            {/* Left connection point */}
+            <circle
+              cx={entity.x}
+              cy={entity.y + entity.height / 2}
+              r={3}
+              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
+            />
+            {/* Right connection point */}
+            <circle
+              cx={entity.x + entity.width}
+              cy={entity.y + entity.height / 2}
+              r={3}
+              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
+            />
           </g>
-        ))}
+        )}
 
         {/* Delete Button (when selected) */}
         {isSelected && (
-          <circle
-            cx={entity.x + entity.width - 10}
-            cy={entity.y + 10}
-            r={8}
-            className="fill-red-500 hover:fill-red-600 cursor-pointer"
-            onClick={() => deleteEntity(entity.id)}
-          />
-        )}
-        {isSelected && (
-          <text
-            x={entity.x + entity.width - 10}
-            y={entity.y + 14}
-            textAnchor="middle"
-            className="fill-white text-xs cursor-pointer pointer-events-none"
-          >
-            ×
-          </text>
+          <g>
+            <circle
+              cx={entity.x + entity.width - 12}
+              cy={entity.y + 12}
+              r={8}
+              className="fill-red-500 hover:fill-red-600 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteEntity(entity.id);
+              }}
+            />
+            <text
+              x={entity.x + entity.width - 12}
+              y={entity.y + 16}
+              textAnchor="middle"
+              className="fill-white text-xs cursor-pointer pointer-events-none font-bold"
+            >
+              ×
+            </text>
+          </g>
         )}
       </g>
     );
@@ -1995,6 +2551,8 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           onUpdateRelationship={(relationshipId, updates) => {
             setRelationships(relationships.map(r => r.id === relationshipId ? {...r, ...updates} : r));
           }}
+          onAddEntity={handleAddEntity}
+          onRemoveEntity={handleRemoveEntity}
         />
       )}
     </div>

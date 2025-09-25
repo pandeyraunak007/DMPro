@@ -48,10 +48,16 @@ import {
   Scissors,
   ClipboardCopy,
   ClipboardPaste,
+  StickyNote,
+  Group,
+  Ungroup,
+  Hand,
+  Shapes,
+  Sparkles,
+  Layers,
   AlignLeft,
   AlignCenter,
   Type,
-  Layers,
   BookOpen,
   HelpCircle,
   Info,
@@ -1398,48 +1404,92 @@ const ModelTree = ({ isDark, isCollapsed, onToggle, isPhysicalView }: {
   );
 };
 
-// Floating Toolbar Component
-const FloatingToolbar = ({ isDark }: { isDark: boolean }) => {
+const ToolbarButton = ({ icon: Icon, tooltip, isDark }: { icon: any; tooltip: string; isDark: boolean }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+
   return (
-    <div className={`absolute top-6 left-6 flex items-center gap-1 p-1.5 rounded-xl shadow-lg backdrop-blur-sm border ${
+    <div className="relative">
+      <button
+        className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+          isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+        }`}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        <Icon className="w-4 h-4" />
+      </button>
+      {showTooltip && (
+        <div className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg text-xs whitespace-nowrap z-50 ${
+          isDark ? 'bg-zinc-700 text-white' : 'bg-gray-800 text-white'
+        }`}>
+          {tooltip}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ObjectToolbar = ({ isDark }: { isDark: boolean }) => {
+  return (
+    <div className={`absolute top-6 left-6 flex flex-col gap-1 p-1.5 rounded-xl shadow-lg backdrop-blur-sm border ${
       isDark ? 'bg-zinc-800/90 border-zinc-700' : 'bg-white/90 border-gray-200'
     }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
-      }`}>
-        <MousePointer className="w-4 h-4" />
+      <ToolbarButton icon={MousePointer} tooltip="Pointer/Select Tool" isDark={isDark} />
+      <ToolbarButton icon={Table} tooltip="Add Entity/Table" isDark={isDark} />
+      <ToolbarButton icon={Link} tooltip="Add Relationship/Connector" isDark={isDark} />
+      <ToolbarButton icon={StickyNote} tooltip="Add Note/Annotation" isDark={isDark} />
+      <div className={`h-px w-6 my-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
+      <ToolbarButton icon={Group} tooltip="Group Entities" isDark={isDark} />
+      <ToolbarButton icon={Ungroup} tooltip="Ungroup Entities" isDark={isDark} />
+      <div className={`h-px w-6 my-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
+      <ToolbarButton icon={Square} tooltip="Draw Rectangle" isDark={isDark} />
+      <ToolbarButton icon={Circle} tooltip="Draw Ellipse" isDark={isDark} />
+      <ToolbarButton icon={ArrowRight} tooltip="Draw Line" isDark={isDark} />
+    </div>
+  );
+};
+
+const ViewToolbarButton = ({ icon: Icon, tooltip, isDark }: { icon: any; tooltip: string; isDark: boolean }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
+          isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+        }`}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        <Icon className="w-4 h-4" />
       </button>
-      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
-      }`}>
-        <Move className="w-4 h-4" />
-      </button>
-      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
-      }`}>
-        <Square className="w-4 h-4" />
-      </button>
-      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
-      }`}>
-        <ArrowRight className="w-4 h-4" />
-      </button>
+      {showTooltip && (
+        <div className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded-lg text-xs whitespace-nowrap z-50 ${
+          isDark ? 'bg-zinc-700 text-white' : 'bg-gray-800 text-white'
+        }`}>
+          {tooltip}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ViewControlsToolbar = ({ isDark }: { isDark: boolean }) => {
+  return (
+    <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-1 p-1.5 rounded-xl shadow-lg backdrop-blur-sm border ${
+      isDark ? 'bg-zinc-800/90 border-zinc-700' : 'bg-white/90 border-gray-200'
+    }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <ViewToolbarButton icon={ZoomIn} tooltip="Zoom In" isDark={isDark} />
+      <ViewToolbarButton icon={ZoomOut} tooltip="Zoom Out" isDark={isDark} />
+      <ViewToolbarButton icon={Maximize2} tooltip="Fit to Screen" isDark={isDark} />
       <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
-      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
-      }`}>
-        <ZoomIn className="w-4 h-4" />
-      </button>
-      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
-      }`}>
-        <ZoomOut className="w-4 h-4" />
-      </button>
-      <button className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-        isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
-      }`}>
-        <Maximize2 className="w-4 h-4" />
-      </button>
+      <ViewToolbarButton icon={Hand} tooltip="Pan/Hand Tool" isDark={isDark} />
+      <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
+      <ViewToolbarButton icon={Grid} tooltip="Toggle Grid" isDark={isDark} />
+      <ViewToolbarButton icon={Target} tooltip="Snap to Grid/Alignment" isDark={isDark} />
+      <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
+      <ViewToolbarButton icon={Sparkles} tooltip="Auto-layout" isDark={isDark} />
+      <ViewToolbarButton icon={Map} tooltip="Toggle Minimap" isDark={isDark} />
     </div>
   );
 };
@@ -1653,7 +1703,8 @@ const DiagramCanvas = ({ isDark }: { isDark: boolean }) => {
           </defs>
         </svg>
 
-        <FloatingToolbar isDark={isDark} />
+        <ObjectToolbar isDark={isDark} />
+        <ViewControlsToolbar isDark={isDark} />
         <MiniMap isDark={isDark} />
       </div>
     </div>

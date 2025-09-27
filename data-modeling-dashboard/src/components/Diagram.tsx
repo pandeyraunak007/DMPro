@@ -232,7 +232,9 @@ const ViewControlsToolbar = ({
   onZoomIn,
   onZoomOut,
   onZoomFit,
-  zoomLevel
+  zoomLevel,
+  handleToggleHandTool,
+  isHandToolActive
 }: {
   isDark: boolean;
   onToggleFullScreen: () => void;
@@ -241,16 +243,24 @@ const ViewControlsToolbar = ({
   onZoomOut: () => void;
   onZoomFit: () => void;
   zoomLevel: number;
+  handleToggleHandTool: () => void;
+  isHandToolActive: boolean;
 }) => {
   return (
-    <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-1 p-1.5 rounded-xl shadow-lg backdrop-blur-sm border ${
-      isDark ? 'bg-zinc-800/90 border-zinc-700' : 'bg-white/90 border-gray-200'
+    <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-1 p-1.5 rounded-xl shadow-lg backdrop-blur-sm border z-50 ${
+      isDark ? 'bg-zinc-800/95 border-zinc-700' : 'bg-white/95 border-gray-200'
     }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <ViewToolbarButton icon={ZoomIn} tooltip="Zoom In" isDark={isDark} onClick={onZoomIn} />
       <ViewToolbarButton icon={ZoomOut} tooltip="Zoom Out" isDark={isDark} onClick={onZoomOut} />
       <ViewToolbarButton icon={Maximize2} tooltip="Fit to Screen" isDark={isDark} onClick={onZoomFit} />
       <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
-      <ViewToolbarButton icon={Hand} tooltip="Pan/Hand Tool" isDark={isDark} />
+      <ViewToolbarButton
+        icon={Hand}
+        tooltip="Pan/Hand Tool"
+        isDark={isDark}
+        onClick={handleToggleHandTool}
+        isActive={isHandToolActive}
+      />
       <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
       <ViewToolbarButton icon={Grid} tooltip="Toggle Grid" isDark={isDark} />
       <ViewToolbarButton icon={Target} tooltip="Snap to Grid/Alignment" isDark={isDark} />
@@ -480,6 +490,9 @@ const ModelTree = ({
                                   <div className="w-3 h-3 flex items-center justify-center">
                                     <div className="w-2 h-2 border border-purple-500 rounded-full" />
                                   </div>
+                                )}
+                                {attribute.isIndexed && !attribute.isPrimaryKey && !attribute.isUnique && (
+                                  <Database className="w-3 h-3 text-orange-500" title={`Index: ${attribute.indexType}`} />
                                 )}
 
                                 {/* Attribute Name */}
@@ -1659,6 +1672,19 @@ const PropertiesPanel = ({
 };
 
 // Canvas Entity Interface
+interface Attribute {
+  name: string;
+  type: string;
+  isPrimaryKey?: boolean;
+  isForeignKey?: boolean;
+  isRequired?: boolean;
+  isUnique?: boolean;
+  allowNull?: boolean;
+  isIndexed?: boolean;
+  indexType?: 'unique' | 'non-unique' | 'clustered' | 'non-clustered';
+  defaultValue?: string;
+}
+
 interface CanvasEntity {
   id: string;
   type: 'entity' | 'annotation';
@@ -1667,7 +1693,7 @@ interface CanvasEntity {
   y: number;
   width: number;
   height: number;
-  attributes?: Array<{ name: string; type: string; isPrimaryKey?: boolean; isForeignKey?: boolean; isRequired?: boolean; }>;
+  attributes?: Attribute[];
   text?: string; // For annotations
   category?: 'standard' | 'lookup' | 'view' | 'junction'; // Entity categories for color coding
 }
@@ -1677,9 +1703,10 @@ interface Relationship {
   type: 'identifying' | 'non-identifying';
   sourceEntityId: string;
   targetEntityId: string;
-  sourceCardinality: '1' | 'M';
-  targetCardinality: '1' | 'M';
+  sourceCardinality: '0' | '1' | 'M' | '0..1' | '1..M' | '0..M';
+  targetCardinality: '0' | '1' | 'M' | '0..1' | '1..M' | '0..M';
   name?: string;
+  isOptional?: boolean; // For optionality visualization
 }
 
 // Main Diagram Component
@@ -1692,6 +1719,9 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   // Zoom and Pan state
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [isHandToolActive, setIsHandToolActive] = useState(false);
 
   const [entities, setEntities] = useState<CanvasEntity[]>([
     {
@@ -1703,12 +1733,12 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
       width: 220,
       height: 180,
       attributes: [
-        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isRequired: true },
-        { name: 'first_name', type: 'VARCHAR(50)', isRequired: true },
-        { name: 'last_name', type: 'VARCHAR(50)', isRequired: true },
-        { name: 'email', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'phone', type: 'VARCHAR(20)' },
-        { name: 'created_at', type: 'TIMESTAMP', isRequired: true },
+        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isRequired: true, allowNull: false, isIndexed: true, indexType: 'clustered' },
+        { name: 'first_name', type: 'VARCHAR(50)', isRequired: true, allowNull: false },
+        { name: 'last_name', type: 'VARCHAR(50)', isRequired: true, allowNull: false },
+        { name: 'email', type: 'VARCHAR(100)', isRequired: true, allowNull: false, isUnique: true, isIndexed: true, indexType: 'unique' },
+        { name: 'phone', type: 'VARCHAR(20)', allowNull: true, isIndexed: true, indexType: 'non-unique' },
+        { name: 'created_at', type: 'TIMESTAMP', isRequired: true, allowNull: false, isIndexed: true, indexType: 'non-unique' },
       ]
     },
     {
@@ -1720,10 +1750,10 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
       width: 200,
       height: 120,
       attributes: [
-        { name: 'country_id', type: 'INT', isPrimaryKey: true, isRequired: true },
-        { name: 'country_name', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'country_code', type: 'CHAR(3)', isRequired: true },
-        { name: 'is_active', type: 'BOOLEAN', isRequired: true },
+        { name: 'country_id', type: 'INT', isPrimaryKey: true, isRequired: true, allowNull: false, isIndexed: true, indexType: 'clustered' },
+        { name: 'country_name', type: 'VARCHAR(100)', isRequired: true, allowNull: false, isIndexed: true, indexType: 'non-unique' },
+        { name: 'country_code', type: 'CHAR(3)', isRequired: true, allowNull: false, isUnique: true, isIndexed: true, indexType: 'unique' },
+        { name: 'is_active', type: 'BOOLEAN', isRequired: true, allowNull: false },
       ]
     },
     {
@@ -1765,8 +1795,19 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
       sourceEntityId: 'sample-customer',
       targetEntityId: 'sample-customer-orders',
       sourceCardinality: '1',
-      targetCardinality: 'M',
-      name: 'customer_places_orders'
+      targetCardinality: '1..M',
+      name: 'places',
+      isOptional: false
+    },
+    {
+      id: 'rel-customer-country',
+      type: 'non-identifying',
+      sourceEntityId: 'sample-customer',
+      targetEntityId: 'sample-country',
+      sourceCardinality: '0..M',
+      targetCardinality: '1',
+      name: 'lives_in',
+      isOptional: true
     }
   ]);
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
@@ -1836,16 +1877,64 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
     setPanOffset({ x: 0, y: 0 });
   };
 
+  // Mouse wheel zoom functionality
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+
+    const delta = e.deltaY > 0 ? 0.9 : 1.1; // Zoom out or in
+    const newZoomLevel = Math.min(Math.max(zoomLevel * delta, 0.1), 3);
+
+    setZoomLevel(newZoomLevel);
+  };
+
+  // Panning functionality
+  const handleCanvasMouseDown = (e: React.MouseEvent) => {
+    // Start panning if hand tool is active or middle mouse button is pressed
+    if (isHandToolActive || e.button === 1) {
+      e.preventDefault();
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+    }
+  };
+
+  const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    if (isPanning) {
+      setPanOffset({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      });
+    }
+  };
+
+  const handleCanvasMouseUp = () => {
+    setIsPanning(false);
+  };
+
+  // Toggle hand tool
+  const handleToggleHandTool = () => {
+    setIsHandToolActive(!isHandToolActive);
+    if (!isHandToolActive) {
+      // When activating hand tool, clear other drawing modes
+      setIsDrawingMode(null);
+      setRelationshipSourceId(null);
+      setRelationshipType(null);
+    }
+  };
+
   // Handle tool selection
   const handleToolSelection = (mode: 'entity' | 'annotation' | 'identifying' | 'non-identifying' | null) => {
-    console.log('🔧 Tool selected from floating toolbar:', mode);
+    console.log('🔧🔧🔧 Tool selected from floating toolbar:', mode);
     setIsDrawingMode(mode);
 
     // Set relationship type for relationship tools
     if (mode === 'identifying' || mode === 'non-identifying') {
+      console.log('   - Setting relationship type:', mode);
       setRelationshipType(mode);
       setRelationshipSourceId(null); // Reset relationship creation
+      console.log('   - Drawing mode set to:', mode);
+      console.log('   - Relationship type set to:', mode);
     } else {
+      console.log('   - Clearing relationship mode');
       setRelationshipType(null);
       setRelationshipSourceId(null);
     }
@@ -1899,26 +1988,45 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
 
   // Handle entity click for relationship creation or selection
   const handleEntityClick = (entityId: string) => {
-    console.log('🎯 Entity clicked:', entityId, 'Drawing mode:', isDrawingMode);
+    console.log('🎯🎯🎯 Entity clicked - ENTRY:', entityId);
+    console.log('   - Drawing mode:', isDrawingMode);
+    console.log('   - Relationship type:', relationshipType);
+    console.log('   - Current source:', relationshipSourceId);
 
     if (isDrawingMode === 'identifying' || isDrawingMode === 'non-identifying') {
+      console.log('   - In relationship mode!');
       if (!relationshipSourceId) {
         // First click: select source entity
+        console.log('   - Setting source entity:', entityId);
         setRelationshipSourceId(entityId);
         console.log('📌 Relationship source selected:', entityId);
       } else if (relationshipSourceId !== entityId) {
         // Second click: create relationship with target entity
+        console.log('   - Creating relationship from', relationshipSourceId, 'to', entityId);
         createRelationship(relationshipSourceId, entityId);
+      } else {
+        // Clicked same entity - cancel
+        console.log('   - Cancelling relationship creation');
+        setRelationshipSourceId(null);
+        console.log('❌ Relationship creation cancelled');
       }
     } else {
       // Normal selection
+      console.log('   - Normal entity selection mode');
       setSelectedEntity(entityId);
+      console.log('👆 Entity selected:', entityId);
     }
   };
 
   // Create a relationship between two entities
   const createRelationship = (sourceId: string, targetId: string) => {
-    if (!relationshipType) return;
+    console.log('🔗 Creating relationship:', sourceId, '->', targetId, 'Type:', relationshipType);
+    console.log('   - Available entities:', entities.map(e => `${e.id} (${e.name})`));
+
+    if (!relationshipType) {
+      console.log('❌ No relationship type set!');
+      return;
+    }
 
     const newRelationship: Relationship = {
       id: `relationship-${Date.now()}`,
@@ -1926,11 +2034,14 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
       sourceEntityId: sourceId,
       targetEntityId: targetId,
       sourceCardinality: '1',
-      targetCardinality: 'M'
+      targetCardinality: '1..M',
+      name: 'relationship',
+      isOptional: relationshipType === 'non-identifying'
     };
 
     setRelationships([...relationships, newRelationship]);
-    console.log('🔗 Relationship created:', newRelationship);
+    console.log('✅ Relationship created successfully:', newRelationship);
+    console.log('   - Total relationships now:', relationships.length + 1);
 
     // Reset relationship creation state
     setRelationshipSourceId(null);
@@ -1940,11 +2051,15 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
 
   // Handle entity drag start
   const handleEntityMouseDown = (e: React.MouseEvent, entityId: string) => {
+    // If hand tool is active, allow canvas panning instead of entity dragging
+    if (isHandToolActive) {
+      return;
+    }
+
     e.stopPropagation();
 
-    // If in relationship mode, handle entity click instead of drag
+    // If in relationship mode, don't allow dragging
     if (isDrawingMode === 'identifying' || isDrawingMode === 'non-identifying') {
-      handleEntityClick(entityId);
       return;
     }
 
@@ -2004,11 +2119,19 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
 
     return (
       <g
-        className="cursor-move"
-        onMouseDown={(e) => handleEntityMouseDown(e as any, entity.id)}
+        className={isDrawingMode === 'identifying' || isDrawingMode === 'non-identifying' ? "cursor-crosshair" : "cursor-move"}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => handleEntityClick(entity.id)}
+        onMouseDown={(e) => {
+          console.log('🎯 Mouse down on entity:', entity.id);
+          if (isDrawingMode === 'identifying' || isDrawingMode === 'non-identifying') {
+            console.log('🎯 In relationship mode - handling as click');
+            e.stopPropagation();
+            handleEntityClick(entity.id);
+            return;
+          }
+          handleEntityMouseDown(e as any, entity.id);
+        }}
       >
         {/* Entity Shadow */}
         <rect
@@ -2028,7 +2151,11 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           height={entity.height}
           rx={6}
           className={`transition-all duration-200 ${
-            isSelected
+            relationshipSourceId === entity.id
+              ? isDark
+                ? 'fill-zinc-800 stroke-green-400'
+                : 'fill-white stroke-green-500'
+              : isSelected
               ? isDark
                 ? 'fill-zinc-800 stroke-indigo-400'
                 : 'fill-white stroke-indigo-500'
@@ -2040,7 +2167,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
               ? 'fill-zinc-800 stroke-zinc-700 hover:stroke-zinc-600'
               : 'fill-white stroke-gray-300 hover:stroke-gray-400'
           }`}
-          strokeWidth={isSelected || isRelationshipSource ? "2" : "1"}
+          strokeWidth={isSelected || isRelationshipSource || relationshipSourceId === entity.id ? "3" : "1"}
         />
 
         {/* Entity Header Background */}
@@ -2117,6 +2244,21 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
                 strokeWidth={0.5}
                 stroke="#f59e0b"
               />
+
+              {/* Additional indicators for primary keys */}
+              {attr.isIndexed && attr.indexType && (
+                <g>
+                  {/* Index type indicator next to PK */}
+                  <text
+                    x={entity.x + 18}
+                    y={yPos + 6}
+                    className={`text-xs ${isDark ? 'fill-orange-400' : 'fill-orange-600'}`}
+                    style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '7px' }}
+                  >
+                    {attr.indexType === 'clustered' ? 'C' : attr.indexType === 'unique' ? 'U' : 'I'}
+                  </text>
+                </g>
+              )}
 
               {/* Attribute name */}
               <text
@@ -2210,9 +2352,66 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
                 />
               )}
 
+              {/* Index indicator */}
+              {attr.isIndexed && !attr.isPrimaryKey && !attr.isUnique && (
+                <g>
+                  {/* Database/cylinder icon for index */}
+                  <rect
+                    x={entity.x + (attr.isForeignKey || attr.isRequired ? 18 : 10)}
+                    y={yPos + 6}
+                    width={8}
+                    height={8}
+                    rx={1}
+                    fill="none"
+                    stroke="#f97316"
+                    strokeWidth={1}
+                  />
+                  <line
+                    x1={entity.x + (attr.isForeignKey || attr.isRequired ? 20 : 12)}
+                    y1={yPos + 8}
+                    x2={entity.x + (attr.isForeignKey || attr.isRequired ? 24 : 16)}
+                    y2={yPos + 8}
+                    stroke="#f97316"
+                    strokeWidth={0.5}
+                  />
+                  <line
+                    x1={entity.x + (attr.isForeignKey || attr.isRequired ? 20 : 12)}
+                    y1={yPos + 10}
+                    x2={entity.x + (attr.isForeignKey || attr.isRequired ? 24 : 16)}
+                    y2={yPos + 10}
+                    stroke="#f97316"
+                    strokeWidth={0.5}
+                  />
+                  <line
+                    x1={entity.x + (attr.isForeignKey || attr.isRequired ? 20 : 12)}
+                    y1={yPos + 12}
+                    x2={entity.x + (attr.isForeignKey || attr.isRequired ? 24 : 16)}
+                    y2={yPos + 12}
+                    stroke="#f97316"
+                    strokeWidth={0.5}
+                  />
+                </g>
+              )}
+
+              {/* Unique Key indicator */}
+              {attr.isUnique && !attr.isPrimaryKey && (
+                <circle
+                  cx={entity.x + (attr.isForeignKey || attr.isRequired || attr.isIndexed ? 30 : attr.isForeignKey || attr.isRequired ? 18 : 10)}
+                  cy={yPos + 10}
+                  r={3}
+                  fill="none"
+                  stroke="#a855f7"
+                  strokeWidth={1.5}
+                />
+              )}
+
               {/* Attribute name */}
               <text
-                x={entity.x + (attr.isForeignKey || attr.isRequired ? 24 : 12)}
+                x={entity.x + (
+                  (attr.isUnique && !attr.isPrimaryKey) ? 36 :
+                  (attr.isIndexed && !attr.isPrimaryKey && !attr.isUnique) ? 30 :
+                  (attr.isForeignKey || attr.isRequired) ? 24 : 12
+                )}
                 y={yPos + 12}
                 className={`text-xs ${isDark ? 'fill-gray-200' : 'fill-gray-800'}`}
                 style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '11px' }}
@@ -2296,64 +2495,258 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   };
 
   // Render Relationship Component
+  // Helper function to calculate edge connection points
+  const getConnectionPoint = (fromEntity: CanvasEntity, toEntity: CanvasEntity) => {
+    const entity = fromEntity;
+    const other = toEntity;
+
+    console.log(`   - FROM entity:`, entity.name, 'at', entity.x, entity.y, 'size', entity.width, 'x', entity.height);
+
+    // Calculate which edge to connect to based on relative positions
+    const dx = (other.x + other.width / 2) - (entity.x + entity.width / 2);
+    const dy = (other.y + other.height / 2) - (entity.y + entity.height / 2);
+
+    console.log(`   - Distance to other: dx=${dx}, dy=${dy}`);
+
+    let x, y;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      // Connect to left or right edge
+      if (dx > 0) {
+        // Connect to right edge
+        x = entity.x + entity.width;
+        y = entity.y + entity.height / 2;
+        console.log(`   - Connecting to RIGHT edge of ${entity.name}`);
+      } else {
+        // Connect to left edge
+        x = entity.x;
+        y = entity.y + entity.height / 2;
+        console.log(`   - Connecting to LEFT edge of ${entity.name}`);
+      }
+    } else {
+      // Connect to top or bottom edge
+      if (dy > 0) {
+        // Connect to bottom edge
+        x = entity.x + entity.width / 2;
+        y = entity.y + entity.height;
+        console.log(`   - Connecting to BOTTOM edge of ${entity.name}`);
+      } else {
+        // Connect to top edge
+        x = entity.x + entity.width / 2;
+        y = entity.y;
+        console.log(`   - Connecting to TOP edge of ${entity.name}`);
+      }
+    }
+
+    console.log(`   - Connection point: (${x}, ${y})`);
+    return { x, y };
+  };
+
   const RelationshipComponent = ({ relationship }: { relationship: Relationship }) => {
+    console.log('🔗 Rendering relationship:', relationship.id, 'from', relationship.sourceEntityId, 'to', relationship.targetEntityId);
+    console.log('   - All available entity IDs:', entities.map(e => e.id));
+
     const sourceEntity = entities.find(e => e.id === relationship.sourceEntityId);
     const targetEntity = entities.find(e => e.id === relationship.targetEntityId);
 
-    if (!sourceEntity || !targetEntity) return null;
+    console.log('   - Source entity found:', sourceEntity ? `${sourceEntity.name} (${sourceEntity.id})` : 'NOT FOUND');
+    console.log('   - Target entity found:', targetEntity ? `${targetEntity.name} (${targetEntity.id})` : 'NOT FOUND');
 
-    // Calculate connection points (center of entities)
-    const sourceX = sourceEntity.x + sourceEntity.width / 2;
-    const sourceY = sourceEntity.y + sourceEntity.height / 2;
-    const targetX = targetEntity.x + targetEntity.width / 2;
-    const targetY = targetEntity.y + targetEntity.height / 2;
+    if (!sourceEntity || !targetEntity) {
+      console.log('❌ Relationship not rendered - missing entities');
+      return null;
+    }
 
-    // Line style based on relationship type
-    const strokeDasharray = relationship.type === 'identifying' ? 'none' : '5,5';
-    const strokeWidth = relationship.type === 'identifying' ? 2 : 2;
+    // Calculate proper connection points on entity edges
+    console.log('   - Calculating connection points...');
+    console.log('   - Source entity for calculation:', sourceEntity.name, sourceEntity.id);
+    console.log('   - Target entity for calculation:', targetEntity.name, targetEntity.id);
+
+    const sourcePoint = getConnectionPoint(sourceEntity, targetEntity);
+    const targetPoint = getConnectionPoint(targetEntity, sourceEntity);
+
+    // Line style based on relationship type and optionality
+    const strokeDasharray = relationship.type === 'identifying' ? 'none' : '8,4';
+    const strokeWidth = relationship.type === 'identifying' ? 3 : 2.5;
+    const strokeColor = isDark ? '#10B981' : '#059669'; // Use bright green for visibility
+
+    // Optional relationships use dashed lines
+    const finalStrokeDasharray = relationship.isOptional ? '6,6' : strokeDasharray;
+
+    console.log('   - Rendering line from', sourcePoint, 'to', targetPoint);
+    console.log('   - Stroke:', strokeColor, 'Width:', strokeWidth);
+
+    // Calculate angle for crow's foot positioning
+    const angle = Math.atan2(targetPoint.y - sourcePoint.y, targetPoint.x - sourcePoint.x);
+
+    // Crow's foot notation symbols
+    const getCrowsFootMarker = (cardinality: string, isSource: boolean) => {
+      const point = isSource ? sourcePoint : targetPoint;
+      const entityAngle = isSource ? angle + Math.PI : angle;
+      const perpAngle = entityAngle + Math.PI / 2;
+
+      // Helper function to create perpendicular line
+      const createPerpLine = (offset: number = 0, strokeWidth: number = 2.5) => {
+        const length = 8;
+        const adjustedPoint = {
+          x: point.x + Math.cos(entityAngle) * offset,
+          y: point.y + Math.sin(entityAngle) * offset
+        };
+
+        const x1 = adjustedPoint.x + Math.cos(perpAngle) * length;
+        const y1 = adjustedPoint.y + Math.sin(perpAngle) * length;
+        const x2 = adjustedPoint.x - Math.cos(perpAngle) * length;
+        const y2 = adjustedPoint.y - Math.sin(perpAngle) * length;
+
+        return (
+          <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={strokeColor} strokeWidth={strokeWidth} />
+        );
+      };
+
+      // Helper function to create crow's foot (many symbol)
+      const createCrowsFoot = (offset: number = 0) => {
+        const length = 12;
+        const spread = 0.4;
+        const adjustedPoint = {
+          x: point.x + Math.cos(entityAngle) * offset,
+          y: point.y + Math.sin(entityAngle) * offset
+        };
+
+        const x1 = adjustedPoint.x + Math.cos(entityAngle + spread) * length;
+        const y1 = adjustedPoint.y + Math.sin(entityAngle + spread) * length;
+        const x2 = adjustedPoint.x + Math.cos(entityAngle - spread) * length;
+        const y2 = adjustedPoint.y + Math.sin(entityAngle - spread) * length;
+        const x3 = adjustedPoint.x + Math.cos(entityAngle) * length;
+        const y3 = adjustedPoint.y + Math.sin(entityAngle) * length;
+
+        return (
+          <g>
+            <line x1={adjustedPoint.x} y1={adjustedPoint.y} x2={x1} y2={y1} stroke={strokeColor} strokeWidth="2" />
+            <line x1={adjustedPoint.x} y1={adjustedPoint.y} x2={x2} y2={y2} stroke={strokeColor} strokeWidth="2" />
+            <line x1={adjustedPoint.x} y1={adjustedPoint.y} x2={x3} y2={y3} stroke={strokeColor} strokeWidth="2" />
+          </g>
+        );
+      };
+
+      // Helper function to create circle (zero/optional symbol)
+      const createOptionalCircle = (offset: number = 0) => {
+        const radius = 4;
+        const adjustedPoint = {
+          x: point.x + Math.cos(entityAngle) * offset,
+          y: point.y + Math.sin(entityAngle) * offset
+        };
+
+        return (
+          <circle
+            cx={adjustedPoint.x}
+            cy={adjustedPoint.y}
+            r={radius}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth="2"
+          />
+        );
+      };
+
+      // Process different cardinality types
+      if (cardinality === 'M' || cardinality === '1..M' || cardinality === '0..M') {
+        if (cardinality === '1..M') {
+          // One-to-Many: perpendicular line + crow's foot
+          return (
+            <g>
+              {createPerpLine(0)}
+              {createCrowsFoot(12)}
+            </g>
+          );
+        } else if (cardinality === '0..M') {
+          // Zero-to-Many: circle + crow's foot
+          return (
+            <g>
+              {createOptionalCircle(0)}
+              {createCrowsFoot(12)}
+            </g>
+          );
+        } else {
+          // Just Many: crow's foot only
+          return createCrowsFoot(0);
+        }
+      } else if (cardinality === '1') {
+        // One: single perpendicular line
+        return createPerpLine(0);
+      } else if (cardinality === '0') {
+        // Zero: circle
+        return createOptionalCircle(0);
+      } else if (cardinality === '0..1') {
+        // Zero-or-One: circle + perpendicular line
+        return (
+          <g>
+            {createOptionalCircle(0)}
+            {createPerpLine(12)}
+          </g>
+        );
+      }
+
+      return null;
+    };
 
     return (
-      <g key={relationship.id}>
+      <g key={relationship.id} style={{ zIndex: 1000 }}>
+        {/* Debug: Show connection points */}
+        <circle cx={sourcePoint.x} cy={sourcePoint.y} r="4" fill="red" opacity="0.8" />
+        <circle cx={targetPoint.x} cy={targetPoint.y} r="4" fill="blue" opacity="0.8" />
+
         {/* Relationship Line */}
         <line
-          x1={sourceX}
-          y1={sourceY}
-          x2={targetX}
-          y2={targetY}
-          stroke={isDark ? '#6366F1' : '#4F46E5'}
+          x1={sourcePoint.x}
+          y1={sourcePoint.y}
+          x2={targetPoint.x}
+          y2={targetPoint.y}
+          stroke={strokeColor}
           strokeWidth={strokeWidth}
-          strokeDasharray={strokeDasharray}
-          markerEnd="url(#arrowhead)"
+          strokeDasharray={finalStrokeDasharray}
+          style={{ zIndex: 1000 }}
         />
+
+        {/* Crow's Foot Notation at Source */}
+        {getCrowsFootMarker(relationship.sourceCardinality, true)}
+
+        {/* Crow's Foot Notation at Target */}
+        {getCrowsFootMarker(relationship.targetCardinality, false)}
 
         {/* Cardinality Labels */}
         <text
-          x={sourceX + (targetX - sourceX) * 0.2}
-          y={sourceY + (targetY - sourceY) * 0.2 - 5}
+          x={sourcePoint.x + (targetPoint.x - sourcePoint.x) * 0.15}
+          y={sourcePoint.y + (targetPoint.y - sourcePoint.y) * 0.15 - 10}
           fill={isDark ? '#9CA3AF' : '#6B7280'}
-          fontSize="12"
+          fontSize="10"
           textAnchor="middle"
+          className="font-medium"
         >
-          {relationship.sourceCardinality}
+          {relationship.sourceCardinality.includes('M') ?
+            relationship.sourceCardinality.replace('M', '∞') :
+            relationship.sourceCardinality}
         </text>
 
         <text
-          x={sourceX + (targetX - sourceX) * 0.8}
-          y={sourceY + (targetY - sourceY) * 0.8 - 5}
+          x={sourcePoint.x + (targetPoint.x - sourcePoint.x) * 0.85}
+          y={sourcePoint.y + (targetPoint.y - sourcePoint.y) * 0.85 - 10}
           fill={isDark ? '#9CA3AF' : '#6B7280'}
-          fontSize="12"
+          fontSize="10"
           textAnchor="middle"
+          className="font-medium"
         >
-          {relationship.targetCardinality}
+          {relationship.targetCardinality.includes('M') ?
+            relationship.targetCardinality.replace('M', '∞') :
+            relationship.targetCardinality}
         </text>
 
         {/* Relationship Name (if exists) */}
         {relationship.name && (
           <text
-            x={sourceX + (targetX - sourceX) * 0.5}
-            y={sourceY + (targetY - sourceY) * 0.5 - 8}
+            x={sourcePoint.x + (targetPoint.x - sourcePoint.x) * 0.5}
+            y={sourcePoint.y + (targetPoint.y - sourcePoint.y) * 0.5 - 12}
             fill={isDark ? '#D1D5DB' : '#374151'}
-            fontSize="11"
+            fontSize="10"
             textAnchor="middle"
             className="font-medium"
           >
@@ -2455,6 +2848,8 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           onZoomOut={handleZoomOut}
           onZoomFit={handleZoomFit}
           zoomLevel={zoomLevel}
+          handleToggleHandTool={handleToggleHandTool}
+          isHandToolActive={isHandToolActive}
         />
         <MiniMap isDark={isDark} />
 
@@ -2488,9 +2883,14 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
         <svg
           className="absolute inset-0 w-full h-full"
           style={{
-            cursor: isDrawingMode ? 'crosshair' : 'default'
+            cursor: isHandToolActive ? 'grab' : isPanning ? 'grabbing' : isDrawingMode ? 'crosshair' : 'default'
           }}
           onClick={handleCanvasClick}
+          onWheel={handleWheel}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseMove={handleCanvasMouseMove}
+          onMouseUp={handleCanvasMouseUp}
+          onMouseLeave={handleCanvasMouseUp}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
@@ -2511,12 +2911,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           </defs>
 
           <g transform={`translate(${panOffset.x}, ${panOffset.y}) scale(${zoomLevel})`}>
-            {/* Render Relationships (behind entities) */}
-          {relationships.map((relationship) => (
-            <RelationshipComponent key={relationship.id} relationship={relationship} />
-          ))}
-
-          {/* Render Entities and Annotations */}
+            {/* Render Entities and Annotations (behind relationships) */}
           {entities.map((entity) => {
             if (entity.type === 'entity') {
               return <EntityComponent key={entity.id} entity={entity} selectedAttribute={selectedAttribute} />;
@@ -2525,6 +2920,11 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
             }
             return null;
           })}
+
+            {/* Render Relationships (in front of entities) */}
+          {relationships.map((relationship) => (
+            <RelationshipComponent key={relationship.id} relationship={relationship} />
+          ))}
           </g>
         </svg>
       </div>
@@ -2621,6 +3021,8 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           onZoomOut={handleZoomOut}
           onZoomFit={handleZoomFit}
           zoomLevel={zoomLevel}
+          handleToggleHandTool={handleToggleHandTool}
+          isHandToolActive={isHandToolActive}
         />
         <MiniMap isDark={isDark} />
 
@@ -2628,9 +3030,14 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
         <svg
           className="absolute inset-0 w-full h-full"
           style={{
-            cursor: isDrawingMode ? 'crosshair' : 'default'
+            cursor: isHandToolActive ? 'grab' : isPanning ? 'grabbing' : isDrawingMode ? 'crosshair' : 'default'
           }}
           onClick={handleCanvasClick}
+          onWheel={handleWheel}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseMove={handleCanvasMouseMove}
+          onMouseUp={handleCanvasMouseUp}
+          onMouseLeave={handleCanvasMouseUp}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
@@ -2651,12 +3058,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           </defs>
 
           <g transform={`translate(${panOffset.x}, ${panOffset.y}) scale(${zoomLevel})`}>
-            {/* Render Relationships (behind entities) */}
-          {relationships.map((relationship) => (
-            <RelationshipComponent key={relationship.id} relationship={relationship} />
-          ))}
-
-          {/* Render Entities and Annotations */}
+            {/* Render Entities and Annotations (behind relationships) */}
           {entities.map((entity) => {
             if (entity.type === 'entity') {
               return <EntityComponent key={entity.id} entity={entity} selectedAttribute={selectedAttribute} />;
@@ -2665,6 +3067,11 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
             }
             return null;
           })}
+
+            {/* Render Relationships (in front of entities) */}
+          {relationships.map((relationship) => (
+            <RelationshipComponent key={relationship.id} relationship={relationship} />
+          ))}
           </g>
         </svg>
       </div>

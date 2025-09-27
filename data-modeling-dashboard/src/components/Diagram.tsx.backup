@@ -27,8 +27,6 @@ import {
   Unlock,
   Copy,
   Trash2,
-  PlusCircle,
-  MinusCircle,
   Edit3,
   Save,
   Folder,
@@ -225,30 +223,14 @@ const ViewToolbarButton = ({ icon: Icon, tooltip, isDark, onClick }: { icon: any
 };
 
 // View Controls Toolbar Component
-const ViewControlsToolbar = ({
-  isDark,
-  onToggleFullScreen,
-  isFullScreen,
-  onZoomIn,
-  onZoomOut,
-  onZoomFit,
-  zoomLevel
-}: {
-  isDark: boolean;
-  onToggleFullScreen: () => void;
-  isFullScreen: boolean;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onZoomFit: () => void;
-  zoomLevel: number;
-}) => {
+const ViewControlsToolbar = ({ isDark, onToggleFullScreen, isFullScreen }: { isDark: boolean; onToggleFullScreen: () => void; isFullScreen: boolean }) => {
   return (
     <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-1 p-1.5 rounded-xl shadow-lg backdrop-blur-sm border ${
       isDark ? 'bg-zinc-800/90 border-zinc-700' : 'bg-white/90 border-gray-200'
     }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <ViewToolbarButton icon={ZoomIn} tooltip="Zoom In" isDark={isDark} onClick={onZoomIn} />
-      <ViewToolbarButton icon={ZoomOut} tooltip="Zoom Out" isDark={isDark} onClick={onZoomOut} />
-      <ViewToolbarButton icon={Maximize2} tooltip="Fit to Screen" isDark={isDark} onClick={onZoomFit} />
+      <ViewToolbarButton icon={ZoomIn} tooltip="Zoom In" isDark={isDark} />
+      <ViewToolbarButton icon={ZoomOut} tooltip="Zoom Out" isDark={isDark} />
+      <ViewToolbarButton icon={Maximize2} tooltip="Fit to Screen" isDark={isDark} />
       <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
       <ViewToolbarButton icon={Hand} tooltip="Pan/Hand Tool" isDark={isDark} />
       <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`} />
@@ -309,10 +291,8 @@ const ModelTree = ({
   relationships = [],
   selectedEntity,
   selectedRelationship,
-  selectedAttribute,
   onSelectEntity,
-  onSelectRelationship,
-  onSelectAttribute
+  onSelectRelationship
 }: {
   isDark: boolean;
   onClose?: () => void;
@@ -320,12 +300,10 @@ const ModelTree = ({
   relationships?: Relationship[];
   selectedEntity?: string | null;
   selectedRelationship?: string | null;
-  selectedAttribute?: { entityId: string; attributeName: string } | null;
   onSelectEntity?: (entityId: string | null) => void;
   onSelectRelationship?: (relationshipId: string | null) => void;
-  onSelectAttribute?: (selection: { entityId: string; attributeName: string } | null) => void;
 }) => {
-  const [expandedNodes, setExpandedNodes] = useState<string[]>(['model1', 'entities', 'relationships', 'domains', 'views', 'indexes']);
+  const [expandedNodes, setExpandedNodes] = useState<string[]>(['model1', 'entities', 'relationships']);
 
   const toggleNode = (nodeId: string) => {
     setExpandedNodes(prev =>
@@ -417,91 +395,25 @@ const ModelTree = ({
                     </div>
                   ) : (
                     entities.filter(e => e.type === 'entity').map((entity) => (
-                      <div key={entity.id}>
-                        {/* Entity Header */}
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => toggleNode(entity.id)}
-                            className={`p-0.5 rounded hover:scale-105 transition-all duration-200 ${
-                              isDark ? 'hover:bg-zinc-800 text-gray-400' : 'hover:bg-gray-100 text-gray-600'
-                            }`}
-                          >
-                            {expandedNodes.includes(entity.id) ? (
-                              <ChevronDown className="w-3 h-3" />
-                            ) : (
-                              <ChevronRight className="w-3 h-3" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => onSelectEntity?.(entity.id)}
-                            className={`flex-1 flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
-                              selectedEntity === entity.id
-                                ? isDark
-                                  ? 'bg-indigo-600 text-white'
-                                  : 'bg-indigo-100 text-indigo-800'
-                                : isDark
-                                ? 'hover:bg-zinc-800 text-gray-300'
-                                : 'hover:bg-gray-100 text-gray-700'
-                            }`}
-                          >
-                            <Table className="w-3.5 h-3.5 text-green-500" />
-                            <span className="truncate">{entity.name}</span>
-                            <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                              {entity.attributes?.length || 0}
-                            </span>
-                          </button>
-                        </div>
-
-                        {/* Entity Attributes */}
-                        {expandedNodes.includes(entity.id) && entity.attributes && (
-                          <div className="ml-4 mt-1 space-y-0.5">
-                            {entity.attributes.map((attribute, index) => (
-                              <button
-                                key={`${entity.id}-${attribute.name}`}
-                                onClick={() => onSelectAttribute?.({ entityId: entity.id, attributeName: attribute.name })}
-                                className={`w-full flex items-center gap-1 p-1 rounded text-xs hover:scale-[1.01] transition-all duration-200 ${
-                                  selectedAttribute?.entityId === entity.id && selectedAttribute?.attributeName === attribute.name
-                                    ? isDark
-                                      ? 'bg-amber-600 text-white'
-                                      : 'bg-amber-100 text-amber-800'
-                                    : isDark
-                                    ? 'hover:bg-zinc-800 text-gray-400'
-                                    : 'hover:bg-gray-100 text-gray-600'
-                                }`}
-                              >
-                                {/* Attribute Icons */}
-                                {attribute.isPrimaryKey && (
-                                  <Key className="w-3 h-3 text-yellow-500" />
-                                )}
-                                {attribute.isForeignKey && (
-                                  <Link className="w-3 h-3 text-blue-500" />
-                                )}
-                                {attribute.isUnique && !attribute.isPrimaryKey && (
-                                  <div className="w-3 h-3 flex items-center justify-center">
-                                    <div className="w-2 h-2 border border-purple-500 rounded-full" />
-                                  </div>
-                                )}
-
-                                {/* Attribute Name */}
-                                <span className="truncate">{attribute.name}</span>
-
-                                {/* Attribute Type */}
-                                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                                  {attribute.type}
-                                </span>
-
-                                {/* Nullability Indicator */}
-                                {attribute.allowNull === false && (
-                                  <div className="w-2 h-2 bg-red-500 rounded-full" title="Not Null" />
-                                )}
-                                {attribute.allowNull === true && (
-                                  <div className="w-2 h-2 border border-green-500 rounded-full" title="Allows Null" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <button
+                        key={entity.id}
+                        onClick={() => onSelectEntity?.(entity.id)}
+                        className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
+                          selectedEntity === entity.id
+                            ? isDark
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-indigo-100 text-indigo-800'
+                            : isDark
+                            ? 'hover:bg-zinc-800 text-gray-300'
+                            : 'hover:bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        <Table className="w-3.5 h-3.5 text-green-500" />
+                        <span className="truncate">{entity.name}</span>
+                        <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                          {entity.attributes?.length || 0}
+                        </span>
+                      </button>
                     ))
                   )}
                 </div>
@@ -564,190 +476,6 @@ const ModelTree = ({
                   )}
                 </div>
               )}
-
-              {/* Domains Section */}
-              <button
-                onClick={() => toggleNode('domains')}
-                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
-                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {expandedNodes.includes('domains') ? (
-                  <ChevronDown className="w-3 h-3" />
-                ) : (
-                  <ChevronRight className="w-3 h-3" />
-                )}
-                <Box className="w-3.5 h-3.5 text-teal-500" />
-                <span>Domains</span>
-                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                  4
-                </span>
-              </button>
-
-              {expandedNodes.includes('domains') && (
-                <div className="ml-3">
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Target className="w-3.5 h-3.5 text-teal-400" />
-                    <span>EmailDomain</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Target className="w-3.5 h-3.5 text-teal-400" />
-                    <span>PhoneDomain</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Target className="w-3.5 h-3.5 text-teal-400" />
-                    <span>CurrencyDomain</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Target className="w-3.5 h-3.5 text-teal-400" />
-                    <span>DateTimeDomain</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Views Section */}
-              <button
-                onClick={() => toggleNode('views')}
-                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
-                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {expandedNodes.includes('views') ? (
-                  <ChevronDown className="w-3 h-3" />
-                ) : (
-                  <ChevronRight className="w-3 h-3" />
-                )}
-                <Eye className="w-3.5 h-3.5 text-cyan-500" />
-                <span>Views</span>
-                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                  3
-                </span>
-              </button>
-
-              {expandedNodes.includes('views') && (
-                <div className="ml-3">
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Eye className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>CustomerOrdersView</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Eye className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>ProductSalesView</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Eye className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>InventoryStatusView</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Indexes Section */}
-              <button
-                onClick={() => toggleNode('indexes')}
-                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
-                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {expandedNodes.includes('indexes') ? (
-                  <ChevronDown className="w-3 h-3" />
-                ) : (
-                  <ChevronRight className="w-3 h-3" />
-                )}
-                <Activity className="w-3.5 h-3.5 text-orange-500" />
-                <span>Indexes</span>
-                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                  6
-                </span>
-              </button>
-
-              {expandedNodes.includes('indexes') && (
-                <div className="ml-3">
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Activity className="w-3.5 h-3.5 text-orange-400" />
-                    <span>idx_customer_email</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Activity className="w-3.5 h-3.5 text-orange-400" />
-                    <span>idx_product_sku</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Activity className="w-3.5 h-3.5 text-orange-400" />
-                    <span>idx_order_date</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Activity className="w-3.5 h-3.5 text-orange-400" />
-                    <span>idx_category_name</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Activity className="w-3.5 h-3.5 text-orange-400" />
-                    <span>idx_payment_status</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Activity className="w-3.5 h-3.5 text-orange-400" />
-                    <span>idx_inventory_level</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Procedures Section */}
-              <button
-                onClick={() => toggleNode('procedures')}
-                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
-                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {expandedNodes.includes('procedures') ? (
-                  <ChevronDown className="w-3 h-3" />
-                ) : (
-                  <ChevronRight className="w-3 h-3" />
-                )}
-                <Zap className="w-3.5 h-3.5 text-yellow-500" />
-                <span>Procedures</span>
-                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                  2
-                </span>
-              </button>
-
-              {expandedNodes.includes('procedures') && (
-                <div className="ml-3">
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Zap className="w-3.5 h-3.5 text-yellow-400" />
-                    <span>sp_ProcessOrder</span>
-                  </div>
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Zap className="w-3.5 h-3.5 text-yellow-400" />
-                    <span>sp_UpdateInventory</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Triggers Section */}
-              <button
-                onClick={() => toggleNode('triggers')}
-                className={`w-full flex items-center gap-1 p-1.5 rounded-lg hover:scale-[1.02] transition-all duration-200 ${
-                  isDark ? 'hover:bg-zinc-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {expandedNodes.includes('triggers') ? (
-                  <ChevronDown className="w-3 h-3" />
-                ) : (
-                  <ChevronRight className="w-3 h-3" />
-                )}
-                <Activity className="w-3.5 h-3.5 text-red-500" />
-                <span>Triggers</span>
-                <span className={`ml-auto text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                  1
-                </span>
-              </button>
-
-              {expandedNodes.includes('triggers') && (
-                <div className="ml-3">
-                  <div className={`p-1.5 flex items-center gap-1 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <Activity className="w-3.5 h-3.5 text-red-400" />
-                    <span>trg_audit_changes</span>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -765,9 +493,7 @@ const PropertiesPanel = ({
   entities,
   relationships,
   onUpdateEntity,
-  onUpdateRelationship,
-  onAddEntity,
-  onRemoveEntity
+  onUpdateRelationship
 }: {
   isDark: boolean;
   onClose?: () => void;
@@ -777,77 +503,495 @@ const PropertiesPanel = ({
   relationships?: Relationship[];
   onUpdateEntity?: (entityId: string, updates: Partial<CanvasEntity>) => void;
   onUpdateRelationship?: (relationshipId: string, updates: Partial<Relationship>) => void;
-  onAddEntity?: () => void;
-  onRemoveEntity?: (entityId: string) => void;
 }) => {
-  const [activeTab, setActiveTab] = useState('general');
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [activePropertyTab, setActivePropertyTab] = React.useState('general');
 
-  const renderContent = () => {
-    if (selectedEntity) {
-      // Entity Properties - Erwin-style tabs
-      const currentEntity = entities?.find(e => e.id === selectedEntity);
-      const entityTabs = [
-        { id: 'general', label: 'General', icon: FileText },
-        { id: 'attributes', label: 'Attributes', icon: Table },
-        { id: 'display', label: 'Display', icon: Eye },
-        { id: 'keys', label: 'Keys', icon: Key },
-        { id: 'data', label: 'Data', icon: Database },
-        { id: 'relations', label: 'Relations', icon: GitBranch },
-        { id: 'rules', label: 'Rules', icon: Settings },
-        { id: 'advanced', label: 'Advanced', icon: Settings }
-      ];
+  const entity = entities?.find(e => e.id === selectedEntity);
+  const relationship = relationships?.find(r => r.id === selectedRelationship);
+  const selectedObject = selectedEntity ? 'entity' : selectedRelationship ? 'relationship' : 'model';
 
-      return (
+  // Property tabs configuration
+  const propertyTabs = [
+    {
+      id: 'general',
+      label: 'General Properties',
+      icon: <Settings className="w-4 h-4 text-gray-500" />,
+      type: 'tab',
+    },
+    {
+      id: 'display',
+      label: 'Display Options',
+      icon: <Eye className="w-4 h-4 text-gray-500" />,
+      type: 'tab',
+    },
+    {
+      id: 'keys',
+      label: 'Keys & Indexes',
+      icon: <Key className="w-4 h-4 text-gray-500" />,
+      type: 'tab',
+    },
+    {
+      id: 'data',
+      label: 'Data Properties',
+      icon: <Database className="w-4 h-4 text-gray-500" />,
+      type: 'tab',
+    },
+  ];
+
+  // Premium Input Component
+  const PremiumInput = ({ label, value, type = 'text', placeholder = '', rows }: {
+    label: string;
+    value: string;
+    type?: string;
+    placeholder?: string;
+    rows?: number;
+  }) => (
+    <div className="mb-4">
+      <label className={`block text-xs font-medium mb-2 ${
+        isDark ? 'text-gray-300' : 'text-gray-700'
+      }`} style={{ fontWeight: 500 }}>
+        {label}
+      </label>
+      {rows ? (
+        <textarea
+          value={value}
+          placeholder={placeholder}
+          rows={rows}
+          className={`w-full px-4 py-3 text-sm border rounded-lg resize-none transition-all duration-200 ${
+            isDark
+              ? 'bg-zinc-800 border-zinc-700 text-gray-100 focus:border-indigo-500 focus:bg-zinc-750'
+              : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
+          } focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm hover:border-gray-400`}
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          className={`w-full px-4 py-3 text-sm border rounded-lg transition-all duration-200 ${
+            isDark
+              ? 'bg-zinc-800 border-zinc-700 text-gray-100 focus:border-indigo-500'
+              : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
+          } focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm hover:border-gray-400`}
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        />
+      )}
+    </div>
+  );
+
+  // Premium Select Component
+  const PremiumSelect = ({ label, value, options }: {
+    label: string;
+    value: string;
+    options: { value: string; label: string }[];
+  }) => (
+    <div className="mb-4">
+      <label className={`block text-xs font-medium mb-2 ${
+        isDark ? 'text-gray-300' : 'text-gray-700'
+      }`} style={{ fontWeight: 500 }}>
+        {label}
+      </label>
+      <select
+        value={value}
+        className={`w-full px-4 py-3 text-sm border rounded-lg transition-all duration-200 ${
+          isDark
+            ? 'bg-zinc-800 border-zinc-700 text-gray-100 focus:border-indigo-500'
+            : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
+        } focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm hover:border-gray-400`}
+        style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+      >
+        {options.map(option => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+    </div>
+  );
+
+  // Premium Checkbox Component
+  const PremiumCheckbox = ({ label, checked = false }: {
+    label: string;
+    checked?: boolean;
+  }) => (
+    <label className={`flex items-center gap-3 text-sm cursor-pointer py-2 ${
+      isDark ? 'text-gray-300 hover:text-gray-100' : 'text-gray-700 hover:text-gray-900'
+    } transition-colors`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <input
+        type="checkbox"
+        checked={checked}
+        className={`w-4 h-4 rounded border-2 transition-colors ${
+          isDark
+            ? 'border-zinc-600 bg-zinc-800 checked:bg-indigo-500 checked:border-indigo-500'
+            : 'border-gray-300 bg-white checked:bg-indigo-600 checked:border-indigo-600'
+        }`}
+        style={{ accentColor: isDark ? '#818CF8' : '#6366F1' }}
+      />
+      {label}
+    </label>
+  );
+
+  return (
+    <div className={`${isCollapsed ? 'w-12' : 'w-96'} border-l transition-all duration-300 ${
+      isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
+    }`}>
+      {/* Header with Collapse Toggle Button */}
+      <div className={`h-8 border-b flex items-center justify-between px-3 ${
+        isDark ? 'border-zinc-800' : 'border-gray-200'
+      }`}>
+        {!isCollapsed && (
+          <h3 className={`text-xs font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`} style={{ fontWeight: 600 }}>
+            Properties
+          </h3>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`p-1 rounded transition-all duration-200 ${
+            isDark ? 'hover:bg-zinc-800 text-gray-400 hover:text-gray-200' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
+          }`}
+          title={isCollapsed ? 'Expand Properties' : 'Collapse Properties'}
+        >
+          {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5 rotate-90" />}
+        </button>
+      </div>
+      {!isCollapsed && (
         <div className="flex h-full">
           {/* Left Icon Strip */}
           <div className={`w-6 border-r transition-colors flex flex-col ${
             isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
           }`}>
-            {entityTabs.map((tab) => (
-              <div
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`h-8 flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? `${isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white'} shadow-sm`
-                    : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-indigo-50/50'}`
-                }`}
-                title={tab.label}
-                style={{ marginBottom: '1px' }}
-              >
-                <div className="w-3.5 h-3.5">
-                  <tab.icon className="w-3.5 h-3.5" />
+        {propertyTabs.map((tab) => (
+          <div
+            key={tab.id}
+            onClick={() => setActivePropertyTab(tab.id)}
+            className={`h-8 flex items-center justify-center cursor-pointer transition-all duration-200 ${
+              activePropertyTab === tab.id
+                ? `${isDark ? 'bg-indigo-500 text-white' : 'bg-indigo-600 text-white'} shadow-sm`
+                : `${isDark ? 'text-gray-400 hover:text-gray-100 hover:bg-zinc-800/50' : 'text-gray-600 hover:text-gray-900 hover:bg-indigo-50/50'}`
+            }`}
+            title={tab.label}
+            style={{ marginBottom: '1px' }}
+          >
+            <div className="w-3.5 h-3.5">{React.cloneElement(tab.icon as React.ReactElement, { className: 'w-3.5 h-3.5' })}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Main Content Area */}
+      <div className={`flex-1 overflow-y-auto transition-colors ${
+        isDark ? 'bg-zinc-900' : 'bg-white'
+      }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        {/* Context Header */}
+        <div className={`p-3 border-b transition-colors ${
+          isDark ? 'border-zinc-800 bg-zinc-900' : 'border-gray-200 bg-gray-50'
+        }`}>
+          <div className="flex items-center gap-2">
+            {propertyTabs.find(tab => tab.id === activePropertyTab)?.icon &&
+              React.cloneElement(propertyTabs.find(tab => tab.id === activePropertyTab)!.icon as React.ReactElement, {
+                className: `w-4 h-4 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`
+              })
+            }
+            <h2 className={`text-sm font-semibold ${
+              isDark ? 'text-gray-100' : 'text-gray-900'
+            }`} style={{ fontWeight: 600 }}>
+              {selectedObject === 'entity' ? entity?.name : selectedObject === 'relationship' ? relationship?.id : 'Model'}
+            </h2>
+          </div>
+          <p className={`text-xs mt-0.5 ${
+            isDark ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            {propertyTabs.find(tab => tab.id === activePropertyTab)?.label} - {selectedObject === 'entity' ? 'Entity' : selectedObject === 'relationship' ? 'Relationship' : 'Model'}
+          </p>
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-4">
+          {activePropertyTab === 'general' && (
+            selectedObject === 'entity' && entity ? (
+              <div className="space-y-4">
+                <PremiumInput label="Name" value={entity.name || ''} />
+                <PremiumInput label="Physical Name" value={entity.name?.toUpperCase() || ''} />
+                <PremiumInput
+                  label="Definition"
+                  value={`${entity.name} entity storing business information`}
+                  rows={4}
+                />
+                <PremiumSelect
+                  label="Owner"
+                  value="dbo"
+                  options={[
+                    { value: 'dbo', label: 'dbo' },
+                    { value: 'admin', label: 'admin' },
+                    { value: 'app_user', label: 'app_user' }
+                  ]}
+                />
+                <div className="space-y-2">
+                  <PremiumCheckbox label="Complete" checked />
+                  <PremiumCheckbox label="Conceptual Only" />
+                  <PremiumCheckbox label="Generate in forward engineering" checked />
+                  <PremiumCheckbox label="Include in impact analysis" checked />
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Main Content Area */}
-          <div className={`flex-1 overflow-y-auto transition-colors ${
-            isDark ? 'bg-zinc-900' : 'bg-white'
-          }`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-            {/* Context Header */}
-            <div className={`p-3 border-b transition-colors ${
-              isDark ? 'border-zinc-800 bg-zinc-900' : 'border-gray-200 bg-gray-50'
-            }`}>
-              <div className="flex items-center gap-2">
-                {entityTabs.find(tab => tab.id === activeTab)?.icon &&
-                  React.createElement(entityTabs.find(tab => tab.id === activeTab)!.icon, {
-                    className: `w-4 h-4 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`
-                  })
-                }
-                <h2 className={`text-sm font-semibold ${
-                  isDark ? 'text-gray-100' : 'text-gray-900'
-                }`} style={{ fontWeight: 600 }}>
-                  {entityTabs.find(t => t.id === activeTab)?.label} Properties
-                </h2>
+            ) : selectedObject === 'relationship' && relationship ? (
+              <div className="space-y-4">
+                <PremiumInput label="Name" value={relationship.name || `${relationship.type}_relationship`} />
+                <PremiumSelect
+                  label="Type"
+                  value={relationship.type}
+                  options={[
+                    { value: 'identifying', label: 'Identifying' },
+                    { value: 'non-identifying', label: 'Non-Identifying' }
+                  ]}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <PremiumSelect
+                    label="Source Cardinality"
+                    value={relationship.sourceCardinality}
+                    options={[
+                      { value: '1', label: 'One' },
+                      { value: 'M', label: 'Many' }
+                    ]}
+                  />
+                  <PremiumSelect
+                    label="Target Cardinality"
+                    value={relationship.targetCardinality}
+                    options={[
+                      { value: '1', label: 'One' },
+                      { value: 'M', label: 'Many' }
+                    ]}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <PremiumCheckbox label="Generate foreign key" checked />
+                  <PremiumCheckbox label="Create index" checked />
+                </div>
               </div>
-              <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            ) : (
+              <div className="space-y-4">
+                <PremiumInput label="Model Name" value="E-Commerce Data Model" />
+                <PremiumInput label="Version" value="1.0" />
+                <PremiumInput
+                  label="Description"
+                  value="Comprehensive data model for e-commerce platform"
+                  rows={3}
+                />
+                <PremiumSelect
+                  label="Database Type"
+                  value="postgresql"
+                  options={[
+                    { value: 'postgresql', label: 'PostgreSQL' },
+                    { value: 'mysql', label: 'MySQL' },
+                    { value: 'sqlserver', label: 'SQL Server' },
+                    { value: 'oracle', label: 'Oracle' }
+                  ]}
+                />
+              </div>
+            )
+          )}
+
+          {activePropertyTab === 'display' && (
+            <div className="space-y-4">
+              <PremiumSelect
+                label="Color"
+                value="blue"
+                options={[
+                  { value: 'blue', label: '🔵 Blue' },
+                  { value: 'green', label: '🟢 Green' },
+                  { value: 'red', label: '🔴 Red' },
+                  { value: 'purple', label: '🟣 Purple' },
+                  { value: 'orange', label: '🟠 Orange' }
+                ]}
+              />
+              <PremiumSelect
+                label="Font Size"
+                value="medium"
+                options={[
+                  { value: 'small', label: 'Small' },
+                  { value: 'medium', label: 'Medium' },
+                  { value: 'large', label: 'Large' }
+                ]}
+              />
+              <div className="space-y-2">
+                <PremiumCheckbox label="Show in diagram" checked />
+                <PremiumCheckbox label="Show entity name" checked />
+                <PremiumCheckbox label="Show definition" />
+                <PremiumCheckbox label="Show attributes" checked />
+                <PremiumCheckbox label="Show data types" />
+                <PremiumCheckbox label="Show constraints" checked />
+              </div>
+            </div>
+          )}
+
+          {activePropertyTab === 'keys' && (
+            <div className="space-y-4">
+              <div className={`p-4 rounded-lg border ${
+                isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
+              }`}>
+                <h4 className={`text-sm font-medium mb-3 ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}>Primary Key</h4>
+                <PremiumInput label="Key Name" value={entity?.name ? `PK_${entity.name}` : 'PK_Entity'} />
+                <div className={`flex items-center gap-2 p-2 rounded border mb-3 ${
+                  isDark ? 'bg-zinc-700 border-zinc-600' : 'bg-white border-gray-300'
+                }`}>
+                  <Key className="w-4 h-4 text-yellow-500" />
+                  <span className={`text-sm ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>id</span>
+                </div>
+                <div className="space-y-2">
+                  <PremiumCheckbox label="Generate constraint" checked />
+                  <PremiumCheckbox label="Create index" checked />
+                  <PremiumCheckbox label="Clustered index" />
+                </div>
+              </div>
+
+              <div className={`p-4 rounded-lg border ${
+                isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
+              }`}>
+                <h4 className={`text-sm font-medium mb-3 ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}>Foreign Keys</h4>
+                <div className="space-y-2">
+                  <div className={`flex items-center gap-2 p-2 rounded border ${
+                    isDark ? 'bg-zinc-700 border-zinc-600' : 'bg-white border-gray-300'
+                  }`}>
+                    <Link className="w-4 h-4 text-blue-500" />
+                    <span className={`text-sm ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>FK_{entity?.name || 'Entity'}_Reference</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activePropertyTab === 'data' && (
+            selectedObject === 'entity' ? (
+              <div className="space-y-4">
+                <h4 className={`text-sm font-medium mb-3 ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}>Attribute Properties</h4>
+                <PremiumSelect
+                  label="Domain"
+                  value="string"
+                  options={[
+                    { value: 'string', label: 'String' },
+                    { value: 'integer', label: 'Integer' },
+                    { value: 'decimal', label: 'Decimal' },
+                    { value: 'date', label: 'Date' },
+                    { value: 'boolean', label: 'Boolean' }
+                  ]}
+                />
+                <div className="grid grid-cols-3 gap-4">
+                  <PremiumInput label="Length" value="255" />
+                  <PremiumInput label="Precision" value="" />
+                  <PremiumInput label="Scale" value="" />
+                </div>
+                <PremiumCheckbox label="Use domain settings" checked />
+
+                <div className="mt-6">
+                  <h4 className={`text-sm font-medium mb-3 ${
+                    isDark ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Null Options</h4>
+                  <div className="space-y-2">
+                    <label className={`flex items-center gap-3 text-sm cursor-pointer ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      <input type="radio" name="nullability" value="null" className={`${
+                        isDark ? 'accent-indigo-400' : 'accent-indigo-600'
+                      }`} />
+                      Null
+                    </label>
+                    <label className={`flex items-center gap-3 text-sm cursor-pointer ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      <input type="radio" name="nullability" value="not-null" checked className={`${
+                        isDark ? 'accent-indigo-400' : 'accent-indigo-600'
+                      }`} />
+                      Not Null
+                    </label>
+                    <label className={`flex items-center gap-3 text-sm cursor-pointer ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      <input type="radio" name="nullability" value="default-null" className={`${
+                        isDark ? 'accent-indigo-400' : 'accent-indigo-600'
+                      }`} />
+                      Default Null
+                    </label>
+                  </div>
+                </div>
+
+                <PremiumInput label="Default Value" value="" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h4 className={`text-sm font-medium ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}>Model Statistics</h4>
+                <div className={`p-4 rounded-lg border ${
+                  isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-gray-50 border-gray-200'
+                }`}>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Entities:</span>
+                      <span className={`ml-2 font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{entities?.length || 0}</span>
+                    </div>
+                    <div>
+                      <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Relationships:</span>
+                      <span className={`ml-2 font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{relationships?.length || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          )}
+        </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Canvas Entity Interface
+interface CanvasEntity {
+  id: string;
+  type: 'entity' | 'annotation';
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  attributes?: Array<{ name: string; type: string; isPrimaryKey?: boolean; isForeignKey?: boolean; }>;
+  text?: string; // For annotations
+}
+
+interface Relationship {
+  id: string;
+  type: 'identifying' | 'non-identifying';
+  sourceEntityId: string;
+  targetEntityId: string;
+  sourceCardinality: '1' | 'M';
+  targetCardinality: '1' | 'M';
+  name?: string;
+}
+
+// Main Diagram Component
+const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
+
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showTreePanel, setShowTreePanel] = useState(true);
+  const [showPropertiesPanel, setShowPropertiesPanel] = useState(true);
+  const [entities, setEntities] = useState<CanvasEntity[]>([]);
+  const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
+  const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
+              <h3 className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {currentEntity?.name || selectedEntity}
+              </h3>
+              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                {entityTabs.find(t => t.id === activeTab)?.label} Properties
               </p>
             </div>
 
-            <div className="p-3 space-y-3">
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
             {activeTab === 'general' && (
               <div className="space-y-2">
                 <div>
@@ -870,7 +1014,11 @@ const PropertiesPanel = ({
                   </label>
                   <textarea
                     rows={2}
-                    className={`w-full p-1.5 text-xs rounded border ${isDark ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    className={`w-full p-1.5 text-xs rounded border ${
+                      isDark
+                        ? 'bg-zinc-800 border-zinc-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Entity definition..."
                   />
                 </div>
@@ -880,268 +1028,6 @@ const PropertiesPanel = ({
                     Abstract Entity
                   </label>
                 </div>
-
-                {/* Entity Management Actions */}
-                <div className={`border-t pt-3 space-y-2 ${isDark ? 'border-zinc-700' : 'border-gray-200'}`}>
-                  <label className={`block text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Entity Actions
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={onAddEntity}
-                      className={`flex items-center gap-2 px-3 py-2 text-xs rounded-md transition-colors ${
-                        isDark
-                          ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                          : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                      }`}
-                    >
-                      <PlusCircle className="w-3 h-3" />
-                      Add New Entity
-                    </button>
-                    <button
-                      onClick={() => selectedEntity && onRemoveEntity?.(selectedEntity)}
-                      className={`flex items-center gap-2 px-3 py-2 text-xs rounded-md transition-colors ${
-                        isDark
-                          ? 'bg-red-600 hover:bg-red-700 text-white'
-                          : 'bg-red-600 hover:bg-red-700 text-white'
-                      }`}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Remove Entity
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'attributes' && (
-              <div className="space-y-3">
-                {/* Header with attribute count and quick actions */}
-                <div className="flex items-center justify-between">
-                  <h4 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Attributes ({currentEntity?.attributes?.length || 0})
-                  </h4>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => {
-                        if (!currentEntity || !onUpdateEntity) return;
-                        const newAttributes = [...(currentEntity.attributes || [])];
-                        newAttributes.push({
-                          name: 'id',
-                          type: 'INT',
-                          isPrimaryKey: true,
-                          isForeignKey: false,
-                          isRequired: true
-                        });
-                        onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                      }}
-                      className={`px-2 py-1 text-xs rounded ${
-                        isDark ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
-                      }`}
-                      title="Add Primary Key"
-                    >
-                      Add PK
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (!currentEntity || !onUpdateEntity) return;
-                        const newAttributes = [...(currentEntity.attributes || [])];
-                        newAttributes.push(
-                          {
-                            name: 'created_at',
-                            type: 'TIMESTAMP',
-                            isPrimaryKey: false,
-                            isForeignKey: false,
-                            isRequired: true
-                          },
-                          {
-                            name: 'updated_at',
-                            type: 'TIMESTAMP',
-                            isPrimaryKey: false,
-                            isForeignKey: false,
-                            isRequired: true
-                          }
-                        );
-                        onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                      }}
-                      className={`px-2 py-1 text-xs rounded ${
-                        isDark ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
-                      }`}
-                      title="Add Timestamps"
-                    >
-                      Add TS
-                    </button>
-                  </div>
-                </div>
-
-                {/* Add attribute button */}
-                <button
-                  onClick={() => {
-                    if (!currentEntity || !onUpdateEntity) return;
-                    const newAttributes = [...(currentEntity.attributes || [])];
-                    newAttributes.push({
-                      name: 'new_attribute',
-                      type: 'VARCHAR(255)',
-                      isPrimaryKey: false,
-                      isForeignKey: false,
-                      isRequired: false
-                    });
-                    onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                  }}
-                  className={`w-full flex items-center justify-center gap-2 py-2 px-3 rounded border border-dashed ${
-                    isDark
-                      ? 'border-zinc-600 hover:border-zinc-500 text-gray-300 hover:bg-zinc-700/50'
-                      : 'border-gray-300 hover:border-gray-400 text-gray-600 hover:bg-gray-50'
-                  } transition-colors duration-200`}
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  Add Attribute
-                </button>
-
-                {/* Attributes table */}
-                {currentEntity?.attributes && currentEntity.attributes.length > 0 ? (
-                  <div className={`border rounded-lg overflow-hidden ${isDark ? 'border-zinc-600' : 'border-gray-300'}`}>
-                    {/* Table header */}
-                    <div className={`grid grid-cols-7 gap-1 p-2 text-xs font-medium ${
-                      isDark ? 'bg-zinc-700 text-gray-300' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      <div className="col-span-2">Name</div>
-                      <div>Type</div>
-                      <div className="text-center">PK</div>
-                      <div className="text-center">FK</div>
-                      <div className="text-center">Req</div>
-                      <div className="text-center">Del</div>
-                    </div>
-
-                    {/* Table body */}
-                    <div className="divide-y divide-gray-200 dark:divide-zinc-600">
-                      {currentEntity.attributes.map((attr, index) => (
-                        <div key={index} className={`grid grid-cols-7 gap-1 p-2 items-center ${
-                          isDark ? 'bg-zinc-800' : 'bg-white'
-                        }`}>
-                          {/* Attribute name */}
-                          <div className="col-span-2">
-                            <input
-                              type="text"
-                              value={attr.name}
-                              onChange={(e) => {
-                                if (!currentEntity || !onUpdateEntity) return;
-                                const newAttributes = [...(currentEntity.attributes || [])];
-                                newAttributes[index] = { ...attr, name: e.target.value };
-                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                              }}
-                              className={`w-full px-2 py-1 text-xs rounded border ${
-                                isDark
-                                  ? 'bg-zinc-700 border-zinc-600 text-gray-300 focus:border-blue-500'
-                                  : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
-                              } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                            />
-                          </div>
-
-                          {/* Attribute type */}
-                          <div>
-                            <select
-                              value={attr.type}
-                              onChange={(e) => {
-                                if (!currentEntity || !onUpdateEntity) return;
-                                const newAttributes = [...(currentEntity.attributes || [])];
-                                newAttributes[index] = { ...attr, type: e.target.value };
-                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                              }}
-                              className={`w-full px-1 py-1 text-xs rounded border ${
-                                isDark
-                                  ? 'bg-zinc-700 border-zinc-600 text-gray-300 focus:border-blue-500'
-                                  : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
-                              } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                            >
-                              <option value="INT">INT</option>
-                              <option value="BIGINT">BIGINT</option>
-                              <option value="VARCHAR(255)">VARCHAR(255)</option>
-                              <option value="VARCHAR(100)">VARCHAR(100)</option>
-                              <option value="VARCHAR(50)">VARCHAR(50)</option>
-                              <option value="TEXT">TEXT</option>
-                              <option value="DATE">DATE</option>
-                              <option value="TIMESTAMP">TIMESTAMP</option>
-                              <option value="BOOLEAN">BOOLEAN</option>
-                              <option value="DECIMAL(10,2)">DECIMAL(10,2)</option>
-                              <option value="FLOAT">FLOAT</option>
-                              <option value="DOUBLE">DOUBLE</option>
-                              <option value="CHAR(3)">CHAR(3)</option>
-                              <option value="JSON">JSON</option>
-                            </select>
-                          </div>
-
-                          {/* Primary Key checkbox */}
-                          <div className="text-center">
-                            <input
-                              type="checkbox"
-                              checked={attr.isPrimaryKey || false}
-                              onChange={(e) => {
-                                if (!currentEntity || !onUpdateEntity) return;
-                                const newAttributes = [...(currentEntity.attributes || [])];
-                                newAttributes[index] = { ...attr, isPrimaryKey: e.target.checked };
-                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                              }}
-                              className={`rounded ${isDark ? 'text-blue-400 focus:ring-blue-400' : 'text-blue-600 focus:ring-blue-600'}`}
-                            />
-                          </div>
-
-                          {/* Foreign Key checkbox */}
-                          <div className="text-center">
-                            <input
-                              type="checkbox"
-                              checked={attr.isForeignKey || false}
-                              onChange={(e) => {
-                                if (!currentEntity || !onUpdateEntity) return;
-                                const newAttributes = [...(currentEntity.attributes || [])];
-                                newAttributes[index] = { ...attr, isForeignKey: e.target.checked };
-                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                              }}
-                              className={`rounded ${isDark ? 'text-yellow-400 focus:ring-yellow-400' : 'text-yellow-600 focus:ring-yellow-600'}`}
-                            />
-                          </div>
-
-                          {/* Required checkbox */}
-                          <div className="text-center">
-                            <input
-                              type="checkbox"
-                              checked={attr.isRequired || false}
-                              onChange={(e) => {
-                                if (!currentEntity || !onUpdateEntity) return;
-                                const newAttributes = [...(currentEntity.attributes || [])];
-                                newAttributes[index] = { ...attr, isRequired: e.target.checked };
-                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                              }}
-                              className={`rounded ${isDark ? 'text-red-400 focus:ring-red-400' : 'text-red-600 focus:ring-red-600'}`}
-                            />
-                          </div>
-
-                          {/* Delete button */}
-                          <div className="text-center">
-                            <button
-                              onClick={() => {
-                                if (!currentEntity || !onUpdateEntity) return;
-                                const newAttributes = [...(currentEntity.attributes || [])];
-                                newAttributes.splice(index, 1);
-                                onUpdateEntity(currentEntity.id, { attributes: newAttributes });
-                              }}
-                              className={`p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 ${isDark ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-600'}`}
-                              title="Delete attribute"
-                            >
-                              <MinusCircle className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className={`text-center py-8 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                    <Table className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No attributes defined</p>
-                    <p className="text-xs mt-1">Click "Add Attribute" to get started</p>
-                  </div>
-                )}
               </div>
             )}
 
@@ -1290,7 +1176,11 @@ const PropertiesPanel = ({
                   </label>
                   <textarea
                     rows={2}
-                    className={`w-full p-1.5 text-xs rounded border ${isDark ? 'bg-zinc-800 border-zinc-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    className={`w-full p-1.5 text-xs rounded border ${
+                      isDark
+                        ? 'bg-zinc-800 border-zinc-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
                     placeholder="Entity definition..."
                   />
                 </div>
@@ -1667,9 +1557,8 @@ interface CanvasEntity {
   y: number;
   width: number;
   height: number;
-  attributes?: Array<{ name: string; type: string; isPrimaryKey?: boolean; isForeignKey?: boolean; isRequired?: boolean; }>;
+  attributes?: Array<{ name: string; type: string; isPrimaryKey?: boolean; isForeignKey?: boolean; }>;
   text?: string; // For annotations
-  category?: 'standard' | 'lookup' | 'view' | 'junction'; // Entity categories for color coding
 }
 
 interface Relationship {
@@ -1688,90 +1577,10 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showTreePanel, setShowTreePanel] = useState(true);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(true);
-
-  // Zoom and Pan state
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-
-  const [entities, setEntities] = useState<CanvasEntity[]>([
-    {
-      id: 'sample-customer',
-      type: 'entity',
-      name: 'Customer',
-      x: 100,
-      y: 100,
-      width: 220,
-      height: 180,
-      attributes: [
-        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isRequired: true },
-        { name: 'first_name', type: 'VARCHAR(50)', isRequired: true },
-        { name: 'last_name', type: 'VARCHAR(50)', isRequired: true },
-        { name: 'email', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'phone', type: 'VARCHAR(20)' },
-        { name: 'created_at', type: 'TIMESTAMP', isRequired: true },
-      ]
-    },
-    {
-      id: 'sample-country',
-      type: 'entity',
-      name: 'Country',
-      x: 400,
-      y: 100,
-      width: 200,
-      height: 120,
-      attributes: [
-        { name: 'country_id', type: 'INT', isPrimaryKey: true, isRequired: true },
-        { name: 'country_name', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'country_code', type: 'CHAR(3)', isRequired: true },
-        { name: 'is_active', type: 'BOOLEAN', isRequired: true },
-      ]
-    },
-    {
-      id: 'sample-order-summary',
-      type: 'entity',
-      name: 'OrderSummaryView',
-      x: 700,
-      y: 100,
-      width: 240,
-      height: 140,
-      attributes: [
-        { name: 'order_id', type: 'INT', isRequired: true },
-        { name: 'customer_name', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'order_date', type: 'DATE', isRequired: true },
-        { name: 'total_amount', type: 'DECIMAL(10,2)', isRequired: true },
-        { name: 'order_status', type: 'VARCHAR(20)', isRequired: true },
-      ]
-    },
-    {
-      id: 'sample-customer-orders',
-      type: 'entity',
-      name: 'CustomerOrders',
-      x: 400,
-      y: 300,
-      width: 200,
-      height: 120,
-      attributes: [
-        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
-        { name: 'order_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
-        { name: 'order_date', type: 'TIMESTAMP', isRequired: true },
-        { name: 'relationship_type', type: 'VARCHAR(20)' },
-      ]
-    }
-  ]);
-  const [relationships, setRelationships] = useState<Relationship[]>([
-    {
-      id: 'rel-customer-orders',
-      type: 'identifying',
-      sourceEntityId: 'sample-customer',
-      targetEntityId: 'sample-customer-orders',
-      sourceCardinality: '1',
-      targetCardinality: 'M',
-      name: 'customer_places_orders'
-    }
-  ]);
+  const [entities, setEntities] = useState<CanvasEntity[]>([]);
+  const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
   const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
-  const [selectedAttribute, setSelectedAttribute] = useState<{ entityId: string; attributeName: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDrawingMode, setIsDrawingMode] = useState<'entity' | 'annotation' | 'identifying' | 'non-identifying' | null>(null);
@@ -1779,35 +1588,6 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   // Relationship creation state
   const [relationshipSourceId, setRelationshipSourceId] = useState<string | null>(null);
   const [relationshipType, setRelationshipType] = useState<'identifying' | 'non-identifying' | null>(null);
-
-  // Entity Management Functions
-  const handleAddEntity = () => {
-    const newEntity: CanvasEntity = {
-      id: `entity-${Date.now()}`,
-      type: 'entity',
-      name: 'NewEntity',
-      x: 300,
-      y: 300,
-      width: 200,
-      height: 100,
-      attributes: [
-        { name: 'id', type: 'INT', isPrimaryKey: true, isRequired: true }
-      ]
-    };
-
-    setEntities(prev => [...prev, newEntity]);
-    setSelectedEntity(newEntity.id);
-  };
-
-  const handleRemoveEntity = (entityId: string) => {
-    setEntities(prev => prev.filter(e => e.id !== entityId));
-    setRelationships(prev => prev.filter(r =>
-      r.sourceEntityId !== entityId && r.targetEntityId !== entityId
-    ));
-    if (selectedEntity === entityId) {
-      setSelectedEntity(null);
-    }
-  };
 
   const handleToggleFullScreen = () => {
     setIsFullScreen(!isFullScreen);
@@ -1819,21 +1599,6 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
 
   const togglePropertiesPanel = () => {
     setShowPropertiesPanel(!showPropertiesPanel);
-  };
-
-  // Zoom Functions
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev * 1.2, 3)); // Max zoom 300%
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev / 1.2, 0.1)); // Min zoom 10%
-  };
-
-  const handleZoomFit = () => {
-    // Simple zoom fit to 100% and center
-    setZoomLevel(1);
-    setPanOffset({ x: 0, y: 0 });
   };
 
   // Handle tool selection
@@ -1867,13 +1632,11 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
         name: `Entity${entities.length + 1}`,
         x: x - 100,
         y: y - 60,
-        width: 220,
-        height: 140,
+        width: 200,
+        height: 120,
         attributes: [
-          { name: 'id', type: 'INT', isPrimaryKey: true, isRequired: true },
-          { name: 'name', type: 'VARCHAR(255)', isRequired: true },
-          { name: 'email', type: 'VARCHAR(100)' },
-          { name: 'created_at', type: 'TIMESTAMP', isRequired: true },
+          { name: 'id', type: 'INT', isPrimaryKey: true },
+          { name: 'name', type: 'VARCHAR(255)' },
         ]
       };
       setEntities([...entities, newEntity]);
@@ -1989,78 +1752,53 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
 
 
   // Render Entity Component
-  const EntityComponent = ({ entity, selectedAttribute }: { entity: CanvasEntity; selectedAttribute?: { entityId: string; attributeName: string } | null }) => {
+  const EntityComponent = ({ entity }: { entity: CanvasEntity }) => {
     const isSelected = selectedEntity === entity.id;
     const isRelationshipSource = relationshipSourceId === entity.id;
-    const [isHovered, setIsHovered] = useState(false);
-
-    const headerHeight = 40;
-    const attributeRowHeight = 24;
-
-    // Separate PK and non-PK attributes
-    const pkAttributes = entity.attributes?.filter(attr => attr.isPrimaryKey) || [];
-    const nonPkAttributes = entity.attributes?.filter(attr => !attr.isPrimaryKey) || [];
-    const hasPrimaryKeys = pkAttributes.length > 0;
-
     return (
       <g
         className="cursor-move"
         onMouseDown={(e) => handleEntityMouseDown(e as any, entity.id)}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={() => handleEntityClick(entity.id)}
       >
-        {/* Entity Shadow */}
-        <rect
-          x={entity.x + 2}
-          y={entity.y + 2}
-          width={entity.width}
-          height={entity.height}
-          rx={6}
-          className="fill-black fill-opacity-10"
-        />
-
-        {/* Entity Main Box */}
+        {/* Entity Box */}
         <rect
           x={entity.x}
           y={entity.y}
           width={entity.width}
           height={entity.height}
-          rx={6}
+          rx={8}
           className={`transition-all duration-200 ${
             isSelected
               ? isDark
-                ? 'fill-zinc-800 stroke-indigo-400'
-                : 'fill-white stroke-indigo-500'
+                ? 'fill-zinc-700 stroke-indigo-400 stroke-2'
+                : 'fill-white stroke-indigo-500 stroke-2'
               : isRelationshipSource
               ? isDark
-                ? 'fill-zinc-800 stroke-green-400'
-                : 'fill-white stroke-green-500'
+                ? 'fill-zinc-700 stroke-green-400 stroke-2'
+                : 'fill-white stroke-green-500 stroke-2'
               : isDark
-              ? 'fill-zinc-800 stroke-zinc-700 hover:stroke-zinc-600'
-              : 'fill-white stroke-gray-300 hover:stroke-gray-400'
+              ? 'fill-zinc-800 stroke-zinc-600 stroke-1 hover:stroke-zinc-500'
+              : 'fill-white stroke-gray-300 stroke-1 hover:stroke-gray-400'
           }`}
-          strokeWidth={isSelected || isRelationshipSource ? "2" : "1"}
+          filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))"
         />
 
-        {/* Entity Header Background */}
+        {/* Entity Header */}
         <rect
           x={entity.x}
           y={entity.y}
           width={entity.width}
-          height={headerHeight}
-          rx={6}
+          height={35}
+          rx={8}
           className={`${
-            isDark ? 'fill-zinc-700' : 'fill-indigo-50'
+            isDark ? 'fill-zinc-700' : 'fill-gray-50'
           }`}
         />
-
-        {/* Header bottom border */}
         <line
           x1={entity.x}
-          y1={entity.y + headerHeight}
+          y1={entity.y + 35}
           x2={entity.x + entity.width}
-          y2={entity.y + headerHeight}
+          y2={entity.y + 35}
           className={`${isDark ? 'stroke-zinc-600' : 'stroke-gray-300'}`}
           strokeWidth={1}
         />
@@ -2068,228 +1806,58 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
         {/* Entity Name */}
         <text
           x={entity.x + entity.width / 2}
-          y={entity.y + 25}
+          y={entity.y + 22}
           textAnchor="middle"
-          className={`text-sm font-bold ${isDark ? 'fill-white' : 'fill-gray-900'}`}
-          style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px' }}
+          className={`text-sm font-semibold ${isDark ? 'fill-gray-100' : 'fill-gray-900'}`}
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           {entity.name}
         </text>
 
-        {/* Primary Key Attributes Section */}
-        {pkAttributes.map((attr, index) => {
-          const yPos = entity.y + headerHeight + 8 + index * attributeRowHeight;
-          const isEvenRow = index % 2 === 0;
-          const isAttributeSelected = selectedAttribute?.entityId === entity.id && selectedAttribute?.attributeName === attr.name;
-
-          return (
-            <g key={`pk-${index}`}>
-              {/* Alternating row background with selection highlighting */}
-              <rect
-                x={entity.x + 1}
-                y={yPos - 4}
-                width={entity.width - 2}
-                height={attributeRowHeight}
-                fill={isAttributeSelected
-                  ? isDark ? '#f59e0b' : '#fbbf24'
-                  : isEvenRow
-                  ? 'transparent'
-                  : isDark ? '#27272a' : '#fafafa'}
-                className={isAttributeSelected ? "opacity-30" : "opacity-50"}
-              />
-
-              {/* Primary Key Icon - small key symbol */}
-              <path
-                d={`M ${entity.x + 10} ${yPos + 8}
-                    l 0 -2
-                    a 3 3 0 1 1 6 0
-                    l 0 2
-                    l -1 0
-                    l 0 4
-                    l -1 0
-                    l 0 -2
-                    l -1 0
-                    l 0 2
-                    l -1 0
-                    l 0 -4
-                    z`}
-                fill="#fbbf24"
-                strokeWidth={0.5}
-                stroke="#f59e0b"
-              />
-
-              {/* Attribute name */}
-              <text
-                x={entity.x + 24}
-                y={yPos + 12}
-                className={`text-xs font-semibold ${isDark ? 'fill-gray-100' : 'fill-gray-900'}`}
-                style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '11px' }}
-              >
-                {attr.name}
-              </text>
-
-              {/* Data type */}
-              <text
-                x={entity.x + entity.width - 8}
-                y={yPos + 12}
-                textAnchor="end"
-                className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
-                style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
-              >
-                {attr.type}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Separator line between PK and non-PK */}
-        {hasPrimaryKeys && nonPkAttributes.length > 0 && (
-          <line
-            x1={entity.x + 5}
-            y1={entity.y + headerHeight + 8 + pkAttributes.length * attributeRowHeight}
-            x2={entity.x + entity.width - 5}
-            y2={entity.y + headerHeight + 8 + pkAttributes.length * attributeRowHeight}
-            className={`${isDark ? 'stroke-zinc-600' : 'stroke-gray-300'}`}
-            strokeWidth={1}
-            strokeDasharray="2,2"
-          />
-        )}
-
-        {/* Non-Primary Key Attributes Section */}
-        {nonPkAttributes.map((attr, index) => {
-          const pkSectionHeight = hasPrimaryKeys ? (pkAttributes.length * attributeRowHeight + 8) : 0;
-          const yPos = entity.y + headerHeight + 8 + pkSectionHeight + index * attributeRowHeight;
-          const isEvenRow = index % 2 === 0;
-          const isAttributeSelected = selectedAttribute?.entityId === entity.id && selectedAttribute?.attributeName === attr.name;
-
-          return (
-            <g key={`non-pk-${index}`}>
-              {/* Alternating row background with selection highlighting */}
-              <rect
-                x={entity.x + 1}
-                y={yPos - 4}
-                width={entity.width - 2}
-                height={attributeRowHeight}
-                fill={isAttributeSelected
-                  ? isDark ? '#f59e0b' : '#fbbf24'
-                  : isEvenRow
-                  ? 'transparent'
-                  : isDark ? '#27272a' : '#fafafa'}
-                className={isAttributeSelected ? "opacity-30" : "opacity-50"}
-              />
-
-              {/* Foreign Key Icon */}
-              {attr.isForeignKey && (
-                <g>
-                  {/* Link icon for foreign key */}
-                  <path
-                    d={`M ${entity.x + 10} ${yPos + 10}
-                        a 2 2 0 0 1 2 -2
-                        l 2 0
-                        a 2 2 0 0 1 0 4
-                        l -2 0
-                        a 2 2 0 0 1 -2 -2
-                        m 3 -1
-                        l 2 0
-                        a 2 2 0 0 1 0 4
-                        l -2 0`}
-                    fill="none"
-                    stroke="#3b82f6"
-                    strokeWidth={1.2}
-                  />
-                </g>
+        {/* Attributes */}
+        {entity.attributes?.map((attr, index) => (
+          <g key={index}>
+            <text
+              x={entity.x + 12}
+              y={entity.y + 55 + index * 20}
+              className={`text-xs ${isDark ? 'fill-gray-300' : 'fill-gray-700'}`}
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+            >
+              {attr.isPrimaryKey && (
+                <>
+                  <tspan className="fill-yellow-500">🔑 </tspan>
+                </>
               )}
-
-              {/* Required indicator */}
-              {attr.isRequired && !attr.isForeignKey && (
-                <circle
-                  cx={entity.x + 12}
-                  cy={yPos + 10}
-                  r={2}
-                  fill="#ef4444"
-                />
+              {attr.isForeignKey && !attr.isPrimaryKey && (
+                <>
+                  <tspan className="fill-blue-500">🔗 </tspan>
+                </>
               )}
-
-              {/* Attribute name */}
-              <text
-                x={entity.x + (attr.isForeignKey || attr.isRequired ? 24 : 12)}
-                y={yPos + 12}
-                className={`text-xs ${isDark ? 'fill-gray-200' : 'fill-gray-800'}`}
-                style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '11px' }}
-              >
-                {attr.name}
-              </text>
-
-              {/* Data type */}
-              <text
-                x={entity.x + entity.width - 8}
-                y={yPos + 12}
-                textAnchor="end"
-                className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
-                style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
-              >
-                {attr.type}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Connection Points (visible on hover) */}
-        {isHovered && (
-          <g className="opacity-60">
-            {/* Top connection point */}
-            <circle
-              cx={entity.x + entity.width / 2}
-              cy={entity.y}
-              r={3}
-              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
-            />
-            {/* Bottom connection point */}
-            <circle
-              cx={entity.x + entity.width / 2}
-              cy={entity.y + entity.height}
-              r={3}
-              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
-            />
-            {/* Left connection point */}
-            <circle
-              cx={entity.x}
-              cy={entity.y + entity.height / 2}
-              r={3}
-              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
-            />
-            {/* Right connection point */}
-            <circle
-              cx={entity.x + entity.width}
-              cy={entity.y + entity.height / 2}
-              r={3}
-              className={`${isDark ? 'fill-zinc-400' : 'fill-gray-500'} cursor-crosshair`}
-            />
+              <tspan>{attr.name}</tspan>
+              <tspan className={`${isDark ? 'fill-gray-500' : 'fill-gray-500'}`}> : {attr.type}</tspan>
+            </text>
           </g>
-        )}
+        ))}
 
         {/* Delete Button (when selected) */}
         {isSelected && (
-          <g>
-            <circle
-              cx={entity.x + entity.width - 12}
-              cy={entity.y + 12}
-              r={8}
-              className="fill-red-500 hover:fill-red-600 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteEntity(entity.id);
-              }}
-            />
-            <text
-              x={entity.x + entity.width - 12}
-              y={entity.y + 16}
-              textAnchor="middle"
-              className="fill-white text-xs cursor-pointer pointer-events-none font-bold"
-            >
-              ×
-            </text>
-          </g>
+          <circle
+            cx={entity.x + entity.width - 10}
+            cy={entity.y + 10}
+            r={8}
+            className="fill-red-500 hover:fill-red-600 cursor-pointer"
+            onClick={() => deleteEntity(entity.id)}
+          />
+        )}
+        {isSelected && (
+          <text
+            x={entity.x + entity.width - 10}
+            y={entity.y + 14}
+            textAnchor="middle"
+            className="fill-white text-xs cursor-pointer pointer-events-none"
+          >
+            ×
+          </text>
         )}
       </g>
     );
@@ -2447,15 +2015,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           isDrawingMode={isDrawingMode}
           onSelectTool={handleToolSelection}
         />
-        <ViewControlsToolbar
-          isDark={isDark}
-          onToggleFullScreen={handleToggleFullScreen}
-          isFullScreen={isFullScreen}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onZoomFit={handleZoomFit}
-          zoomLevel={zoomLevel}
-        />
+        <ViewControlsToolbar isDark={isDark} onToggleFullScreen={handleToggleFullScreen} isFullScreen={isFullScreen} />
         <MiniMap isDark={isDark} />
 
         {/* Tool Status Indicator */}
@@ -2510,8 +2070,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
             </marker>
           </defs>
 
-          <g transform={`translate(${panOffset.x}, ${panOffset.y}) scale(${zoomLevel})`}>
-            {/* Render Relationships (behind entities) */}
+          {/* Render Relationships (behind entities) */}
           {relationships.map((relationship) => (
             <RelationshipComponent key={relationship.id} relationship={relationship} />
           ))}
@@ -2519,13 +2078,12 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           {/* Render Entities and Annotations */}
           {entities.map((entity) => {
             if (entity.type === 'entity') {
-              return <EntityComponent key={entity.id} entity={entity} selectedAttribute={selectedAttribute} />;
+              return <EntityComponent key={entity.id} entity={entity} />;
             } else if (entity.type === 'annotation') {
               return <AnnotationComponent key={entity.id} entity={entity} />;
             }
             return null;
           })}
-          </g>
         </svg>
       </div>
     );
@@ -2544,10 +2102,8 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           relationships={relationships}
           selectedEntity={selectedEntity}
           selectedRelationship={selectedRelationship}
-          selectedAttribute={selectedAttribute}
           onSelectEntity={setSelectedEntity}
           onSelectRelationship={setSelectedRelationship}
-          onSelectAttribute={setSelectedAttribute}
         />
       )}
 
@@ -2564,18 +2120,20 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           }}
         />
 
-        {/* Model Explorer Toggle Button - Always visible */}
-        {!showTreePanel && (
-          <button
-            onClick={toggleTreePanel}
-            className={`fixed left-6 top-1/2 transform -translate-y-1/2 z-50 p-2.5 rounded-r-xl shadow-lg backdrop-blur-sm border border-l-0 ${
-              isDark ? 'bg-zinc-800/90 border-zinc-700 text-gray-300 hover:bg-zinc-700' : 'bg-white/90 border-gray-200 text-gray-600 hover:bg-gray-100'
-            } hover:translate-x-1 transition-all duration-200`}
-            title="Show Model Explorer"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        )}
+        {/* Panel Toggle Buttons */}
+        <div className={`absolute top-6 left-6 z-10 flex gap-2`}>
+          {!showTreePanel && (
+            <button
+              onClick={toggleTreePanel}
+              className={`p-2.5 rounded-xl shadow-lg backdrop-blur-sm border ${
+                isDark ? 'bg-zinc-800/90 border-zinc-700 text-gray-300 hover:bg-zinc-700' : 'bg-white/90 border-gray-200 text-gray-600 hover:bg-gray-100'
+              } hover:scale-105 transition-all duration-200`}
+              title="Show Tree Panel"
+            >
+              <PanelLeftOpen className="w-4 h-4" />
+            </button>
+          )}
+        </div>
 
         <div className={`absolute top-6 right-6 z-10 flex gap-2`}>
           {!showPropertiesPanel && (
@@ -2613,15 +2171,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           isDrawingMode={isDrawingMode}
           onSelectTool={handleToolSelection}
         />
-        <ViewControlsToolbar
-          isDark={isDark}
-          onToggleFullScreen={handleToggleFullScreen}
-          isFullScreen={isFullScreen}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onZoomFit={handleZoomFit}
-          zoomLevel={zoomLevel}
-        />
+        <ViewControlsToolbar isDark={isDark} onToggleFullScreen={handleToggleFullScreen} isFullScreen={isFullScreen} />
         <MiniMap isDark={isDark} />
 
         {/* Canvas Content */}
@@ -2650,8 +2200,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
             </marker>
           </defs>
 
-          <g transform={`translate(${panOffset.x}, ${panOffset.y}) scale(${zoomLevel})`}>
-            {/* Render Relationships (behind entities) */}
+          {/* Render Relationships (behind entities) */}
           {relationships.map((relationship) => (
             <RelationshipComponent key={relationship.id} relationship={relationship} />
           ))}
@@ -2659,13 +2208,12 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           {/* Render Entities and Annotations */}
           {entities.map((entity) => {
             if (entity.type === 'entity') {
-              return <EntityComponent key={entity.id} entity={entity} selectedAttribute={selectedAttribute} />;
+              return <EntityComponent key={entity.id} entity={entity} />;
             } else if (entity.type === 'annotation') {
               return <AnnotationComponent key={entity.id} entity={entity} />;
             }
             return null;
           })}
-          </g>
         </svg>
       </div>
 
@@ -2684,8 +2232,6 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           onUpdateRelationship={(relationshipId, updates) => {
             setRelationships(relationships.map(r => r.id === relationshipId ? {...r, ...updates} : r));
           }}
-          onAddEntity={handleAddEntity}
-          onRemoveEntity={handleRemoveEntity}
         />
       )}
     </div>

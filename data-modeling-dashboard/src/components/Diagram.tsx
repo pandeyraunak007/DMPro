@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   ChevronDown,
@@ -1577,11 +1577,19 @@ interface CanvasEntity {
   id: string;
   type: 'entity' | 'annotation';
   name: string;
+  physicalName?: string; // Database table name
   x: number;
   y: number;
   width: number;
   height: number;
-  attributes?: Array<{ name: string; type: string; isPrimaryKey?: boolean; isForeignKey?: boolean; isRequired?: boolean; }>;
+  attributes?: Array<{
+    name: string;
+    physicalName?: string; // Database column name
+    type: string;
+    isPrimaryKey?: boolean;
+    isForeignKey?: boolean;
+    isRequired?: boolean;
+  }>;
   text?: string; // For annotations
   category?: 'standard' | 'lookup' | 'view' | 'junction'; // Entity categories for color coding
 }
@@ -1602,68 +1610,75 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showTreePanel, setShowTreePanel] = useState(true);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(true);
+  const [viewMode, setViewMode] = useState<'logical' | 'physical'>('logical');
+  const [showViewModeDropdown, setShowViewModeDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [entities, setEntities] = useState<CanvasEntity[]>([
     {
       id: 'sample-customer',
       type: 'entity',
       name: 'Customer',
+      physicalName: 'customers',
       x: 100,
       y: 100,
       width: 220,
       height: 180,
       attributes: [
-        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isRequired: true },
-        { name: 'first_name', type: 'VARCHAR(50)', isRequired: true },
-        { name: 'last_name', type: 'VARCHAR(50)', isRequired: true },
-        { name: 'email', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'phone', type: 'VARCHAR(20)' },
-        { name: 'created_at', type: 'TIMESTAMP', isRequired: true },
+        { name: 'Customer ID', physicalName: 'customer_id', type: 'INT', isPrimaryKey: true, isRequired: true },
+        { name: 'First Name', physicalName: 'first_name', type: 'VARCHAR(50)', isRequired: true },
+        { name: 'Last Name', physicalName: 'last_name', type: 'VARCHAR(50)', isRequired: true },
+        { name: 'Email Address', physicalName: 'email', type: 'VARCHAR(100)', isRequired: true },
+        { name: 'Phone Number', physicalName: 'phone', type: 'VARCHAR(20)' },
+        { name: 'Created Date', physicalName: 'created_at', type: 'TIMESTAMP', isRequired: true },
       ]
     },
     {
       id: 'sample-country',
       type: 'entity',
       name: 'Country',
+      physicalName: 'countries',
       x: 400,
       y: 100,
       width: 200,
       height: 120,
       attributes: [
-        { name: 'country_id', type: 'INT', isPrimaryKey: true, isRequired: true },
-        { name: 'country_name', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'country_code', type: 'CHAR(3)', isRequired: true },
-        { name: 'is_active', type: 'BOOLEAN', isRequired: true },
+        { name: 'Country ID', physicalName: 'country_id', type: 'INT', isPrimaryKey: true, isRequired: true },
+        { name: 'Country Name', physicalName: 'country_name', type: 'VARCHAR(100)', isRequired: true },
+        { name: 'Country Code', physicalName: 'country_code', type: 'CHAR(3)', isRequired: true },
+        { name: 'Is Active', physicalName: 'is_active', type: 'BOOLEAN', isRequired: true },
       ]
     },
     {
       id: 'sample-order-summary',
       type: 'entity',
-      name: 'OrderSummaryView',
+      name: 'Order Summary View',
+      physicalName: 'vw_order_summary',
       x: 700,
       y: 100,
       width: 240,
       height: 140,
       attributes: [
-        { name: 'order_id', type: 'INT', isRequired: true },
-        { name: 'customer_name', type: 'VARCHAR(100)', isRequired: true },
-        { name: 'order_date', type: 'DATE', isRequired: true },
-        { name: 'total_amount', type: 'DECIMAL(10,2)', isRequired: true },
-        { name: 'order_status', type: 'VARCHAR(20)', isRequired: true },
+        { name: 'Order ID', physicalName: 'order_id', type: 'INT', isRequired: true },
+        { name: 'Customer Name', physicalName: 'customer_name', type: 'VARCHAR(100)', isRequired: true },
+        { name: 'Order Date', physicalName: 'order_date', type: 'DATE', isRequired: true },
+        { name: 'Total Amount', physicalName: 'total_amount', type: 'DECIMAL(10,2)', isRequired: true },
+        { name: 'Order Status', physicalName: 'order_status', type: 'VARCHAR(20)', isRequired: true },
       ]
     },
     {
       id: 'sample-customer-orders',
       type: 'entity',
-      name: 'CustomerOrders',
+      name: 'Customer Orders',
+      physicalName: 'customer_orders',
       x: 400,
       y: 300,
       width: 200,
       height: 120,
       attributes: [
-        { name: 'customer_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
-        { name: 'order_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
-        { name: 'order_date', type: 'TIMESTAMP', isRequired: true },
-        { name: 'relationship_type', type: 'VARCHAR(20)' },
+        { name: 'Customer ID', physicalName: 'customer_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
+        { name: 'Order ID', physicalName: 'order_id', type: 'INT', isPrimaryKey: true, isForeignKey: true, isRequired: true },
+        { name: 'Order Date', physicalName: 'order_date', type: 'TIMESTAMP', isRequired: true },
+        { name: 'Relationship Type', physicalName: 'relationship_type', type: 'VARCHAR(20)' },
       ]
     }
   ]);
@@ -1687,6 +1702,20 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
   // Relationship creation state
   const [relationshipSourceId, setRelationshipSourceId] = useState<string | null>(null);
   const [relationshipType, setRelationshipType] = useState<'identifying' | 'non-identifying' | null>(null);
+
+  // Handle click outside dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowViewModeDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Entity Management Functions
   const handleAddEntity = () => {
@@ -1882,7 +1911,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
 
 
   // Render Entity Component
-  const EntityComponent = ({ entity }: { entity: CanvasEntity }) => {
+  const EntityComponent = ({ entity, viewMode: currentViewMode }: { entity: CanvasEntity; viewMode: 'logical' | 'physical' }) => {
     const isSelected = selectedEntity === entity.id;
     const isRelationshipSource = relationshipSourceId === entity.id;
     const [isHovered, setIsHovered] = useState(false);
@@ -1966,7 +1995,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           className={`text-sm font-bold ${isDark ? 'fill-white' : 'fill-gray-900'}`}
           style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px' }}
         >
-          {entity.name}
+          {currentViewMode === 'logical' ? entity.name : (entity.physicalName || entity.name)}
         </text>
 
         {/* Primary Key Attributes Section */}
@@ -2015,19 +2044,21 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
                 className={`text-xs font-semibold ${isDark ? 'fill-gray-100' : 'fill-gray-900'}`}
                 style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '11px' }}
               >
-                {attr.name}
+                {currentViewMode === 'logical' ? attr.name : (attr.physicalName || attr.name)}
               </text>
 
-              {/* Data type */}
-              <text
-                x={entity.x + entity.width - 8}
-                y={yPos + 12}
-                textAnchor="end"
-                className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
-                style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
-              >
-                {attr.type}
-              </text>
+              {/* Data type - shown only in physical mode */}
+              {currentViewMode === 'physical' && (
+                <text
+                  x={entity.x + entity.width - 8}
+                  y={yPos + 12}
+                  textAnchor="end"
+                  className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
+                  style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
+                >
+                  {attr.type}
+                </text>
+              )}
             </g>
           );
         })}
@@ -2104,19 +2135,21 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
                 className={`text-xs ${isDark ? 'fill-gray-200' : 'fill-gray-800'}`}
                 style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '11px' }}
               >
-                {attr.name}
+                {currentViewMode === 'logical' ? attr.name : (attr.physicalName || attr.name)}
               </text>
 
-              {/* Data type */}
-              <text
-                x={entity.x + entity.width - 8}
-                y={yPos + 12}
-                textAnchor="end"
-                className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
-                style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
-              >
-                {attr.type}
-              </text>
+              {/* Data type - shown only in physical mode */}
+              {currentViewMode === 'physical' && (
+                <text
+                  x={entity.x + entity.width - 8}
+                  y={yPos + 12}
+                  textAnchor="end"
+                  className={`text-xs ${isDark ? 'fill-gray-400' : 'fill-gray-600'}`}
+                  style={{ fontFamily: 'JetBrains Mono, Consolas, monospace', fontSize: '10px' }}
+                >
+                  {attr.type}
+                </text>
+              )}
             </g>
           );
         })}
@@ -2397,7 +2430,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           {/* Render Entities and Annotations */}
           {entities.map((entity) => {
             if (entity.type === 'entity') {
-              return <EntityComponent key={entity.id} entity={entity} />;
+              return <EntityComponent key={entity.id} entity={entity} viewMode={viewMode} />;
             } else if (entity.type === 'annotation') {
               return <AnnotationComponent key={entity.id} entity={entity} />;
             }
@@ -2439,22 +2472,124 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           }}
         />
 
-        {/* Panel Toggle Buttons */}
-        <div className={`absolute top-6 left-6 z-10 flex gap-2`}>
-          {!showTreePanel && (
-            <button
-              onClick={toggleTreePanel}
-              className={`p-2.5 rounded-xl shadow-lg backdrop-blur-sm border ${
-                isDark ? 'bg-zinc-800/90 border-zinc-700 text-gray-300 hover:bg-zinc-700' : 'bg-white/90 border-gray-200 text-gray-600 hover:bg-gray-100'
-              } hover:scale-105 transition-all duration-200`}
-              title="Show Tree Panel"
-            >
+        {/* Always Visible Panel Toggle - Left Edge, Vertically Centered */}
+        <div className={`absolute top-1/2 left-2 -translate-y-1/2 z-20`}>
+          <button
+            onClick={toggleTreePanel}
+            className={`p-2.5 rounded-lg shadow-lg backdrop-blur-sm border ${
+              showTreePanel
+                ? isDark ? 'bg-zinc-700/80 border-zinc-600 text-gray-300 hover:bg-zinc-600' : 'bg-gray-100/80 border-gray-200 text-gray-600 hover:bg-gray-200'
+                : isDark ? 'bg-indigo-600/90 border-indigo-500 text-white hover:bg-indigo-700' : 'bg-indigo-600/90 border-indigo-500 text-white hover:bg-indigo-700'
+            } hover:scale-105 transition-all duration-200`}
+            title={showTreePanel ? "Hide Model Explorer" : "Show Model Explorer"}
+          >
+            {showTreePanel ? (
+              <PanelLeftClose className="w-4 h-4" />
+            ) : (
               <PanelLeftOpen className="w-4 h-4" />
-            </button>
-          )}
+            )}
+          </button>
+        </div>
+
+
+        {/* Always Visible Properties Panel Toggle - Right Edge, Vertically Centered */}
+        <div className={`absolute top-1/2 right-2 -translate-y-1/2 z-20`}>
+          <button
+            onClick={togglePropertiesPanel}
+            className={`p-2.5 rounded-lg shadow-lg backdrop-blur-sm border ${
+              showPropertiesPanel
+                ? isDark ? 'bg-zinc-700/80 border-zinc-600 text-gray-300 hover:bg-zinc-600' : 'bg-gray-100/80 border-gray-200 text-gray-600 hover:bg-gray-200'
+                : isDark ? 'bg-indigo-600/90 border-indigo-500 text-white hover:bg-indigo-700' : 'bg-indigo-600/90 border-indigo-500 text-white hover:bg-indigo-700'
+            } hover:scale-105 transition-all duration-200`}
+            title={showPropertiesPanel ? "Hide Properties Panel" : "Show Properties Panel"}
+          >
+            {showPropertiesPanel ? (
+              <PanelRightClose className="w-4 h-4" />
+            ) : (
+              <PanelRightOpen className="w-4 h-4" />
+            )}
+          </button>
         </div>
 
         <div className={`absolute top-6 right-6 z-10 flex gap-2`}>
+          {/* Logical/Physical View Mode Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => {
+                console.log('Dropdown button clicked, current state:', showViewModeDropdown);
+                setShowViewModeDropdown(!showViewModeDropdown);
+              }}
+              className={`px-3 py-2.5 rounded-xl shadow-lg backdrop-blur-sm border flex items-center gap-2 ${
+                isDark ? 'bg-zinc-800/90 border-zinc-700 text-gray-300 hover:bg-zinc-700' : 'bg-white/90 border-gray-200 text-gray-600 hover:bg-gray-100'
+              } hover:scale-105 transition-all duration-200`}
+              title="Switch View Mode"
+            >
+              <Database className="w-4 h-4" />
+              <span className="text-sm font-medium capitalize">{viewMode}</span>
+              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showViewModeDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showViewModeDropdown && (
+              <div className={`absolute top-full right-0 mt-2 w-48 rounded-xl shadow-xl backdrop-blur-sm border ${
+                isDark ? 'bg-zinc-800/95 border-zinc-700' : 'bg-white/95 border-gray-200'
+              } overflow-hidden z-20`}>
+                <div className={`p-2 border-b ${isDark ? 'border-zinc-700' : 'border-gray-200'}`}>
+                  <p className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    View Mode
+                  </p>
+                </div>
+                <div className="p-1">
+                  <button
+                    onClick={() => {
+                      console.log('Switching to logical mode');
+                      setViewMode('logical');
+                      setShowViewModeDropdown(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                      viewMode === 'logical'
+                        ? isDark ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-700'
+                        : isDark ? 'text-gray-300 hover:bg-zinc-700' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Box className="w-4 h-4" />
+                    <div>
+                      <div className="text-sm font-medium">Logical</div>
+                      <div className={`text-xs ${viewMode === 'logical'
+                        ? isDark ? 'text-indigo-200' : 'text-indigo-600'
+                        : isDark ? 'text-gray-500' : 'text-gray-500'
+                      }`}>
+                        Business view with logical names
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('Switching to physical mode');
+                      setViewMode('physical');
+                      setShowViewModeDropdown(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                      viewMode === 'physical'
+                        ? isDark ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-700'
+                        : isDark ? 'text-gray-300 hover:bg-zinc-700' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Cpu className="w-4 h-4" />
+                    <div>
+                      <div className="text-sm font-medium">Physical</div>
+                      <div className={`text-xs ${viewMode === 'physical'
+                        ? isDark ? 'text-indigo-200' : 'text-indigo-600'
+                        : isDark ? 'text-gray-500' : 'text-gray-500'
+                      }`}>
+                        Database view with technical names
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {!showPropertiesPanel && (
             <button
               onClick={togglePropertiesPanel}
@@ -2527,7 +2662,7 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           {/* Render Entities and Annotations */}
           {entities.map((entity) => {
             if (entity.type === 'entity') {
-              return <EntityComponent key={entity.id} entity={entity} />;
+              return <EntityComponent key={entity.id} entity={entity} viewMode={viewMode} />;
             } else if (entity.type === 'annotation') {
               return <AnnotationComponent key={entity.id} entity={entity} />;
             }

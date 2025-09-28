@@ -198,14 +198,16 @@ const ObjectToolbar = ({
 };
 
 // View Toolbar Button Component
-const ViewToolbarButton = ({ icon: Icon, tooltip, isDark, onClick }: { icon: any; tooltip: string; isDark: boolean; onClick?: () => void }) => {
+const ViewToolbarButton = ({ icon: Icon, tooltip, isDark, onClick, isActive = false }: { icon: any; tooltip: string; isDark: boolean; onClick?: () => void; isActive?: boolean }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
     <div className="relative">
       <button
         className={`p-2.5 rounded-lg hover:scale-105 transition-all duration-200 ${
-          isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+          isActive
+            ? isDark ? 'bg-indigo-600 text-white' : 'bg-indigo-500 text-white'
+            : isDark ? 'hover:bg-zinc-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
         }`}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
@@ -492,7 +494,9 @@ const ModelTree = ({
                                   </div>
                                 )}
                                 {attribute.isIndexed && !attribute.isPrimaryKey && !attribute.isUnique && (
-                                  <Database className="w-3 h-3 text-orange-500" title={`Index: ${attribute.indexType}`} />
+                                  <span title={`Index: ${attribute.indexType}`}>
+                                    <Database className="w-3 h-3 text-orange-500" />
+                                  </span>
                                 )}
 
                                 {/* Attribute Name */}
@@ -2888,11 +2892,15 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           onClick={handleCanvasClick}
           onWheel={handleWheel}
           onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleCanvasMouseMove}
-          onMouseUp={handleCanvasMouseUp}
+          onMouseMove={(e) => {
+            handleCanvasMouseMove(e);
+            handleMouseMove(e);
+          }}
+          onMouseUp={(e) => {
+            handleCanvasMouseUp();
+            handleMouseUp();
+          }}
           onMouseLeave={handleCanvasMouseUp}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
         >
           <defs>
             <marker
@@ -3035,11 +3043,15 @@ const Diagram: React.FC<DiagramProps> = ({ isDark, toggleTheme }) => {
           onClick={handleCanvasClick}
           onWheel={handleWheel}
           onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleCanvasMouseMove}
-          onMouseUp={handleCanvasMouseUp}
+          onMouseMove={(e) => {
+            handleCanvasMouseMove(e);
+            handleMouseMove(e);
+          }}
+          onMouseUp={(e) => {
+            handleCanvasMouseUp();
+            handleMouseUp();
+          }}
           onMouseLeave={handleCanvasMouseUp}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
         >
           <defs>
             <marker
